@@ -1,0 +1,33 @@
+construct_id,dimension_id,construct_name,construct_module
+1,1,Alignment with Business Goals,1
+2,1,Leadership Commitment,2
+3,1,Long-Term Vision,3
+4,1,Resource Allocation,4
+5,2,Data Quality,1
+6,2,Data Accessibility,2
+7,2,Data Governance Framework,3
+8,2,Data Integration,4
+9,3,AI Tools and Platforms,1
+10,3,Scalability,2
+11,3,Cloud vs. On-Premises Solutions,3
+12,3,Integration and Optimization,4
+13,4,AI Skills and Expertise,1
+14,4,Training and Development,2
+15,4,Recruitment and Team Formation,3
+16,4,Cross-Functional Collaboration,4
+17,5,AI Governance and Structure,1
+18,5,Process Integration and Optimization,2
+19,5,Change Management,3
+20,5,AI-Driven Decision Optimization,4
+21,6,Prototyping and Experimentation,1
+22,6,Products and Services,2
+23,6,Speed of Implementation,3
+24,6,Innovation Culture and Leadership,4
+25,7,Tooldropping,1
+26,7,Jobs,2
+27,7,Engagement,3
+28,7,Confidence/Authority,4
+29,8,Ethical AI Framework,1
+30,8,Bias and Fairness,2
+31,8,Transparency and Explainability,3
+32,8,Data Privacy and Security,4

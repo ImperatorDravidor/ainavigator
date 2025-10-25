@@ -1,0 +1,95 @@
+# Milestone 3 — Capability Flow Data Deliverables
+
+**Owner:** Data Science / Engineering  
+**Date:** October 2025  
+**Purpose:**  
+This dataset powers the **Capability Flow** in Milestone 3 (Sections 6.3 – 6.4).  
+It supports backend endpoints, radar and drilldown visualisations, benchmarking, and filters.
+
+---
+
+## Folder Location
+All files are located under:
+/public/data_demo/
+
+---
+
+## Files Overview
+
+| File | Description |
+|------|--------------|
+| `capability_demo.csv` | Main dataset combining all capability scores (8 dimensions × 4 constructs), including synthetic filters (industry, country, continent, role). |
+| `constructs.csv` | Metadata mapping construct → dimension, used for drilldown radar labels and API lookups. |
+| `dimensions.csv` | Metadata for the 8 capability dimensions, used for the top-level radar chart. |
+| `README.md` | Schema and integration guide. |
+
+---
+
+## Data Schema — `capability_demo.csv`
+
+| Column | Description | Example |
+|---------|--------------|----------|
+| `ResponseId_id` | Unique respondent identifier | 0046a5e5 |
+| `dimension_id` | Numeric ID of the capability dimension (1 – 8) | 3 |
+| `dimension` | Name of the capability dimension | Technology |
+| `construct_id` | Numeric ID of the construct (1 – 32) | 9 |
+| `construct` | Name of the construct | Data Architecture |
+| `score` | Numeric score (1 – 5 scale) | 4.2 |
+| `industry_synthetic` | Synthetic industry segment | Manufacturing |
+| `country_synthetic` | Synthetic country (local region) | Netherlands |
+| `continent_synthetic` | Synthetic continent (global region) | Europe |
+| `role_synthetic` | Synthetic organisational role | Leadership |
+
+---
+
+## Backend Endpoint Alignment
+
+| API | Purpose | Uses Columns |
+|-----|----------|--------------|
+| `GET /api/capability/dimensions` | Calculate average/min–max scores per dimension | `dimension`, `score`, filters |
+| `GET /api/capability/constructs/:dimensionId` | Return 4 construct scores for selected dimension | `dimension_id`, `construct`, `score` |
+| `GET /api/benchmark/:industry/:region` | Compare results with synthetic benchmarks | `industry_synthetic`, `continent_synthetic` |
+| `POST /api/capability/summarize` *(optional)* | Generate AI summarisation of open responses | `open_responses.csv` + filters |
+
+---
+
+## Filter System
+
+These columns enable cross-view filtering between sentiment and capability flows:
+
+| Filter | Column | Example |
+|---------|---------|----------|
+| Industry | `industry_synthetic` | Finance |
+| Country (Local) | `country_synthetic` | Netherlands |
+| Continent (Global) | `continent_synthetic` | Europe |
+| Role / Segment | `role_synthetic` | Staff |
+
+---
+
+## Dimensions Overview
+
+| ID | Dimension |
+|----|------------|
+| 1 | Strategy and Vision |
+| 2 | Data |
+| 3 | Technology |
+| 4 | Talent and Skills |
+| 5 | Organisation and Processes |
+| 6 | Innovation |
+| 7 | Adaptation & Adoption |
+| 8 | Ethics and Responsibility |
+
+Each dimension contains 4 constructs → 32 constructs total.
+
+---
+
+## Integration Checklist
+- [x] All scores and filters in English  
+- [x] Synthetic fields stable for demo  
+- [x] Compatible with frontend radar and drilldown components  
+- [x] Benchmark dataset included  
+- [x] Metadata for dimension/construct mapping provided  
+
+---
+
+**Ready for integration into radar visualisations, benchmarking overlay, and capability drilldown views.**
