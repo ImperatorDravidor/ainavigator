@@ -1,0 +1,9 @@
+Real Capability Data Import - 2025-11-03 12:00:02.343595
+================================================================================
+
+Input file: data-foundation/capability_real_wide.csv
+Respondents updated: 2
+Respondents inserted: 0
+Total capability respondents: 0
+
+Status: PARTIAL

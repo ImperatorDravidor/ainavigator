@@ -1,0 +1,104 @@
+
+================================================================================
+🚀 INTERVENTION DATA IMPORT
+================================================================================
+Source: Interventions/0 - Overview of interventions per area.xlsx
+Descriptions: Interventions/*.docx
+Database: https://zxxxsstkzmiughpgwmaw.supabase.co
+
+================================================================================
+📋 Step 1: Importing Interventions
+================================================================================
+  ✓ A1: AI Roadmap Pressure Cooker...
+  ✓ A2: AI Dialectics Sessions...
+  ✓ A3: AI Adoption Playbook Co-Design...
+  ✓ B1: Adoption Challenge...
+  ✓ B2: AI Learning Week...
+  ✓ B3: The Road to AI Adoption...
+  ✓ B4: AI Ambassadors Network...
+  ✓ B5: Playful Nudging Toolkit...
+  ✓ C1: Kickstart with AI...
+  ✓ C2: ROI Retrospective Workshop...
+
+❌ Error inserting interventions: {'message': 'new row violates row-level security policy for table "interventions"', 'code': '42501', 'hint': None, 'details': None}
+
+================================================================================
+📊 Step 2: Importing Sentiment Heatmap Mappings (25 cells)
+================================================================================
+  ✓ L1×C1: B1, B2, C1
+  ✓ L1×C2: B2, B5, A2
+  ✓ L1×C3: B1, B4, C2
+  ✓ L1×C4: B3, B5, A3
+  ✓ L1×C5: B4, B1, A1
+  ✓ L2×C1: B1, B2, A2
+  ✓ L2×C2: B4, B1, C1
+  ✓ L2×C3: B2, B3, A3
+  ✓ L2×C4: B5, B1, A1
+  ✓ L2×C5: B1, B4, C2
+⚠️  Warning: Could not map Level='3 - Trust & Fairness Issues' or Reason='AI is too Autonomous'
+⚠️  Warning: Could not map Level='3 - Trust & Fairness Issues' or Reason='AI is too Inflexible'
+⚠️  Warning: Could not map Level='3 - Trust & Fairness Issues' or Reason='AI is Emotionless'
+⚠️  Warning: Could not map Level='3 - Trust & Fairness Issues' or Reason='AI is too Opaque'
+⚠️  Warning: Could not map Level='3 - Trust & Fairness Issues' or Reason='People Prefer Human Interaction'
+⚠️  Warning: Could not map Level='4 - Career Security & Job Redefinition' or Reason='AI is too Autonomous'
+⚠️  Warning: Could not map Level='4 - Career Security & Job Redefinition' or Reason='AI is too Inflexible'
+⚠️  Warning: Could not map Level='4 - Career Security & Job Redefinition' or Reason='AI is Emotionless'
+⚠️  Warning: Could not map Level='4 - Career Security & Job Redefinition' or Reason='AI is too Opaque'
+⚠️  Warning: Could not map Level='4 - Career Security & Job Redefinition' or Reason='People Prefer Human Interaction'
+⚠️  Warning: Could not map Level='5 - Organisational Stability at Risk' or Reason='AI is too Autonomous'
+⚠️  Warning: Could not map Level='5 - Organisational Stability at Risk' or Reason='AI is too Inflexible'
+⚠️  Warning: Could not map Level='5 - Organisational Stability at Risk' or Reason='AI is Emotionless'
+⚠️  Warning: Could not map Level='5 - Organisational Stability at Risk' or Reason='AI is too Opaque'
+⚠️  Warning: Could not map Level='5 - Organisational Stability at Risk' or Reason='People Prefer Human Interaction'
+
+❌ Error inserting sentiment mappings: {'message': 'new row violates row-level security policy for table "intervention_sentiment_mappings"', 'code': '42501', 'hint': None, 'details': None}
+
+================================================================================
+🔷 Step 3: Importing Capability Dimension Mappings (8 dimensions)
+================================================================================
+  ✓ Dimension 1: 1. Strategy & Vision...
+    → A1, A2, A3
+  ✓ Dimension 2: 2. Data...
+    → A1, C2, A3
+  ✓ Dimension 3: 3. Technology...
+    → C1, C2, B2
+  ✓ Dimension 4: 4. Talent & Skills...
+    → B2, B4, B5
+  ✓ Dimension 5: 5. Organization & Processes...
+    → A3, B3, C2
+  ✓ Dimension 6: 6. Innovation...
+    → C1, B1, B2
+  ✓ Dimension 7: 7. Adaptation & Adoption...
+    → B1, B5, B4
+  ✓ Dimension 8: 8. Ethics & Responsibility...
+    → A2, A3, B3
+
+❌ Error inserting capability mappings: {'message': 'new row violates row-level security policy for table "intervention_capability_mappings"', 'code': '42501', 'hint': None, 'details': None}
+
+================================================================================
+➡️  Step 4: Importing Next Steps / Progression Logic (10 interventions)
+================================================================================
+  ✓ A1 → A2, A3, B1
+  ✓ A2 → A3, B1, C2
+  ✓ A3 → B3, B5, C2
+  ✓ B1 → B4, B5, C2
+  ✓ B2 → B4, B3, C1
+  ✓ B3 → B4, B5, C2
+  ✓ B4 → B5, C2, C1
+  ✓ B5 → C2, B4, B1
+  ✓ C1 → B1, B2, C2
+  ✓ C2 → A1, A3, B1
+
+❌ Error inserting next steps: {'message': 'new row violates row-level security policy for table "intervention_next_steps"', 'code': '42501', 'hint': None, 'details': None}
+
+================================================================================
+🔍 Step 5: Verification
+================================================================================
+  📋 Interventions: 0 (expected: 10)
+  📊 Sentiment mappings: 0 (expected: 25)
+  🔷 Capability mappings: 0 (expected: 8)
+  ➡️  Next steps: 0 (expected: 10)
+
+⚠️  Some counts don't match expected values
+
+❌ Import completed with errors

@@ -40,7 +40,9 @@ import RecommendationsView from '@/components/recommendations/RecommendationsVie
 import ReportsView from '@/components/reports/ReportsView'
 import AIAgentView from '@/components/ai-agent/AIAgentView'
 import InterventionsBrowsePage from '@/components/interventions/InterventionsBrowsePage'
-import { generatePDF } from '@/lib/utils/pdfExport'
+import { generateCompletePDF } from '@/lib/utils/pdfExport-complete'
+import { calculateSentimentHeatmap, getLowestScoringCells } from '@/lib/calculations/sentiment-ranking'
+import { calculateCapabilityAssessment } from '@/lib/calculations/capability-analysis'
 // Skeleton component imported but not actively used in current view
 // import { SkeletonDashboard } from '@/components/ui/skeleton'
 
@@ -118,69 +120,174 @@ export default function AssessmentPage() {
     }
   }, [isLoading])
 
-  // PDF Export handler (defined here to avoid hoisting issues)
+  // PDF Export handler - COMPLETE with all real data
   const handleExportPDF = async () => {
     try {
-      // Show loading notification
-      console.log('Generating PDF report...')
+      toast.loading('Generating comprehensive PDF report...')
       
-      // Prepare data for PDF
+      // Calculate real sentiment analysis
+      const sentimentAnalysis = sentimentData.length > 0 ? 
+        calculateSentimentHeatmap(sentimentData, filters) : null
+      
+      // Calculate real capability assessment
+      const capabilityAnalysis = capabilityData.length > 0 ?
+        calculateCapabilityAssessment(capabilityData, benchmarks, filters) : null
+      
+      // Calculate real readiness score
+      const sentimentScore = sentimentAnalysis?.stats.overallAverage || 3.0
+      const capabilityScore = capabilityAnalysis?.overall.average || 4.0
+      const readinessScore = Math.round(
+        ((sentimentScore / 5) * 0.4 + (capabilityScore / 10) * 0.6) * 100
+      )
+
+      // Get lowest scoring cells
+      const lowestCells = sentimentAnalysis ? 
+        getLowestScoringCells(sentimentAnalysis.cells, 10) : []
+      
+      // Get weak dimensions
+      const weakDimensions = capabilityAnalysis?.dimensions
+        .filter(d => d.status === 'below' || d.status === 'significantly_below')
+        .slice(0, 5) || []
+      
+      // Get strong dimensions
+      const strongDimensions = capabilityAnalysis?.dimensions
+        .filter(d => d.status === 'above')
+        .slice(0, 3) || []
+
+      // Prepare comprehensive PDF data
       const pdfData = {
         companyName: companyProfile.displayName,
+        industry: companyProfile.industry,
+        size: companyProfile.size,
+        
         assessment: {
           date: new Date().toLocaleDateString(),
-          respondents: sentimentData?.length || 0,
-          readinessScore: 62, // Calculate from actual data
-          sentimentAverage: 3.2, // Default value
-          capabilityMaturity: 4.1 // Default value
+          respondents: sentimentData.length,
+          readinessScore,
+          sentimentAverage: Number(sentimentScore).toFixed(1),
+          capabilityMaturity: Number(capabilityScore).toFixed(1)
         },
-        sentimentData: sentimentData.length > 0 ? {
-          heatmap: {},
-          problemCategories: [],
-          lowestCells: []
+        
+        sentimentData: sentimentAnalysis ? {
+          stats: {
+            overallAverage: sentimentAnalysis.stats.overallAverage,
+            totalRespondents: sentimentAnalysis.stats.totalRespondents,
+            cellsAnalyzed: sentimentAnalysis.cells.filter(c => c.count > 0).length
+          },
+          lowestCells: lowestCells,
+          allCells: sentimentAnalysis.cells
         } : undefined,
-        capabilityData: capabilityData.length > 0 ? {
-          dimensions: [],
-          weakestDimensions: [],
-          benchmarkComparison: {}
+        
+        capabilityData: capabilityAnalysis ? {
+          overall: {
+            average: capabilityAnalysis.overall.average,
+            max: capabilityAnalysis.overall.highest?.average || 0,
+            min: capabilityAnalysis.overall.lowest?.average || 0
+          },
+          dimensions: capabilityAnalysis.dimensions,
+          weakestDimensions: weakDimensions,
+          strongestDimensions: strongDimensions
         } : undefined,
+        
         interventions: [
-          {
-            title: 'AI Transparency Program',
-            description: 'Implement clear communication protocols and explainable AI practices to build trust.',
-            investmentRange: '$150K-$350K',
-            expectedROI: '30-50%',
-            timeline: '12 weeks'
-          },
-          {
-            title: 'Data Infrastructure Modernization',
-            description: 'Upgrade data systems to enable AI readiness and improve data accessibility.',
-            investmentRange: '$250K-$500K',
-            expectedROI: '40-60%',
-            timeline: '16 weeks'
-          },
-          {
-            title: 'Human-in-the-Loop Design',
-            description: 'Balance AI automation with human oversight to address autonomy concerns.',
-            investmentRange: '$80K-$200K',
-            expectedROI: '25-35%',
-            timeline: '8 weeks'
-          }
+          // Include smart interventions based on gaps
+          ...generateSmartInterventions(weakDimensions, lowestCells)
         ],
+        
+        taboos: {
+          highlighted: lowestCells.slice(0, 6).map((cell, idx) => ({
+            code: `T${idx + 1}`,
+            name: `${cell.levelName} × ${cell.categoryName}`,
+            description: `This taboo manifests as ${cell.levelName.toLowerCase()} sentiment when AI is perceived as ${cell.categoryName.toLowerCase()}. It affects ${cell.count} employees.`,
+            severity: cell.score < 2.5 ? 'critical' : cell.score < 3.0 ? 'high' : 'medium',
+            affected: cell.count
+          }))
+        },
+        
         filters: Object.keys(filters).length > 0 ? filters : undefined,
-        selectedFlow: (currentView.type.includes('sentiment') ? 'sentiment' : 
-                      currentView.type.includes('capability') ? 'capability' : 'both') as 'sentiment' | 'capability' | 'both'
+        
+        elementIds: {
+          heatmap: 'sentiment-heatmap',
+          radarChart: 'capability-radar',
+          dashboard: 'executive-dashboard'
+        }
       }
 
-      await generatePDF(pdfData)
+      await generateCompletePDF(pdfData)
       
-      // Success notification
-      console.log('PDF generated successfully!')
-      toast.success('PDF report downloaded successfully!')
+      toast.dismiss()
+      toast.success('📄 Complete PDF report downloaded successfully!')
     } catch (error) {
       console.error('PDF export failed:', error)
+      toast.dismiss()
       toast.error('Failed to generate PDF report. Please try again.')
     }
+  }
+
+  // Generate smart interventions based on actual gaps
+  const generateSmartInterventions = (weakDims: any[], lowCells: any[]): any[] => {
+    const interventions: any[] = []
+    
+    // From weak capability dimensions
+    if (weakDims.length > 0) {
+      const topWeak = weakDims[0]
+      interventions.push({
+        title: `Strengthen ${topWeak.name}`,
+        description: `Targeted program to improve ${topWeak.name.toLowerCase()} from current ${topWeak.average.toFixed(1)} to industry benchmark ${topWeak.benchmark.toFixed(1)}. Focus on the key constructs.`,
+        investmentRange: '$100K-$250K',
+        expectedROI: '35-45%',
+        timeline: '12-16 weeks',
+        impact: 'high',
+        effort: 'medium'
+      })
+    }
+    
+    // From sentiment gaps
+    if (lowCells.length > 0) {
+      const topLow = lowCells[0]
+      interventions.push({
+        title: `Address ${topLow.levelName} Concerns about ${topLow.categoryName}`,
+        description: `Intervention to address ${topLow.levelName.toLowerCase()} sentiment when employees perceive AI as ${topLow.categoryName.toLowerCase()}. Affects ${topLow.count} employees with score of ${topLow.score.toFixed(2)}.`,
+        investmentRange: '$75K-$150K',
+        expectedROI: '25-40%',
+        timeline: '8-10 weeks',
+        impact: 'high',
+        effort: 'low'
+      })
+    }
+    
+    // Add strategic interventions
+    interventions.push(
+      {
+        title: 'AI Transparency & Trust Program',
+        description: 'Implement clear communication protocols, explainable AI practices, and regular town halls to build trust and reduce opacity concerns.',
+        investmentRange: '$150K-$300K',
+        expectedROI: '30-50%',
+        timeline: '12 weeks',
+        impact: 'high',
+        effort: 'medium'
+      },
+      {
+        title: 'Human-in-the-Loop Design Framework',
+        description: 'Balance AI automation with human oversight to address autonomy concerns while maintaining efficiency gains.',
+        investmentRange: '$80K-$200K',
+        expectedROI: '25-35%',
+        timeline: '8 weeks',
+        impact: 'medium',
+        effort: 'low'
+      },
+      {
+        title: 'AI Skills Development Program',
+        description: 'Comprehensive training program addressing competence anxiety and building practical AI literacy across all levels.',
+        investmentRange: '$120K-$280K',
+        expectedROI: '40-60%',
+        timeline: '16 weeks',
+        impact: 'high',
+        effort: 'high'
+      }
+    )
+    
+    return interventions.slice(0, 6)
   }
 
   // Keyboard navigation with achievement tracking

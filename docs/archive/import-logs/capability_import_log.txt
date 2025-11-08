@@ -1,0 +1,14 @@
+Capability Data Import (LONG Format) - 2025-11-03 12:13:20.625825
+================================================================================
+
+Input file: data-foundation/capability_demo.csv
+Total rows: 260,064
+Records inserted: 0
+Database count: 0
+
+Company Distribution:
+  acme-corp: 47,392 scores
+  global-solutions: 94,784 scores
+  tech-innovations: 117,888 scores
+
+Status: SUCCESS

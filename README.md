@@ -154,35 +154,47 @@ npm start
 
 ```
 ainavigator/
-├── app/                      # Next.js App Router
-│   ├── page.tsx             # Landing page
-│   ├── layout.tsx           # Root layout
-│   └── globals.css          # Global styles
-├── documentation/           # Product documentation
-│   ├── prd.md              # Product Requirements Document
-│   ├── sprint-plan.md      # Development Sprint Plan
-│   └── Database info/      # Data structure & sample datasets
-├── public/                  # Static assets
-├── components/              # (Coming soon) React components
-├── lib/                     # (Coming soon) Utilities & helpers
-└── api/                     # (Coming soon) Backend API routes
+├── app/                      # Next.js 16 App Router (pages, layouts, API routes)
+├── components/               # React components organized by feature
+├── lib/                      # Business logic, services, utilities
+├── hooks/                    # Custom React hooks
+├── supabase/                 # Database migrations and schema
+├── data/                     # Data files, sources, and notebooks
+│   ├── csv-imports/          # Import-ready CSV files
+│   ├── source-documents/     # Source PDFs and extracts
+│   └── notebooks/            # Analysis notebooks
+├── scripts/                  # Data import and utility scripts
+├── docs/                     # Comprehensive documentation
+│   ├── team/                 # Team guides and quick start
+│   ├── development/          # Development documentation
+│   ├── features/             # Feature documentation
+│   └── archive/              # Historical docs and status reports
+└── public/                   # Static assets
 ```
+
+**📚 Full Project Structure**: See [docs/PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md) for complete details.
 
 ---
 
 ## 📖 Documentation
 
-### Core Documents
+### 🎯 Essential Guides
 
-| Document | Description | Status |
-|----------|-------------|--------|
-| [AI Chat Quick Start](QUICK_START_AI_CHAT.md) | Get started with the AI chat in 30 seconds | ⭐ NEW |
-| [⚡ AI Chat Refinements](AI_CHAT_REFINEMENTS.md) | Latest enhancements - actions, streaming, intelligence | ⚡ ENHANCED |
-| [AI Chat Full Guide](AI_CHAT_GUIDE.md) | Comprehensive guide to the AI chat interface | ⭐ NEW |
-| [AI Chat Technical Overview](AI_CHAT_TRANSFORMATION_SUMMARY.md) | Architecture and implementation details | ⭐ NEW |
-| [Product Requirements (PRD)](./documentation/prd.md) | Complete product specification for Web Summit MVP | ✅ Complete |
-| [Sprint Plan](./documentation/sprint-plan.md) | 4-day development roadmap with milestones | ✅ Complete |
-| [Database Info](./documentation/Database%20info/) | Data structures, schemas, and sample datasets | ✅ Complete |
+| Document | Description |
+|----------|-------------|
+| **[How It Works](HOW_IT_WORKS.md)** | 📘 Complete platform walkthrough - start here! |
+| **[Quick Start](docs/team/QUICK_START.md)** | ⚡ Get up and running in 30 seconds |
+| **[Developer Guide](docs/team/DEVELOPER_GUIDE.md)** | 🔧 Comprehensive developer reference (also: [CLAUDE.md](CLAUDE.md)) |
+| **[Project Structure](docs/PROJECT_STRUCTURE.md)** | 🗂️ Complete codebase organization guide |
+
+### 📚 Complete Documentation
+
+- **[Documentation Hub](docs/README.md)** - Central documentation index with all guides
+- **Team Guides** → `docs/team/` - Quick start and developer guides
+- **Development Docs** → `docs/development/` - Architecture, specs, workflows
+- **Feature Docs** → `docs/features/` - Feature-specific documentation
+- **User Guides** → `docs/guides/` - End-user documentation
+- **Archive** → `docs/archive/` - Historical docs and status reports
 
 ### Key Concepts
 

@@ -20,7 +20,8 @@
       "Bash(node scripts/import-open-ended-responses.js:*)",
       "Bash(cat:*)",
       "Bash(curl:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(awk:*)"
     ],
     "deny": [],
     "ask": []

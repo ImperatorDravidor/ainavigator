@@ -1,0 +1,39 @@
+================================================================================
+CAPABILITY DATA TRANSFORMATION REPORT
+================================================================================
+Generated: 2025-11-03 11:36:23
+
+INPUT DATA SUMMARY
+--------------------------------------------------------------------------------
+Total rows: 260,064
+Unique respondents: 27
+Unique constructs: 32
+Score range: -0.53 - 11.55
+Duplicate entries found: 259,200
+Null scores: 0
+
+TRANSFORMATION RESULTS
+--------------------------------------------------------------------------------
+Output respondents: 27
+Construct columns created: 32
+
+COMPANY DISTRIBUTION
+--------------------------------------------------------------------------------
+tech-innovations: 12 (44.4%)
+global-solutions: 10 (37.0%)
+acme-corp: 5 (18.5%)
+
+SCORE STATISTICS (Sample: construct_1, construct_16, construct_32)
+--------------------------------------------------------------------------------
+construct_1: min=3.78, max=4.34, mean=4.00, nulls=0
+construct_16: min=4.04, max=4.57, mean=4.21, nulls=0
+construct_32: min=6.69, max=7.10, mean=6.87, nulls=0
+
+NEXT STEPS
+--------------------------------------------------------------------------------
+1. Review transformation_report.txt for data quality
+2. Apply database migration: npm run db:migrate
+3. Import transformed data: python scripts/import_capability_wide.py
+4. Validate in database: npm run db:validate
+
+================================================================================

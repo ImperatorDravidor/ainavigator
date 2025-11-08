@@ -32,7 +32,7 @@ async function main() {
   console.log('🚀 Starting demo data import...\n')
 
   // Read CSV file
-  const csvPath = path.join(process.cwd(), 'data-foundation', 'sentiment_demo.csv')
+  const csvPath = path.join(process.cwd(), 'data', 'csv-imports', 'sentiment_demo.csv')
   console.log(`📁 Reading CSV from: ${csvPath}`)
   
   if (!fs.existsSync(csvPath)) {

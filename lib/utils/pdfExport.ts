@@ -212,7 +212,7 @@ export async function generatePDF(options: PDFExportOptions): Promise<void> {
     pdf.text('SENTIMENT', card2X + cardWidth/2, cardY + 8, { align: 'center' })
     
     pdf.setFontSize(32)
-    pdf.text(`${options.assessment.sentimentAverage}`, card2X + cardWidth/2, cardY + 22, { align: 'center' })
+    pdf.text(`${Number(options.assessment.sentimentAverage).toFixed(1)}`, card2X + cardWidth/2, cardY + 22, { align: 'center' })
     
     pdf.setFontSize(8)
     pdf.setFont('helvetica', 'normal')
@@ -231,7 +231,7 @@ export async function generatePDF(options: PDFExportOptions): Promise<void> {
     pdf.text('CAPABILITY', card3X + cardWidth/2, cardY + 8, { align: 'center' })
     
     pdf.setFontSize(32)
-    pdf.text(`${options.assessment.capabilityMaturity}`, card3X + cardWidth/2, cardY + 22, { align: 'center' })
+    pdf.text(`${Number(options.assessment.capabilityMaturity).toFixed(1)}`, card3X + cardWidth/2, cardY + 22, { align: 'center' })
     
     pdf.setFontSize(8)
     pdf.setFont('helvetica', 'normal')
