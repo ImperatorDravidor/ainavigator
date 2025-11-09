@@ -51,9 +51,9 @@ export default function LoginPage() {
   }
 
   const demoAccounts = [
-    { email: 'demo@acme-corp.com', company: 'Acme Corporation' },
-    { email: 'demo@tech-innovations.com', company: 'Tech Innovations' },
-    { email: 'demo@global-solutions.com', company: 'Global Solutions' },
+    { email: 'demo@acmewealth.com', company: 'Acme Wealth Advisors' },
+    { email: 'analyst@acmewealth.com', company: 'Acme Wealth Advisors' },
+    { email: 'executive@acmewealth.com', company: 'Acme Wealth Advisors' },
   ]
 
   return (
@@ -106,7 +106,7 @@ export default function LoginPage() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="demo@company.com"
+                      placeholder="demo@acmewealth.com"
                       required
                       className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     />

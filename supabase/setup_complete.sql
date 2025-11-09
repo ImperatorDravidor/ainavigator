@@ -109,9 +109,7 @@ CREATE POLICY "Users can view respondents from their company"
 -- SEED DATA: Demo Companies
 -- ============================================================================
 INSERT INTO companies (name, display_name) VALUES
-  ('acme-corp', 'Acme Corporation'),
-  ('tech-innovations', 'Tech Innovations Inc.'),
-  ('global-solutions', 'Global Solutions Ltd.')
+  ('acme-wealth', 'Acme Wealth Advisors')
 ON CONFLICT (name) DO NOTHING;
 
 -- ============================================================================
@@ -119,9 +117,9 @@ ON CONFLICT (name) DO NOTHING;
 -- Password: demo123 (plaintext for demo - replace with proper hashing in prod)
 -- ============================================================================
 INSERT INTO demo_users (email, password_hash, company_id, full_name, role) VALUES
-  ('demo@acme-corp.com', 'demo123', (SELECT id FROM companies WHERE name = 'acme-corp'), 'John Smith', 'admin'),
-  ('demo@tech-innovations.com', 'demo123', (SELECT id FROM companies WHERE name = 'tech-innovations'), 'Jane Doe', 'admin'),
-  ('demo@global-solutions.com', 'demo123', (SELECT id FROM companies WHERE name = 'global-solutions'), 'Mike Johnson', 'admin')
+  ('demo@acmewealth.com', 'demo123', (SELECT id FROM companies WHERE name = 'acme-wealth'), 'Sarah Morgan', 'admin'),
+  ('analyst@acmewealth.com', 'demo123', (SELECT id FROM companies WHERE name = 'acme-wealth'), 'Michael Chen', 'admin'),
+  ('executive@acmewealth.com', 'demo123', (SELECT id FROM companies WHERE name = 'acme-wealth'), 'Emma Rodriguez', 'admin')
 ON CONFLICT (email) DO NOTHING;
 
 -- ============================================================================

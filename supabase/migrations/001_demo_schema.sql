@@ -87,15 +87,13 @@ CREATE POLICY "Users can view respondents from their company"
 
 -- Insert demo companies
 INSERT INTO companies (name, display_name) VALUES
-  ('acme-corp', 'Acme Corporation'),
-  ('tech-innovations', 'Tech Innovations Inc.'),
-  ('global-solutions', 'Global Solutions Ltd.');
+  ('acme-wealth', 'Acme Wealth Advisors');
 
 -- Insert demo users (password is 'demo123' - you should hash this properly)
 -- For demo purposes, using plain text - replace with proper bcrypt/argon2 hashing
 INSERT INTO demo_users (email, password_hash, company_id, full_name, role) VALUES
-  ('demo@acme-corp.com', 'demo123', (SELECT id FROM companies WHERE name = 'acme-corp'), 'John Smith', 'admin'),
-  ('demo@tech-innovations.com', 'demo123', (SELECT id FROM companies WHERE name = 'tech-innovations'), 'Jane Doe', 'admin'),
-  ('demo@global-solutions.com', 'demo123', (SELECT id FROM companies WHERE name = 'global-solutions'), 'Mike Johnson', 'admin');
+  ('demo@acmewealth.com', 'demo123', (SELECT id FROM companies WHERE name = 'acme-wealth'), 'Sarah Morgan', 'admin'),
+  ('analyst@acmewealth.com', 'demo123', (SELECT id FROM companies WHERE name = 'acme-wealth'), 'Michael Chen', 'admin'),
+  ('executive@acmewealth.com', 'demo123', (SELECT id FROM companies WHERE name = 'acme-wealth'), 'Emma Rodriguez', 'admin');
 
 

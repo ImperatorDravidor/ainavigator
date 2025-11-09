@@ -43,7 +43,7 @@ export default function SentimentHeatmapRevised({ data, filters, onAnalyzeProble
   const selectedCellData = cells.find(c => c.cellId === selectedCell)
 
   return (
-    <div className="h-full flex flex-col gap-2 overflow-hidden">
+    <div className="h-full flex flex-col gap-3 overflow-hidden relative">
       
       {/* ULTRA COMPACT HEADER - Single row */}
       <div className="flex items-center justify-between gap-3 flex-shrink-0">
@@ -94,17 +94,17 @@ export default function SentimentHeatmapRevised({ data, filters, onAnalyzeProble
         </div>
       </div>
 
-      {/* HEATMAP EXPLANATION - Collapsible */}
+      {/* HEATMAP EXPLANATION - Overlay (doesn't push content) */}
       <AnimatePresence>
         {showExplanation && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            className="overflow-hidden"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+            className="absolute top-16 left-0 right-0 z-30 mx-4"
           >
-            <div className="bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-lg border border-blue-500/20 p-4 mb-3">
+            <div className="bg-white/95 dark:bg-black/95 backdrop-blur-xl rounded-xl border-2 border-blue-500/30 dark:border-blue-500/50 p-5 shadow-2xl">
               <div className="grid md:grid-cols-2 gap-6 text-xs">
                 <div>
                   <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
@@ -219,66 +219,75 @@ export default function SentimentHeatmapRevised({ data, filters, onAnalyzeProble
         )}
       </AnimatePresence>
 
-      {/* HEATMAP GRID */}
-      <div className="flex-1 bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-white/10 p-4 flex flex-col overflow-hidden shadow-sm">
+      {/* HEATMAP GRID - REFINED DATA-RICH DESIGN */}
+      <div id="sentiment-heatmap" className="bg-white dark:bg-black rounded-xl border-2 border-slate-200 dark:border-white/10 p-4 md:p-6 flex flex-col shadow-lg">
         
-        {/* Legend - Enhanced with scale explanation */}
-        <div className="flex items-center justify-between gap-4 pb-2 mb-3 border-b border-slate-200 dark:border-white/10 flex-shrink-0">
+        {/* Legend - Professional Data Visualization Style */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4 pb-3 md:pb-4 mb-3 md:mb-4 border-b-2 border-slate-200 dark:border-white/10 flex-shrink-0">
           <div className="flex items-center gap-3">
-            <span className="text-xs font-bold text-slate-700 dark:text-gray-300 uppercase tracking-wider">Resistance Level:</span>
-            <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-gray-400">
-              <span className="font-medium">1 = Minimal</span>
-              <span className="text-slate-400 dark:text-gray-500">→</span>
-              <span className="font-medium">10 = Critical</span>
+            <div className="w-1 h-8 bg-gradient-to-b from-teal-500 to-purple-500 rounded-full" />
+            <div>
+              <div className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">Resistance Intensity</div>
+              <div className="text-[10px] text-slate-600 dark:text-gray-400 font-medium">5×5 Matrix Analysis</div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30">
-              <div className="w-3 h-3 rounded" style={{ backgroundColor: '#15803d' }}></div>
-              <span className="text-[10px] text-slate-700 dark:text-green-300 font-medium">Lowest</span>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-1 px-2 md:px-3 py-1 md:py-1.5 rounded-lg bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-500/10 dark:to-emerald-500/10 border border-green-300 dark:border-green-500/30">
+              <div className="w-2.5 md:w-3 h-2.5 md:h-3 rounded-sm" style={{ backgroundColor: '#15803d' }}></div>
+              <span className="text-[9px] md:text-[10px] text-slate-700 dark:text-green-300 font-bold">Low</span>
             </div>
-            <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-500/30">
-              <div className="w-3 h-3 rounded" style={{ backgroundColor: '#fcd34d' }}></div>
-              <span className="text-[10px] text-slate-700 dark:text-yellow-300 font-medium">Mid</span>
+            <div className="flex items-center gap-1 px-2 md:px-3 py-1 md:py-1.5 rounded-lg bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-500/10 dark:to-amber-500/10 border border-yellow-300 dark:border-yellow-500/30">
+              <div className="w-2.5 md:w-3 h-2.5 md:h-3 rounded-sm" style={{ backgroundColor: '#fcd34d' }}></div>
+              <span className="text-[9px] md:text-[10px] text-slate-700 dark:text-yellow-300 font-bold">Mod</span>
             </div>
-            <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30">
-              <div className="w-3 h-3 rounded" style={{ backgroundColor: '#dc2626' }}></div>
-              <span className="text-[10px] text-slate-700 dark:text-red-300 font-medium">Highest</span>
+            <div className="flex items-center gap-1 px-2 md:px-3 py-1 md:py-1.5 rounded-lg bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-500/10 dark:to-rose-500/10 border border-red-300 dark:border-red-500/30">
+              <div className="w-2.5 md:w-3 h-2.5 md:h-3 rounded-sm" style={{ backgroundColor: '#dc2626' }}></div>
+              <span className="text-[9px] md:text-[10px] text-slate-700 dark:text-red-300 font-bold">High</span>
             </div>
-            <div className="text-[10px] text-slate-500 dark:text-gray-400 italic ml-2">Relative to your data</div>
+            <div className="hidden md:flex items-center gap-1.5 px-2 py-1 rounded-md bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 ml-2">
+              <TrendingUp className="w-3 h-3 text-teal-600 dark:text-teal-400" />
+              <span className="text-[10px] text-slate-600 dark:text-gray-400 font-medium">Scale: 1.0-5.0</span>
+            </div>
           </div>
         </div>
 
-        {/* Grid Container with Averages - SCALED DOWN */}
-        <div className="flex-1 flex gap-1.5 overflow-auto min-h-0">
+        {/* Grid Container with Averages - Optimized */}
+        <div className="flex gap-1.5 min-h-0">
           
-          {/* Y-Axis Labels */}
-          <div className="flex flex-col flex-shrink-0 gap-1.5">
+          {/* Y-Axis Labels - Clean aligned */}
+          <div className="hidden md:flex flex-col flex-shrink-0 gap-1.5">
             {/* Row labels aligned with grid rows */}
-            <div className="flex-1 grid grid-rows-5 gap-1.5">
-              {SENTIMENT_LEVELS.map(level => (
+            <div className="grid grid-rows-5 gap-1.5" style={{ height: 'calc(100% - 50px - 6px)' }}>
+              {SENTIMENT_LEVELS.map((level, idx) => (
                 <div key={level.id} className="flex items-center justify-end pr-3">
-                  <div className="text-right bg-slate-100 dark:bg-slate-800/50 rounded-md px-2 py-1.5 border border-slate-200 dark:border-white/20">
-                    <div className="text-[8px] text-slate-600 dark:text-gray-200 font-bold uppercase tracking-wider">L{level.id}</div>
-                    <div className="text-[10px] font-bold text-gray-900 dark:text-white leading-tight mt-0.5">{level.name}</div>
+                  <div className="text-right flex items-center gap-2">
+                    <div className="text-[10px] font-bold text-gray-900 dark:text-white leading-tight text-right max-w-[160px]">
+                      {level.name}
+                    </div>
+                    <div className={cn(
+                      "w-6 h-6 rounded-md flex items-center justify-center font-bold text-[10px] flex-shrink-0",
+                      idx === 0 ? "bg-blue-500 text-white" :
+                      idx === 1 ? "bg-purple-500 text-white" :
+                      idx === 2 ? "bg-orange-500 text-white" :
+                      idx === 3 ? "bg-red-500 text-white" :
+                      "bg-rose-600 text-white"
+                    )}>
+                      L{level.id}
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
-            {/* Label for column averages row */}
-            <div className="flex items-start justify-end pr-3 h-[38px] pt-1">
-              <div className="text-[9px] font-bold text-gray-700 dark:text-gray-400 uppercase bg-gray-50 dark:bg-white/5 rounded-md px-2 py-1 border border-gray-200 dark:border-white/10">
-                Col Avg
-              </div>
-            </div>
+            {/* Empty spacer for column averages alignment */}
+            <div className="h-[50px]" />
           </div>
 
           {/* Grid + Averages */}
           <div className="flex-1 flex flex-col min-w-0">
             {/* Main Grid with Row Averages */}
-            <div className="flex-1 flex gap-1.5">
-              {/* Heatmap Grid - FULL HEIGHT */}
-              <div className="flex-1 grid grid-cols-5 grid-rows-5 gap-1.5">
+            <div className="flex gap-1.5">
+              {/* Heatmap Grid - Fixed aspect ratio */}
+              <div className="grid grid-cols-5 grid-rows-5 gap-1.5 flex-1" style={{ aspectRatio: '5/5', maxHeight: '500px' }}>
                 {SENTIMENT_LEVELS.map((level) => (
                   SENTIMENT_CATEGORIES.map((cat) => {
                     const cellId = `L${level.id}_C${cat.id}`
@@ -289,59 +298,94 @@ export default function SentimentHeatmapRevised({ data, filters, onAnalyzeProble
                         key={cellId}
                         onClick={() => cell && cell.count > 0 ? setSelectedCell(cellId) : null}
                         className={cn(
-                          "relative rounded-lg transition-all border-2 group min-h-0 shadow-md",
+                          "relative rounded-xl transition-all border group min-h-0 overflow-hidden",
                           selectedCell === cellId 
-                            ? 'ring-4 ring-teal-400/50 dark:ring-teal-400/50 ring-offset-2 ring-offset-white dark:ring-offset-gray-900 scale-105 z-20 border-white dark:border-white/50' 
-                            : 'ring-0 border-transparent',
+                            ? 'ring-4 ring-teal-400/50 dark:ring-teal-500/60 ring-offset-2 ring-offset-white dark:ring-offset-black scale-[1.08] z-20 border-white dark:border-white/70 shadow-2xl' 
+                            : 'ring-0 border-white/20 dark:border-white/10',
                           cell && cell.count > 0 
-                            ? 'cursor-pointer hover:scale-[1.05] hover:z-10 hover:shadow-xl' 
-                            : 'cursor-default opacity-30'
+                            ? 'cursor-pointer hover:scale-[1.03] hover:z-10 hover:shadow-2xl hover:border-white/40 dark:hover:border-white/30' 
+                            : 'cursor-default opacity-20'
                         )}
                         style={{
-                          backgroundColor: cell?.color || '#374151',
-                          boxShadow: selectedCell === cellId 
-                            ? '0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1)' 
-                            : cell && cell.count > 0 
-                              ? '0 4px 6px -1px rgba(0, 0, 0, 0.2)' 
-                              : 'none'
+                          backgroundColor: cell?.color || '#1f2937',
                         }}
                         whileHover={cell && cell.count > 0 ? { 
-                          scale: 1.05,
-                          boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.2)'
+                          scale: 1.03,
                         } : {}}
-                        whileTap={cell && cell.count > 0 ? { scale: 0.97 } : {}}
+                        whileTap={cell && cell.count > 0 ? { scale: 0.98 } : {}}
                       >
                         {cell && cell.count > 0 ? (
                           <>
+                            {/* Subtle grid pattern overlay */}
+                            <div className="absolute inset-0 opacity-5"
+                              style={{
+                                backgroundImage: `
+                                  linear-gradient(to right, white 1px, transparent 1px),
+                                  linear-gradient(to bottom, white 1px, transparent 1px)
+                                `,
+                                backgroundSize: '8px 8px'
+                              }}
+                            />
+
                             {/* Gradient overlay for depth */}
-                            <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
+                            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 via-transparent to-black/20 pointer-events-none" />
                             
-                            <div className="absolute inset-0 flex flex-col items-center justify-center p-1.5 z-10">
-                              <div className="text-xl font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] tabular-nums leading-tight">
+                            {/* Main Content */}
+                            <div className="absolute inset-0 flex flex-col items-center justify-center p-2 z-10">
+                              {/* Score */}
+                              <div className="text-2xl font-black text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)] tabular-nums leading-none mb-1">
                                 {cell.score.toFixed(2)}
                               </div>
-                              <div className="text-[9px] text-white/90 font-semibold mt-0.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
-                                n={cell.count}
+                              
+                              {/* Sample size with bar indicator */}
+                              <div className="flex items-center gap-1 bg-black/30 backdrop-blur-sm px-2 py-0.5 rounded-full border border-white/20">
+                                <Users className="w-2.5 h-2.5 text-white/80" />
+                                <span className="text-[9px] text-white/90 font-bold">{cell.count}</span>
                               </div>
+
+                              {/* Cell ID for data context */}
+                              <div className="absolute top-1 left-1.5">
+                                <span className="text-[8px] font-mono font-bold text-white/60 bg-black/20 px-1 py-0.5 rounded border border-white/10">
+                                  {cellId}
+                                </span>
+                              </div>
+
+                              {/* Rank badge for top problem areas */}
+                              {cell.rank <= 5 && (
+                                <div className="absolute bottom-1 left-1.5">
+                                  <div className="bg-red-600/90 backdrop-blur-sm px-1.5 py-0.5 rounded-md border border-red-400/50 shadow-lg">
+                                    <span className="text-[8px] font-bold text-white">#{cell.rank}</span>
+                                  </div>
+                                </div>
+                              )}
                             </div>
-                            {/* Sparkle indicator for interactive cells with category data */}
+
+                            {/* Sparkle indicator for interactive cells */}
                             {categoryDataLoaded && CategoryDataService.getCategoryForCell(cellId) && (
                               <motion.div
-                                initial={{ opacity: 0, scale: 0 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: 0.3 }}
+                                initial={{ opacity: 0, scale: 0, rotate: -180 }}
+                                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                                transition={{ delay: 0.2 + (level.id * 0.05) + (cat.id * 0.02), type: "spring" }}
                                 className="absolute top-1.5 right-1.5 z-20"
                               >
-                                <div className="relative">
-                                  <div className="absolute inset-0 bg-white/30 rounded-full blur-sm animate-pulse" />
-                                  <Sparkles className="w-4 h-4 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] group-hover:scale-110 transition-transform relative z-10" />
+                                <div className="relative group/sparkle">
+                                  <div className="absolute inset-0 bg-purple-400/40 rounded-full blur-md animate-pulse" />
+                                  <div className="relative bg-gradient-to-br from-purple-400 to-pink-400 rounded-full p-1 shadow-lg border border-white/30">
+                                    <Sparkles className="w-3 h-3 text-white relative z-10 group-hover/sparkle:scale-125 transition-transform" />
+                                  </div>
                                 </div>
                               </motion.div>
                             )}
+
+                            {/* Hover overlay */}
+                            <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors pointer-events-none rounded-xl" />
                           </>
                         ) : (
                           <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="text-2xl text-white/30 font-light">—</span>
+                            <div className="text-center">
+                              <span className="text-xl text-white/20 font-light">—</span>
+                              <div className="text-[7px] text-white/30 font-medium mt-0.5">No data</div>
+                            </div>
                           </div>
                         )}
                       </motion.button>
@@ -350,50 +394,91 @@ export default function SentimentHeatmapRevised({ data, filters, onAnalyzeProble
                 ))}
               </div>
 
-              {/* Row Averages */}
-              <div className="grid grid-rows-5 gap-1.5 w-16 flex-shrink-0">
-                {stats.rowAverages.map((avg, idx) => (
-                  <div key={idx} className="flex items-center justify-center rounded-lg bg-gradient-to-br from-gray-100 to-gray-50 dark:from-slate-500/20 dark:to-slate-500/10 border border-gray-300 dark:border-slate-500/30 shadow-sm">
-                    <div className="text-center">
-                      <div className="text-sm font-bold text-gray-900 dark:text-white tabular-nums">{avg.toFixed(2)}</div>
-                      <div className="text-[8px] text-gray-600 dark:text-gray-400 uppercase font-medium">Row</div>
+              {/* Row Averages - Enhanced */}
+              <div className="hidden md:grid grid-rows-5 gap-1.5 w-16 flex-shrink-0">
+                {stats.rowAverages.map((avg, idx) => {
+                  const isHigh = avg >= 3.5
+                  const isMed = avg >= 2.5 && avg < 3.5
+                  const isLow = avg < 2.5
+                  
+                  return (
+                    <div key={idx} className={cn(
+                      "flex items-center justify-center rounded-lg border-2 shadow-md backdrop-blur-sm",
+                      isHigh ? "bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-500/15 dark:to-rose-500/15 border-red-300 dark:border-red-500/40" :
+                      isMed ? "bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-500/15 dark:to-amber-500/15 border-yellow-300 dark:border-yellow-500/40" :
+                      "bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-500/15 dark:to-emerald-500/15 border-green-300 dark:border-green-500/40"
+                    )}>
+                      <div className="text-center">
+                        <div className={cn(
+                          "text-base font-black tabular-nums leading-none",
+                          isHigh ? "text-red-700 dark:text-red-400" :
+                          isMed ? "text-yellow-700 dark:text-yellow-400" :
+                          "text-green-700 dark:text-green-400"
+                        )}>{avg.toFixed(2)}</div>
+                        <div className="text-[8px] text-slate-600 dark:text-gray-400 uppercase font-bold mt-0.5">Avg</div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
 
             {/* Column Averages + Labels + Overall */}
             <div className="flex gap-1.5 mt-1.5">
               <div className="flex-1 grid grid-cols-5 gap-1.5">
-                {SENTIMENT_CATEGORIES.map((cat, idx) => (
-                  <div key={cat.id} className="flex flex-col gap-1">
-                    {/* Column Average */}
-                    <div className="flex items-center justify-center rounded-lg bg-gradient-to-br from-gray-100 to-gray-50 dark:from-slate-500/20 dark:to-slate-500/10 border border-gray-300 dark:border-slate-500/30 h-[38px] shadow-sm">
+                {SENTIMENT_CATEGORIES.map((cat, idx) => {
+                  const avg = stats.columnAverages[idx]
+                  const isHigh = avg >= 3.5
+                  const isMed = avg >= 2.5 && avg < 3.5
+                  const isLow = avg < 2.5
+                  
+                  return (
+                    <div key={cat.id} className="flex flex-col gap-1">
+                      {/* Column Average */}
+                      <div className={cn(
+                        "flex items-center justify-center rounded-lg border-2 h-[40px] shadow-sm",
+                        isHigh ? "bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-500/15 dark:to-rose-500/15 border-red-300 dark:border-red-500/40" :
+                        isMed ? "bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-500/15 dark:to-amber-500/15 border-yellow-300 dark:border-yellow-500/40" :
+                        "bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-500/15 dark:to-emerald-500/15 border-green-300 dark:border-green-500/40"
+                      )}>
+                        <div className="text-center">
+                          <div className={cn(
+                            "text-sm md:text-base font-black tabular-nums leading-none",
+                            isHigh ? "text-red-700 dark:text-red-400" :
+                            isMed ? "text-yellow-700 dark:text-yellow-400" :
+                            "text-green-700 dark:text-green-400"
+                          )}>{avg?.toFixed(2) || '—'}</div>
+                          <div className="text-[7px] text-slate-600 dark:text-gray-400 uppercase font-bold mt-0.5">AVG</div>
+                        </div>
+                      </div>
+                      {/* Category Label */}
                       <div className="text-center">
-                        <div className="text-sm font-bold text-gray-900 dark:text-white tabular-nums">{stats.columnAverages[idx]?.toFixed(2) || '—'}</div>
-                        <div className="text-[7px] text-gray-600 dark:text-gray-400 uppercase font-medium">Col</div>
+                        <div className="text-[9px] md:text-[10px] font-bold text-gray-900 dark:text-white leading-tight mb-0.5">{cat.shortName}</div>
+                        <div className={cn(
+                          "inline-block text-[7px] font-bold px-1.5 py-0.5 rounded-md",
+                          idx === 0 ? "bg-blue-500/20 text-blue-700 dark:text-blue-400" :
+                          idx === 1 ? "bg-purple-500/20 text-purple-700 dark:text-purple-400" :
+                          idx === 2 ? "bg-pink-500/20 text-pink-700 dark:text-pink-400" :
+                          idx === 3 ? "bg-orange-500/20 text-orange-700 dark:text-orange-400" :
+                          "bg-teal-500/20 text-teal-700 dark:text-teal-400"
+                        )}>C{cat.id}</div>
                       </div>
                     </div>
-                    {/* Category Label */}
-                    <div className="text-center px-1">
-                      <div className="text-[10px] font-bold text-gray-900 dark:text-white leading-tight">{cat.shortName}</div>
-                      <div className="text-[7px] text-gray-500 dark:text-gray-400 font-medium">C{cat.id}</div>
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
 
-              {/* Overall Average */}
-              <div className="w-16 flex-shrink-0">
-                <div className="flex items-center justify-center rounded-lg bg-gradient-to-br from-teal-100 to-teal-50 dark:from-teal-500/20 dark:to-teal-500/10 border-2 border-teal-300 dark:border-teal-500/40 h-[38px] shadow-md">
+              {/* Overall Average - Compact & Aligned */}
+              <div className="hidden md:flex w-16 flex-shrink-0 flex-col gap-1">
+                <div className="flex items-center justify-center rounded-lg bg-gradient-to-br from-teal-100 to-cyan-100 dark:from-teal-500/20 dark:to-cyan-500/20 border-2 border-teal-400 dark:border-teal-500/50 shadow-sm h-[40px]">
                   <div className="text-center">
-                    <div className="text-sm font-bold text-teal-700 dark:text-teal-400 tabular-nums">{stats.overallAverage.toFixed(2)}</div>
-                    <div className="text-[7px] text-teal-600 dark:text-teal-500 uppercase font-semibold">All</div>
+                    <div className="text-base font-black text-teal-700 dark:text-teal-300 tabular-nums leading-none">{stats.overallAverage.toFixed(2)}</div>
+                    <div className="text-[7px] text-teal-600 dark:text-teal-400 uppercase font-bold mt-0.5">AVG</div>
                   </div>
                 </div>
-                <div className="text-center mt-1">
-                  <div className="text-[9px] font-bold text-gray-700 dark:text-gray-300 uppercase">Overall</div>
+                <div className="text-center">
+                  <div className="text-[9px] font-bold text-gray-700 dark:text-gray-300 uppercase leading-tight">OVERALL</div>
+                  <div className="text-[7px] text-gray-500 dark:text-gray-400">n={stats.totalRespondents.toLocaleString()}</div>
                 </div>
               </div>
             </div>
@@ -411,9 +496,9 @@ export default function SentimentHeatmapRevised({ data, filters, onAnalyzeProble
         )}
       </AnimatePresence>
 
-      {/* ACTION BUTTON - Ultra Compact */}
+      {/* ACTION BUTTON - With proper spacing */}
       {lowestCells.length > 0 && (
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 mt-4">
           <button
             onClick={() => onAnalyzeProblemAreas(lowestCells)}
             className="w-full bg-gradient-to-r from-teal-50 to-purple-50 dark:from-teal-500/10 dark:to-purple-500/10 hover:from-teal-100 hover:to-purple-100 dark:hover:from-teal-500/15 dark:hover:to-purple-500/15 rounded-lg border border-teal-300 dark:border-teal-500/30 hover:border-teal-400 dark:hover:border-teal-400/50 transition-all p-3 flex items-center justify-between group shadow-sm hover:shadow-md"
