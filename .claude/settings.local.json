@@ -23,7 +23,12 @@
       "Bash(npm run build:*)",
       "Bash(awk:*)",
       "mcp__linear-server__list_teams",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(npx tsx:*)",
+      "Bash(if [ -f .env.local ])",
+      "Bash(then echo \"✅ .env.local exists\")",
+      "Bash(else echo \"❌ .env.local not found\")",
+      "Bash(fi)"
     ],
     "deny": [],
     "ask": []

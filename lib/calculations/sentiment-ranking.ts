@@ -54,15 +54,10 @@ export function calculateSentimentHeatmap(
       .map(row => {
         const rawScore = row[columnName]
         if (typeof rawScore === 'number' && !isNaN(rawScore)) {
-          // TRANSFORM TO USER-FRIENDLY 1-10 SCALE:
-          // Raw data: 1.0 = low resistance (good), 3.0 = high resistance (concerning)
-          // Transform to: 1-10 scale where higher = MORE resistance (worse)
-          // Formula: ((raw - 1.0) / 2.0) * 9 + 1
-          // Maps: Raw 1.0 → Display 1.0 (least resistance)
-          //       Raw 2.0 → Display 5.5 (moderate)
-          //       Raw 3.0 → Display 10.0 (highest resistance)
-          const displayScore = ((rawScore - 1.0) / 2.0) * 9 + 1
-          return Math.max(1.0, Math.min(10.0, displayScore))
+          // NO TRANSFORMATION - data is already on 1-5 scale
+          // Raw data: 1.0 = low resistance (good), 5.0 = high resistance (concerning)
+          // Display as-is where higher = MORE resistance (worse)
+          return Math.max(1.0, Math.min(5.0, rawScore))
         }
         return null
       })

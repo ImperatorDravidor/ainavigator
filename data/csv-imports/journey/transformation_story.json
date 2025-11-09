@@ -1,0 +1,82 @@
+{
+  "organization": "Acme Wealth Advisors",
+  "assessment_journey": {
+    "phase1_baseline": {
+      "date": "2024-10-15",
+      "name": "Oct 2024 Baseline",
+      "respondents": 500,
+      "sentiment_avg": 2.089816,
+      "capability_avg": 4.279398648025102,
+      "interventions": [],
+      "key_findings": [
+        "Low trust in AI autonomy (avg 2.8/5)",
+        "Limited strategic alignment (Dim 1: 3.1/5)",
+        "Gaps in talent readiness (Dim 4: 3.0/5)",
+        "Innovation capability nascent (Dim 6: 2.9/5)"
+      ]
+    },
+    "phase2_progress": {
+      "date": "2025-03-15",
+      "name": "March 2025 - Phase 2",
+      "respondents": 500,
+      "sentiment_avg": 2.650302027833672,
+      "capability_avg": 3.9672573151509742,
+      "interventions": [
+        "A1",
+        "B2",
+        "C1"
+      ],
+      "improvements": {
+        "sentiment": "+0.56",
+        "capability": "+-0.31",
+        "percent_improvement": "26.8%"
+      },
+      "key_wins": [
+        "Strategy clarity improved 18%",
+        "Collaboration trust up 15%",
+        "Training effectiveness visible",
+        "Innovation culture emerging"
+      ]
+    },
+    "phase3_transformation": {
+      "date": "2025-11-15",
+      "name": "Nov 2025 - Phase 3",
+      "respondents": 500,
+      "sentiment_avg": 3.270357799074373,
+      "capability_avg": 4.23335347063987,
+      "interventions": [
+        "A1",
+        "A3",
+        "B2",
+        "B3",
+        "C1",
+        "C2"
+      ],
+      "improvements": {
+        "sentiment_total": "+1.18",
+        "capability_total": "+-0.05",
+        "percent_total": "56.5%"
+      },
+      "transformation_markers": [
+        "Ethics & responsibility embedded (Dim 8: +0.7)",
+        "Organizational readiness achieved",
+        "Sustained adoption patterns",
+        "Culture shift measurable across all levels"
+      ]
+    }
+  },
+  "roi_analysis": {
+    "total_investment": "$850K over 13 months",
+    "measurable_improvements": {
+      "sentiment_score": "+56.5%",
+      "capability_maturity": "+-1.1%",
+      "readiness_level": "Advanced"
+    },
+    "business_impact": [
+      "Accelerated AI adoption timeline by 6 months",
+      "Reduced resistance and change fatigue",
+      "Built sustainable innovation capability",
+      "Established ethical AI framework"
+    ]
+  }
+}
