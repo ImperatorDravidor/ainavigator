@@ -1,15 +1,13 @@
 -- Insert demo companies
 INSERT INTO public.companies (id, name, display_name, logo_url) VALUES
-  ('550e8400-e29b-41d4-a716-446655440001', 'acme-corp', 'Acme Corporation', null),
-  ('550e8400-e29b-41d4-a716-446655440002', 'tech-innovations', 'Tech Innovations', null),
-  ('550e8400-e29b-41d4-a716-446655440003', 'global-solutions', 'Global Solutions', null)
+  ('550e8400-e29b-41d4-a716-446655440001', 'acme-wealth', 'Acme Wealth Advisors', null)
 ON CONFLICT (name) DO NOTHING;
 
 -- Insert demo users (password is "demo123" for all)
 INSERT INTO public.demo_users (email, password_hash, company_id, full_name, role) VALUES
-  ('demo@acme-corp.com', 'demo123', '550e8400-e29b-41d4-a716-446655440001', 'Sarah Johnson', 'Chief AI Officer'),
-  ('demo@tech-innovations.com', 'demo123', '550e8400-e29b-41d4-a716-446655440002', 'Michael Chen', 'VP of Digital Transformation'),
-  ('demo@global-solutions.com', 'demo123', '550e8400-e29b-41d4-a716-446655440003', 'Emma Rodriguez', 'Director of AI Strategy')
+  ('demo@acmewealth.com', 'demo123', '550e8400-e29b-41d4-a716-446655440001', 'Sarah Morgan', 'Chief Innovation Officer'),
+  ('analyst@acmewealth.com', 'demo123', '550e8400-e29b-41d4-a716-446655440001', 'Michael Chen', 'Senior Analyst'),
+  ('executive@acmewealth.com', 'demo123', '550e8400-e29b-41d4-a716-446655440001', 'Emma Rodriguez', 'Chief Strategy Officer')
 ON CONFLICT (email) DO NOTHING;
 
 -- Insert sample respondent data for demo (optional - for testing dashboard)

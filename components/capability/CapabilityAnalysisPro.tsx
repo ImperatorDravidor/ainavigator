@@ -332,7 +332,7 @@ export default function CapabilityAnalysisPro({
             <span className="text-xs text-purple-600 dark:text-purple-400 font-medium">{benchmarkComparisons[benchmarkType].label}</span>
           </div>
 
-          <div className="flex-1 min-h-0">
+          <div id="capability-radar-chart" className="flex-1 min-h-0">
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart 
                 data={

@@ -225,7 +225,7 @@ export default function DimensionDrilldown({
             <p className="text-xs text-slate-600 dark:text-gray-400">Visual breakdown of component scores</p>
           </div>
 
-          <div className="flex-1 min-h-0">
+          <div id={`dimension-radar-${dimensionId}`} className="flex-1 min-h-0">
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart data={radarData}>
                 <PolarGrid

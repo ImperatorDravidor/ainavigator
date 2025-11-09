@@ -10,7 +10,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/hooks/useAuth'
-import { useStore } from '@/lib/store'
+import { useStore, useData } from '@/lib/store'
 import { SimpleThemeToggle } from '@/components/ui/simple-theme-toggle'
 import { EnhancedTooltip } from '@/components/ui/enhanced-tooltip'
 import { ContextualHelp } from '@/components/ui/contextual-help'
@@ -38,7 +38,8 @@ import RecommendationsView from '@/components/recommendations/RecommendationsVie
 import ReportsView from '@/components/reports/ReportsView'
 import AIAgentView from '@/components/ai-agent/AIAgentView'
 import InterventionsBrowsePage from '@/components/interventions/InterventionsBrowsePage'
-import { generateCompletePDF } from '@/lib/utils/pdfExport-complete'
+import TimelineSelector from '@/components/dashboard/TimelineSelector'
+import { generateCompletePDF } from '@/lib/utils/pdfExport-comprehensive'
 import { calculateSentimentHeatmap, getLowestScoringCells } from '@/lib/calculations/sentiment-ranking'
 import { calculateCapabilityAssessment } from '@/lib/calculations/capability-analysis'
 // Skeleton component imported but not actively used in current view
@@ -48,7 +49,8 @@ type NavigationView = 'overview' | 'sentiment' | 'capability' | 'interventions' 
 
 export default function AssessmentPage() {
   const { session, company } = useAuth()
-  
+  const { currentPeriod, currentPeriodId } = useData()
+
   const [activeView, setActiveView] = useState<NavigationView>('overview')
   const [currentView, setCurrentView] = useState<ViewState>({ type: 'overview' })
   const setStoreActiveView = useStore((state) => state.setActiveView)
@@ -76,8 +78,8 @@ export default function AssessmentPage() {
   // Mock company profile (replace with actual data)
   const companyProfile: CompanyProfile = {
     id: company?.id || 'demo',
-    name: company?.display_name || 'Demo Company',
-    displayName: company?.display_name || 'Demo Company',
+    name: company?.display_name || 'Acme Wealth Advisors',
+    displayName: company?.display_name || 'Acme Wealth Advisors',
     industry: 'Financial Services', // TODO: Get from company data
     size: '1000-5000',
     aiMaturity: 'early_adoption'
@@ -94,19 +96,12 @@ export default function AssessmentPage() {
     8: 4.9  // Ethics
   }
 
+  // Load data when company or current period changes
   useEffect(() => {
-    // Only load data once we have a valid company ID
-    if (company?.id) {
+    if (company?.id && currentPeriod) {
       loadData()
     }
-  }, [company?.id])
-
-  // Reload data when selectedWave changes (temporal filtering)
-  useEffect(() => {
-    if (company?.id && selectedWave !== undefined) {
-      loadData(selectedWave)
-    }
-  }, [selectedWave])
+  }, [company?.id, currentPeriodId]) // Reload when period selection changes
 
   useEffect(() => {
     // Show onboarding hint for first-time users
@@ -206,8 +201,9 @@ export default function AssessmentPage() {
         
         elementIds: {
           heatmap: 'sentiment-heatmap',
-          radarChart: 'capability-radar',
-          dashboard: 'executive-dashboard'
+          radarChart: 'capability-radar-chart',
+          dashboard: 'executive-dashboard',
+          dimensionRadars: [1, 2, 3, 4, 5, 6, 7, 8].map(id => `dimension-radar-${id}`)
         }
       }
 
@@ -383,16 +379,22 @@ export default function AssessmentPage() {
     }
   }
 
-  const loadData = async (wave?: string) => {
+  const loadData = async () => {
     if (!company?.id) {
+      setIsLoading(false)
+      return
+    }
+
+    // If no period selected yet, wait for TimelineSelector to load periods
+    if (!currentPeriod) {
       setIsLoading(false)
       return
     }
 
     setIsLoading(true)
     try {
-      // Build query params for temporal filtering
-      const queryParams = wave ? `?survey_wave=${encodeURIComponent(wave)}` : ''
+      // Build query params for temporal filtering using current period
+      const queryParams = `?survey_wave=${encodeURIComponent(currentPeriod.survey_wave)}`
 
       // Load sentiment data
       const sentimentResponse = await fetch(`/api/data/respondents${queryParams}`, {
@@ -906,18 +908,9 @@ export default function AssessmentPage() {
                     <span className="text-[10px] text-gray-500 dark:text-gray-600">responses</span>
                   </div>
                 </EnhancedTooltip>
-                
-                {/* Wave Selector for Progress Tracking */}
-                <select
-                  value={selectedWave || 'all'}
-                  onChange={(e) => setSelectedWave(e.target.value === 'all' ? undefined : e.target.value)}
-                  className="px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs font-medium text-slate-700 dark:text-gray-300 hover:border-teal-300 dark:hover:border-teal-500/30 transition-all cursor-pointer"
-                >
-                  <option value="all">All Data</option>
-                  <option value="baseline">Baseline Assessment</option>
-                  <option value="wave-2">After Interventions (Wave 2)</option>
-                  <option value="wave-3">Latest (Wave 3)</option>
-                </select>
+
+                {/* Timeline Selector for Assessment Periods */}
+                <TimelineSelector />
 
                 <EnhancedTooltip
                   content="Data is synced and up-to-date"

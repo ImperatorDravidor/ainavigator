@@ -54,12 +54,12 @@ const COMPANY_ACCESS_CODES = {
     readiness: 81
   },
   "DEMO2024": {
-    name: "Demo Company",
-    industry: "Multi-Industry",
+    name: "Acme Wealth Advisors",
+    industry: "Financial Services",
     size: "1000+ employees",
-    contact: "Alex Demo",
-    role: "Innovation Lead",
-    challenges: ["General AI Adoption", "Strategy Development", "Implementation"],
+    contact: "Alex Morgan",
+    role: "Chief Innovation Officer",
+    challenges: ["Client AI Personalization", "Risk Management", "Digital Transformation"],
     readiness: 75
   }
 }

@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Sparkles, Lightbulb, ArrowRight, Search, Filter as FilterIcon } from 'lucide-react'
+import { Sparkles, Lightbulb, ArrowRight, Search, Filter as FilterIcon, Zap, LayoutGrid } from 'lucide-react'
 import { InterventionDetail } from './InterventionDetail'
+import GamifiedInterventionsView from './GamifiedInterventionsView'
+import { cn } from '@/lib/utils'
 
 interface Intervention {
   code: string
@@ -13,7 +15,10 @@ interface Intervention {
   description?: string
 }
 
+type ViewMode = 'programs' | 'quick-actions'
+
 export default function InterventionsBrowsePage() {
+  const [viewMode, setViewMode] = useState<ViewMode>('programs')
   const [interventions, setInterventions] = useState<Intervention[]>([])
   const [filteredInterventions, setFilteredInterventions] = useState<Intervention[]>([])
   const [selectedIntervention, setSelectedIntervention] = useState<string | null>(null)
@@ -98,6 +103,10 @@ export default function InterventionsBrowsePage() {
 
   const levels = Object.keys(groupedInterventions).sort()
 
+  if (viewMode === 'quick-actions') {
+    return <GamifiedInterventionsView />
+  }
+
   return (
     <div className="h-full flex flex-col gap-4 overflow-hidden">
       {/* REFINED HEADER with brand colors */}
@@ -116,7 +125,7 @@ export default function InterventionsBrowsePage() {
                 Interventions Library
               </h1>
               <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
-                {interventions.length} proven solutions to accelerate AI adoption
+                {interventions.length} strategic programs + 78 quick actions
               </p>
             </div>
           </div>
@@ -133,6 +142,30 @@ export default function InterventionsBrowsePage() {
               <div className="text-lg font-bold text-gray-900 dark:text-white tabular-nums">{filteredInterventions.length}</div>
             </div>
           </motion.div>
+        </div>
+
+        {/* VIEW MODE TOGGLE */}
+        <div className="flex items-center gap-2 mb-4 p-1 bg-gray-100 dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/10">
+          <button
+            onClick={() => setViewMode('programs')}
+            className="flex-1 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all flex items-center justify-center gap-2 bg-white dark:bg-white/10 text-gray-900 dark:text-white shadow-md"
+          >
+            <LayoutGrid className="w-4 h-4" />
+            Strategic Programs
+            <span className="px-2 py-0.5 rounded-md text-xs font-bold bg-orange-100 dark:bg-orange-500/20 text-orange-700 dark:text-orange-300">
+              {interventions.length}
+            </span>
+          </button>
+          <button
+            onClick={() => setViewMode('quick-actions')}
+            className="flex-1 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all flex items-center justify-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+          >
+            <Zap className="w-4 h-4" />
+            Quick Actions
+            <span className="px-2 py-0.5 rounded-md text-xs font-bold bg-gray-200 dark:bg-white/10 text-gray-600 dark:text-gray-400">
+              78
+            </span>
+          </button>
         </div>
 
         {/* REFINED Search and Filter */}

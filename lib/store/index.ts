@@ -23,6 +23,33 @@ interface Organization {
   displayName?: string
 }
 
+interface AssessmentPeriod {
+  id: string
+  company_id: string
+  survey_wave: string
+  assessment_date: string
+  name: string
+  description?: string
+  status: 'draft' | 'active' | 'archived'
+  interventions_applied?: string[]
+  sentiment_respondents: number
+  capability_respondents: number
+  created_at: string
+  updated_at: string
+}
+
+interface AppliedIntervention {
+  id: string
+  company_id: string
+  assessment_period_id: string
+  intervention_code: string
+  applied_date: string
+  status: 'planned' | 'in_progress' | 'completed' | 'abandoned'
+  expected_impact?: any
+  actual_impact?: any
+  notes?: string
+}
+
 interface FileUpload {
   id: string
   name: string
@@ -30,6 +57,7 @@ interface FileUpload {
   status: 'pending' | 'uploading' | 'processing' | 'complete' | 'error'
   progress: number
   error?: string
+  periodId?: string  // Link upload to assessment period
 }
 
 // Store-specific filter state (different from assessment FilterState)
@@ -62,9 +90,20 @@ interface DataSlice {
   capabilityData: CapabilityResponse[]
   isDataLoading: boolean
   dataError: string | null
+  // Period management
+  assessmentPeriods: AssessmentPeriod[]
+  currentPeriodId: string | null
+  currentPeriod: AssessmentPeriod | null
+  appliedInterventions: AppliedIntervention[]
+  // Actions
   setSentimentData: (data: SentimentResponse[]) => void
   setCapabilityData: (data: CapabilityResponse[]) => void
   setOrganization: (org: Organization | null) => void
+  setAssessmentPeriods: (periods: AssessmentPeriod[]) => void
+  setCurrentPeriod: (periodId: string) => void
+  addAssessmentPeriod: (period: AssessmentPeriod) => void
+  setAppliedInterventions: (interventions: AppliedIntervention[]) => void
+  addAppliedIntervention: (intervention: AppliedIntervention) => void
   clearData: () => void
 }
 
@@ -193,27 +232,72 @@ export const useStore = create<AppStore>()(
           capabilityData: [],
           isDataLoading: false,
           dataError: null,
-          
+          assessmentPeriods: [],
+          currentPeriodId: null,
+          currentPeriod: null,
+          appliedInterventions: [],
+
           setSentimentData: (data) => set((state) => {
             state.sentimentData = data
             state.dataError = null
             logger.info('Sentiment data updated', { count: data.length })
           }),
-          
+
           setCapabilityData: (data) => set((state) => {
             state.capabilityData = data
             state.dataError = null
             logger.info('Capability data updated', { count: data.length })
           }),
-          
+
           setOrganization: (org) => set((state) => {
             state.organization = org
           }),
-          
+
+          setAssessmentPeriods: (periods) => set((state) => {
+            state.assessmentPeriods = periods
+            // Auto-select most recent active period if none selected
+            if (!state.currentPeriodId && periods.length > 0) {
+              const activePeriods = periods.filter(p => p.status === 'active')
+              const mostRecent = activePeriods.sort((a, b) =>
+                new Date(b.assessment_date).getTime() - new Date(a.assessment_date).getTime()
+              )[0]
+              if (mostRecent) {
+                state.currentPeriodId = mostRecent.id
+                state.currentPeriod = mostRecent
+              }
+            }
+            logger.info('Assessment periods updated', { count: periods.length })
+          }),
+
+          setCurrentPeriod: (periodId) => set((state) => {
+            state.currentPeriodId = periodId
+            state.currentPeriod = state.assessmentPeriods.find(p => p.id === periodId) || null
+            logger.info('Current period changed', { periodId, periodName: state.currentPeriod?.name })
+          }),
+
+          addAssessmentPeriod: (period) => set((state) => {
+            state.assessmentPeriods.push(period)
+            logger.info('Assessment period added', { periodId: period.id, name: period.name })
+          }),
+
+          setAppliedInterventions: (interventions) => set((state) => {
+            state.appliedInterventions = interventions
+            logger.info('Applied interventions updated', { count: interventions.length })
+          }),
+
+          addAppliedIntervention: (intervention) => set((state) => {
+            state.appliedInterventions.push(intervention)
+            logger.info('Intervention applied', { code: intervention.intervention_code })
+          }),
+
           clearData: () => set((state) => {
             state.sentimentData = []
             state.capabilityData = []
             state.dataError = null
+            state.assessmentPeriods = []
+            state.currentPeriodId = null
+            state.currentPeriod = null
+            state.appliedInterventions = []
           }),
 
           // Filter Slice
@@ -320,7 +404,8 @@ export const useStore = create<AppStore>()(
           user: state.user,
           theme: state.theme,
           filters: state.filters,
-          sidebarOpen: state.sidebarOpen
+          sidebarOpen: state.sidebarOpen,
+          currentPeriodId: state.currentPeriodId  // Persist selected period
         })
       }
     ),
@@ -349,9 +434,18 @@ export const useData = () => ({
   capabilityData: useStore((state) => state.capabilityData),
   isDataLoading: useStore((state) => state.isDataLoading),
   dataError: useStore((state) => state.dataError),
+  assessmentPeriods: useStore((state) => state.assessmentPeriods),
+  currentPeriodId: useStore((state) => state.currentPeriodId),
+  currentPeriod: useStore((state) => state.currentPeriod),
+  appliedInterventions: useStore((state) => state.appliedInterventions),
   setSentimentData: useStore((state) => state.setSentimentData),
   setCapabilityData: useStore((state) => state.setCapabilityData),
   setOrganization: useStore((state) => state.setOrganization),
+  setAssessmentPeriods: useStore((state) => state.setAssessmentPeriods),
+  setCurrentPeriod: useStore((state) => state.setCurrentPeriod),
+  addAssessmentPeriod: useStore((state) => state.addAssessmentPeriod),
+  setAppliedInterventions: useStore((state) => state.setAppliedInterventions),
+  addAppliedIntervention: useStore((state) => state.addAppliedIntervention),
   clearData: useStore((state) => state.clearData)
 })
 
