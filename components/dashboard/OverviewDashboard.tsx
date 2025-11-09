@@ -58,9 +58,9 @@ export default function OverviewDashboard({
   }, [sentimentData, capabilityData])
 
   const getReadinessColor = (score: number) => {
-    if (score >= 75) return 'text-green-400'
-    if (score >= 60) return 'text-yellow-400'
-    return 'text-orange-400'
+    if (score >= 75) return 'text-green-600 dark:text-green-400'
+    if (score >= 60) return 'text-yellow-600 dark:text-yellow-400'
+    return 'text-orange-600 dark:text-orange-400'
   }
 
   const getReadinessMessage = (score: number) => {
@@ -91,7 +91,7 @@ export default function OverviewDashboard({
             <Sparkles className="w-8 h-8 text-teal-400" />
           </motion.div>
           <motion.h1 
-            className="text-4xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
+            className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-white dark:to-gray-300 bg-clip-text text-transparent"
             initial={{ backgroundPosition: "0% 50%" }}
             animate={{ backgroundPosition: "100% 50%" }}
             transition={{ duration: 3, repeat: Infinity, repeatType: "reverse" }}
@@ -100,21 +100,21 @@ export default function OverviewDashboard({
           </motion.h1>
         </motion.div>
         <motion.p 
-          className="text-xl text-gray-300 mb-2"
+          className="text-xl text-gray-700 dark:text-gray-300 mb-2"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          Your AI Readiness Assessment for <span className="text-teal-400 font-semibold animate-pulse">{companyName}</span> is ready
+          Your AI Readiness Assessment for <span className="text-teal-600 dark:text-teal-400 font-semibold animate-pulse">{companyName}</span> is ready
         </motion.p>
         <motion.p 
-          className="text-gray-400"
+          className="text-gray-600 dark:text-gray-400"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
           Based on insights from <motion.span 
-            className="font-semibold text-white"
+            className="font-semibold text-gray-900 dark:text-white"
             initial={{ scale: 1 }}
             animate={{ scale: [1, 1.1, 1] }}
             transition={{ duration: 0.5, delay: 0.5 }}
@@ -142,7 +142,7 @@ export default function OverviewDashboard({
             >
               <Target className="w-6 h-6 text-teal-400 group-hover:text-teal-300 transition-colors" />
             </motion.div>
-            <h3 className="text-sm font-medium text-gray-400 group-hover:text-gray-300 transition-colors">Overall AI Readiness</h3>
+            <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 group-hover:text-gray-800 dark:group-hover:text-gray-300 transition-colors">Overall AI Readiness</h3>
           </div>
           <motion.div 
             className={`text-5xl font-bold mb-2 ${getReadinessColor(metrics.readinessScore)}`}
@@ -152,7 +152,7 @@ export default function OverviewDashboard({
           >
             {metrics.readinessScore}%
           </motion.div>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             {getReadinessMessage(metrics.readinessScore)}
           </p>
         </motion.div>
@@ -170,20 +170,20 @@ export default function OverviewDashboard({
             >
               <Users className="w-6 h-6 text-purple-400 group-hover:text-purple-300 transition-colors" />
             </motion.div>
-            <h3 className="text-sm font-medium text-gray-400 group-hover:text-gray-300 transition-colors">Employee Sentiment</h3>
+            <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 group-hover:text-gray-800 dark:group-hover:text-gray-300 transition-colors">Employee Sentiment</h3>
           </div>
           <div className="flex items-baseline gap-2 mb-2">
             <motion.div 
-              className="text-5xl font-bold text-purple-400"
+              className="text-5xl font-bold text-purple-600 dark:text-purple-400"
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", delay: 0.4 }}
             >
               {metrics.sentimentAvg}
             </motion.div>
-            <div className="text-xl text-gray-500">/5.0</div>
+            <div className="text-xl text-gray-600 dark:text-gray-500">/5.0</div>
           </div>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             {parseFloat(metrics.sentimentAvg) >= 3.5 ? 'Positive outlook on AI adoption' :
              parseFloat(metrics.sentimentAvg) >= 2.5 ? 'Mixed feelings about AI transformation' :
              'Notable concerns about AI integration'}
@@ -203,20 +203,20 @@ export default function OverviewDashboard({
             >
               <TrendingUp className="w-6 h-6 text-blue-400 group-hover:text-blue-300 transition-colors" />
             </motion.div>
-            <h3 className="text-sm font-medium text-gray-400 group-hover:text-gray-300 transition-colors">Capability Maturity</h3>
+            <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 group-hover:text-gray-800 dark:group-hover:text-gray-300 transition-colors">Capability Maturity</h3>
           </div>
           <div className="flex items-baseline gap-2 mb-2">
             <motion.div 
-              className="text-5xl font-bold text-blue-400"
+              className="text-5xl font-bold text-blue-600 dark:text-blue-400"
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", delay: 0.5 }}
             >
               {metrics.capabilityAvg}
             </motion.div>
-            <div className="text-xl text-gray-500">/7.0</div>
+            <div className="text-xl text-gray-600 dark:text-gray-500">/7.0</div>
           </div>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             {parseFloat(metrics.capabilityAvg) >= 5.5 ? 'Strong organizational capabilities' :
              parseFloat(metrics.capabilityAvg) >= 4.0 ? 'Solid foundation for growth' :
              'Building blocks in place'}
@@ -245,8 +245,8 @@ export default function OverviewDashboard({
             <div className="flex items-start gap-3">
               <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
               <div>
-                <h3 className="font-semibold text-green-400 mb-2">Key Strength</h3>
-                <p className="text-sm text-gray-300">
+                <h3 className="font-semibold text-green-600 dark:text-green-400 mb-2">Key Strength</h3>
+                <p className="text-sm text-gray-700 dark:text-gray-300">
                   Strong positive sentiment around <span className="font-semibold">collaboration and human interaction</span> preferences.
                   Employees value the human element in AI adoption.
                 </p>
@@ -255,12 +255,12 @@ export default function OverviewDashboard({
           </div>
 
           {/* Challenge */}
-          <div className="glass rounded-xl p-4 border border-orange-500/20">
+          <div className="glass rounded-xl p-4 border border-orange-500/20 dark:border-orange-500/20">
             <div className="flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-orange-400 mt-0.5 flex-shrink-0" />
+              <AlertCircle className="w-5 h-5 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" />
               <div>
-                <h3 className="font-semibold text-orange-400 mb-2">Primary Challenge</h3>
-                <p className="text-sm text-gray-300">
+                <h3 className="font-semibold text-orange-600 dark:text-orange-400 mb-2">Primary Challenge</h3>
+                <p className="text-sm text-gray-700 dark:text-gray-300">
                   Concerns about <span className="font-semibold">AI transparency and autonomy</span> at the personal workflow level.
                   {metrics.lowScoreCount} areas need attention.
                 </p>
@@ -269,12 +269,12 @@ export default function OverviewDashboard({
           </div>
 
           {/* Opportunity */}
-          <div className="glass rounded-xl p-4 border border-blue-500/20">
+          <div className="glass rounded-xl p-4 border border-blue-500/20 dark:border-blue-500/20">
             <div className="flex items-start gap-3">
-              <TrendingUp className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
+              <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
               <div>
-                <h3 className="font-semibold text-blue-400 mb-2">Top Opportunity</h3>
-                <p className="text-sm text-gray-300">
+                <h3 className="font-semibold text-blue-600 dark:text-blue-400 mb-2">Top Opportunity</h3>
+                <p className="text-sm text-gray-700 dark:text-gray-300">
                   High capability scores in <span className="font-semibold">Ethics and Innovation</span> provide
                   a strong foundation for responsible AI scaling.
                 </p>
@@ -283,12 +283,12 @@ export default function OverviewDashboard({
           </div>
 
           {/* Recommendation */}
-          <div className="glass rounded-xl p-4 border border-purple-500/20">
+          <div className="glass rounded-xl p-4 border border-purple-500/20 dark:border-purple-500/20">
             <div className="flex items-start gap-3">
-              <Target className="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" />
+              <Target className="w-5 h-5 text-purple-600 dark:text-purple-400 mt-0.5 flex-shrink-0" />
               <div>
-                <h3 className="font-semibold text-purple-400 mb-2">Recommended Focus</h3>
-                <p className="text-sm text-gray-300">
+                <h3 className="font-semibold text-purple-600 dark:text-purple-400 mb-2">Recommended Focus</h3>
+                <p className="text-sm text-gray-700 dark:text-gray-300">
                   Address <span className="font-semibold">transparency and communication</span> gaps through
                   targeted change management and training interventions.
                 </p>
@@ -308,21 +308,21 @@ export default function OverviewDashboard({
         <div className="text-center mb-6">
           <div className="flex items-center justify-center gap-3 mb-3">
             <Lightbulb className="w-6 h-6 text-amber-400" />
-            <h2 className="text-2xl font-bold">Recommended Interventions</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Recommended Interventions</h2>
           </div>
-          <p className="text-gray-400 mb-4">Curated change programs designed for your situation</p>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">Curated change programs designed for your situation</p>
 
           {/* Tier Toggle */}
           <div className="flex items-center justify-center gap-2">
-            <span className="text-sm text-gray-400">View:</span>
-            <div className="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-white/5 border border-white/10">
+            <span className="text-sm text-gray-600 dark:text-gray-400">View:</span>
+            <div className="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-gray-100 dark:bg-white/5 border border-gray-300 dark:border-white/10">
               <button
                 onClick={() => setInterventionTier('small')}
                 className={cn(
                   "px-4 py-1.5 rounded text-sm font-medium transition-all",
                   interventionTier === 'small'
                     ? "bg-amber-500 text-white shadow-lg"
-                    : "text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white"
+                    : "text-gray-700 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                 )}
               >
                 Small Interventions
@@ -333,7 +333,7 @@ export default function OverviewDashboard({
                   "px-4 py-1.5 rounded text-sm font-medium transition-all",
                   interventionTier === 'large'
                     ? "bg-amber-500 text-white shadow-lg"
-                    : "text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white"
+                    : "text-gray-700 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                 )}
               >
                 Strategic Catalogue
@@ -359,22 +359,22 @@ export default function OverviewDashboard({
                 </div>
                 <div className="flex-1">
                   <h3 className="text-xl font-bold mb-3">Targeted Cell-Specific Interventions</h3>
-                  <p className="text-gray-400 mb-4 leading-relaxed">
+                  <p className="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
                     Each of the 25 sentiment heatmap cells has been mapped to 3 precisely targeted interventions
                     (75 total recommendations). These small, focused programs address specific emotional blockers
                     and resistance patterns your employees are experiencing.
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div className="p-4 rounded-lg bg-white/5 border border-white/10">
-                      <div className="text-2xl font-bold text-amber-400 mb-1">75</div>
-                      <div className="text-sm text-gray-400">Targeted Interventions</div>
+                    <div className="p-4 rounded-lg bg-gray-100 dark:bg-white/5 border border-gray-300 dark:border-white/10">
+                      <div className="text-2xl font-bold text-amber-600 dark:text-amber-400 mb-1">75</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">Targeted Interventions</div>
                     </div>
-                    <div className="p-4 rounded-lg bg-white/5 border border-white/10">
-                      <div className="text-2xl font-bold text-amber-400 mb-1">3 per cell</div>
-                      <div className="text-sm text-gray-400">Primary, Secondary, Tertiary</div>
+                    <div className="p-4 rounded-lg bg-gray-100 dark:bg-white/5 border border-gray-300 dark:border-white/10">
+                      <div className="text-2xl font-bold text-amber-600 dark:text-amber-400 mb-1">3 per cell</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">Primary, Secondary, Tertiary</div>
                     </div>
                   </div>
-                  <p className="text-sm text-gray-400 italic">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 italic">
                     💡 Tip: Click on any cell in the sentiment heatmap to see its specific intervention recommendations
                   </p>
                 </div>
@@ -449,7 +449,7 @@ export default function OverviewDashboard({
               </div>
 
               <div className="glass-dark rounded-xl p-6 border border-amber-500/20">
-                <p className="text-sm text-gray-400 text-center">
+                <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
                   💡 These 10 strategic interventions form the foundation of organizational AI transformation.
                   Navigate to the Sentiment or Capability view for personalized recommendations.
                 </p>
@@ -467,8 +467,8 @@ export default function OverviewDashboard({
         className="space-y-4"
       >
         <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold mb-2">Explore Your Results</h2>
-          <p className="text-gray-400">Choose an analysis path to dive deeper</p>
+          <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Explore Your Results</h2>
+          <p className="text-gray-600 dark:text-gray-400">Choose an analysis path to dive deeper</p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
@@ -489,8 +489,8 @@ export default function OverviewDashboard({
             <h3 className="text-2xl font-bold mb-3 group-hover:text-teal-300 transition-colors">
               Sentiment Analysis
             </h3>
-            <p className="text-gray-400 mb-4 leading-relaxed">
-              See how your employees <span className="font-semibold text-gray-300">feel</span> about AI across 25 dimensions.
+            <p className="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
+              See how your employees <span className="font-semibold text-gray-800 dark:text-gray-300">feel</span> about AI across 25 dimensions.
               Understand emotional readiness and resistance patterns.
             </p>
 
@@ -521,8 +521,8 @@ export default function OverviewDashboard({
             <h3 className="text-2xl font-bold mb-3 group-hover:text-purple-300 transition-colors">
               Capability Assessment
             </h3>
-            <p className="text-gray-400 mb-4 leading-relaxed">
-              Measure organizational <span className="font-semibold text-gray-300">maturity</span> across 8 key dimensions.
+            <p className="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
+              Measure organizational <span className="font-semibold text-gray-800 dark:text-gray-300">maturity</span> across 8 key dimensions.
               Compare against industry benchmarks and identify gaps.
             </p>
 

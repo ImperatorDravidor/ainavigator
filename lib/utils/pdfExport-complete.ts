@@ -406,7 +406,7 @@ export async function generateCompletePDF(options: CompletePDFOptions): Promise<
     pdf.setTextColor(C.purple.r, C.purple.g, C.purple.b)
     pdf.setFontSize(10)
     pdf.setFont('helvetica', 'bold')
-    pdf.text('💡 Why This Assessment Matters', M + 4, Y + 6)
+    pdf.text(' Why This Assessment Matters', M + 4, Y + 6)
     
     pdf.setTextColor(70, 70, 70)
     pdf.setFont('helvetica', 'normal')
@@ -463,7 +463,7 @@ export async function generateCompletePDF(options: CompletePDFOptions): Promise<
     pdf.setTextColor(50, 50, 50)
     pdf.setFontSize(10)
     pdf.setFont('helvetica', 'bold')
-    pdf.text('📊 What We Found', M + 4, Y + 6)
+    pdf.text(' What We Found', M + 4, Y + 6)
     
     pdf.setFont('helvetica', 'normal')
     pdf.setFontSize(8)
@@ -497,7 +497,7 @@ export async function generateCompletePDF(options: CompletePDFOptions): Promise<
       pdf.setTextColor(C.orange.r, C.orange.g, C.orange.b)
       pdf.setFontSize(14)
       pdf.setFont('helvetica', 'bold')
-      pdf.text('🚨 Priority Concern Areas', M, Y)
+      pdf.text(' Priority Concern Areas', M, Y)
       Y += 8
 
       pdf.setFontSize(8)
@@ -569,7 +569,7 @@ export async function generateCompletePDF(options: CompletePDFOptions): Promise<
       pdf.setTextColor(C.pink.r, C.pink.g, C.pink.b)
       pdf.setFontSize(14)
       pdf.setFont('helvetica', 'bold')
-      pdf.text('🤫 Highlighted AI Taboos', M, Y)
+      pdf.text(' Highlighted AI Taboos', M, Y)
       Y += 8
 
       pdf.setFontSize(8)
@@ -651,7 +651,7 @@ export async function generateCompletePDF(options: CompletePDFOptions): Promise<
     pdf.setTextColor(50, 50, 50)
     pdf.setFontSize(10)
     pdf.setFont('helvetica', 'bold')
-    pdf.text('📊 Capability Landscape', M + 4, Y + 6)
+    pdf.text(' Capability Landscape', M + 4, Y + 6)
     
     pdf.setFont('helvetica', 'normal')
     pdf.setFontSize(8)
@@ -759,7 +759,7 @@ export async function generateCompletePDF(options: CompletePDFOptions): Promise<
       // Add comparison context callout
       callout('Industry Context', 
         `Your average capability of ${options.capabilityData.overall.average.toFixed(1)}/10.0 compares to an industry average of 4.5. Organizations in the top quartile average 6.5+, while transformation leaders achieve 8.0+.`,
-        '📊', C.blue)
+        '', C.blue)
     }
 
     // ==================== INTERVENTIONS - THE SOLUTIONS ====================
@@ -773,7 +773,7 @@ export async function generateCompletePDF(options: CompletePDFOptions): Promise<
       // Intervention philosophy callout
       callout('Our Approach',
         'These interventions are data-driven, generated from your specific gaps. Each addresses real concerns from your employees and measurable capability weaknesses. They\'re designed to work together as a coordinated program.',
-        '🎯', C.orange)
+        '', C.orange)
 
       Y += 3
 
@@ -821,26 +821,26 @@ export async function generateCompletePDF(options: CompletePDFOptions): Promise<
         pdf.setFontSize(7)
         pdf.setFont('helvetica', 'bold')
         const investment = intervention.investmentRange || intervention.budget_estimate || 'TBD'
-        pdf.text(`💰 ${investment}`, M + 24, mY + 4, { align: 'center' })
+        pdf.text(` ${investment}`, M + 24, mY + 4, { align: 'center' })
         
         // ROI
         pdf.setFillColor(C.green.r, C.green.g, C.green.b)
         pdf.roundedRect(M + 46, mY, 38, 6, 1.5, 1.5, 'F')
         const roi = intervention.expectedROI || intervention.expected_roi || 'TBD'
-        pdf.text(`📈 ${roi} ROI`, M + 65, mY + 4, { align: 'center' })
+        pdf.text(` ${roi} ROI`, M + 65, mY + 4, { align: 'center' })
         
         // Timeline
         pdf.setFillColor(C.blue.r, C.blue.g, C.blue.b)
         pdf.roundedRect(M + 87, mY, 38, 6, 1.5, 1.5, 'F')
         const timeline = intervention.timeline || intervention.timeframe || '12 weeks'
-        pdf.text(`⏱️ ${timeline}`, M + 106, mY + 4, { align: 'center' })
+        pdf.text(` ${timeline}`, M + 106, mY + 4, { align: 'center' })
         
         // Impact badge
         const impact = intervention.impact || 'medium'
         const impactC = impact === 'high' ? C.green : impact === 'medium' ? C.yellow : C.gray
         pdf.setFillColor(impactC.r, impactC.g, impactC.b)
         pdf.roundedRect(M + 128, mY, 38, 6, 1.5, 1.5, 'F')
-        pdf.text(`🎯 ${impact.toUpperCase()}`, M + 147, mY + 4, { align: 'center' })
+        pdf.text(` ${impact.toUpperCase()}`, M + 147, mY + 4, { align: 'center' })
 
         Y += 41
       })
@@ -856,7 +856,7 @@ export async function generateCompletePDF(options: CompletePDFOptions): Promise<
       pdf.setTextColor(C.teal.r, C.teal.g, C.teal.b)
       pdf.setFontSize(10)
       pdf.setFont('helvetica', 'bold')
-      pdf.text('💼 Program Investment Summary', M + 4, Y + 6)
+      pdf.text(' Program Investment Summary', M + 4, Y + 6)
       
       pdf.setTextColor(60, 60, 60)
       pdf.setFont('helvetica', 'normal')
@@ -960,7 +960,7 @@ export async function generateCompletePDF(options: CompletePDFOptions): Promise<
       pdf.setTextColor(phaseC.r, phaseC.g, phaseC.b)
       pdf.setFontSize(7)
       pdf.setFont('helvetica', 'bold')
-      pdf.text(`⏱️ ${phase.timeline}`, M + CW - 19, Y + 6, { align: 'center' })
+      pdf.text(` ${phase.timeline}`, M + CW - 19, Y + 6, { align: 'center' })
       
       // Steps with checkboxes
       pdf.setTextColor(70, 70, 70)
@@ -992,7 +992,7 @@ export async function generateCompletePDF(options: CompletePDFOptions): Promise<
     pdf.setTextColor(C.green.r, C.green.g, C.green.b)
     pdf.setFontSize(14)
     pdf.setFont('helvetica', 'bold')
-    pdf.text('📊 Measuring Success', M, Y)
+    pdf.text(' Measuring Success', M, Y)
     Y += 8
 
     const metrics = [
@@ -1028,7 +1028,7 @@ export async function generateCompletePDF(options: CompletePDFOptions): Promise<
       pdf.setTextColor(100, 100, 100)
       pdf.setFont('helvetica', 'normal')
       pdf.setFontSize(7)
-      pdf.text(`⏱️ ${m.timeline}`, M + 160, Y + 4.5, { align: 'right' })
+      pdf.text(` ${m.timeline}`, M + 160, Y + 4.5, { align: 'right' })
 
       Y += 9.5
     })
@@ -1043,7 +1043,7 @@ export async function generateCompletePDF(options: CompletePDFOptions): Promise<
     pdf.setTextColor(C.teal.r, C.teal.g, C.teal.b)
     pdf.setFontSize(12)
     pdf.setFont('helvetica', 'bold')
-    pdf.text('🤝 Partner With Us', M + 4, Y + 7)
+    pdf.text(' Partner With Us', M + 4, Y + 7)
 
     pdf.setTextColor(70, 70, 70)
     pdf.setFont('helvetica', 'normal')

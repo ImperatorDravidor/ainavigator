@@ -61,8 +61,8 @@ const FilterSelect = ({
                     onChange('all')
                     setIsOpen(false)
                   }}
-                  className={`w-full px-4 py-2 text-left hover:bg-white/10 transition-colors ${
-                    value === 'all' ? 'bg-teal-500/20 text-teal-400' : 'text-slate-600 dark:text-gray-400'
+                  className={`w-full px-4 py-2 text-left dark:hover:bg-white/10 hover:bg-gray-100 transition-colors ${
+                    value === 'all' ? 'bg-teal-500/20 text-teal-600 dark:text-teal-400' : 'text-gray-700 dark:text-gray-400'
                   }`}
                 >
                   All {label}s
@@ -74,8 +74,8 @@ const FilterSelect = ({
                       onChange(option)
                       setIsOpen(false)
                     }}
-                    className={`w-full px-4 py-2 text-left hover:bg-white/10 transition-colors ${
-                      value === option ? 'bg-teal-500/20 text-teal-400' : 'text-slate-900 dark:text-white'
+                    className={`w-full px-4 py-2 text-left dark:hover:bg-white/10 hover:bg-gray-100 transition-colors ${
+                      value === option ? 'bg-teal-500/20 text-teal-600 dark:text-teal-400' : 'text-gray-900 dark:text-white'
                     }`}
                   >
                     {option}
@@ -177,8 +177,8 @@ export default function FilterPanel({
             className="overflow-hidden"
           >
             <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-teal-500/10 border border-teal-500/30">
-              <Cpu className="w-4 h-4 text-teal-400 animate-pulse" />
-              <span className="text-xs text-teal-400">Applying filters...</span>
+              <Cpu className="w-4 h-4 text-teal-600 dark:text-teal-400 animate-pulse" />
+              <span className="text-xs text-teal-600 dark:text-teal-400">Applying filters...</span>
             </div>
           </motion.div>
         )}
@@ -266,11 +266,11 @@ export default function FilterPanel({
                   transition={{ delay: index * 0.05 }}
                   className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-teal-500/20 to-purple-500/20 border border-teal-500/30 text-sm"
                 >
-                  <span className="text-slate-600 dark:text-gray-400 capitalize">{key}:</span>
-                  <span className="font-medium text-teal-400">{value}</span>
+                  <span className="text-gray-700 dark:text-gray-400 capitalize">{key}:</span>
+                  <span className="font-medium text-teal-600 dark:text-teal-400">{value}</span>
                   <button
                     onClick={() => handleFilterChange(key as keyof FilterState, undefined)}
-                    className="ml-1 hover:text-slate-900 dark:text-white transition-colors"
+                    className="ml-1 hover:text-gray-900 dark:hover:text-white transition-colors"
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -288,10 +288,10 @@ export default function FilterPanel({
           <div className="glass-premium rounded-lg p-4">
             <p className="text-xs text-slate-600 dark:text-gray-400 mb-2 uppercase tracking-wider">Filtered Results</p>
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-bold text-teal-400">{sentimentData.length + capabilityData.length}</span>
-              <span className="text-sm text-slate-600 dark:text-gray-400">responses shown</span>
+              <span className="text-3xl font-bold text-teal-600 dark:text-teal-400">{sentimentData.length + capabilityData.length}</span>
+              <span className="text-sm text-gray-700 dark:text-gray-400">responses shown</span>
             </div>
-            <div className="mt-2 text-xs text-slate-500">
+            <div className="mt-2 text-xs text-gray-600 dark:text-gray-500">
               (out of {sentimentData.length + capabilityData.length} total)
             </div>
           </div>
@@ -299,8 +299,8 @@ export default function FilterPanel({
           <div className="glass-premium rounded-lg p-4">
             <p className="text-xs text-slate-600 dark:text-gray-400 mb-2 uppercase tracking-wider">Total Responses</p>
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-bold text-teal-400">{sentimentData.length + capabilityData.length}</span>
-              <span className="text-sm text-slate-600 dark:text-gray-400">total</span>
+              <span className="text-3xl font-bold text-teal-600 dark:text-teal-400">{sentimentData.length + capabilityData.length}</span>
+              <span className="text-sm text-gray-700 dark:text-gray-400">total</span>
             </div>
           </div>
         )}
@@ -309,16 +309,16 @@ export default function FilterPanel({
         <p className="text-xs text-slate-600 dark:text-gray-400 uppercase tracking-wider">Breakdown</p>
         <div className="grid grid-cols-2 gap-3">
           <div className="glass rounded-lg p-3 text-center">
-            <div className="text-2xl font-bold text-purple-400">
+            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
               {sentimentData.length}
             </div>
-            <div className="text-xs text-gray-500 mt-1">Sentiment</div>
+            <div className="text-xs text-gray-600 dark:text-gray-500 mt-1">Sentiment</div>
           </div>
           <div className="glass rounded-lg p-3 text-center">
-            <div className="text-2xl font-bold text-teal-400">
+            <div className="text-2xl font-bold text-teal-600 dark:text-teal-400">
               {capabilityData.length}
             </div>
-            <div className="text-xs text-gray-500 mt-1">Capability</div>
+            <div className="text-xs text-gray-600 dark:text-gray-500 mt-1">Capability</div>
           </div>
         </div>
       </div>

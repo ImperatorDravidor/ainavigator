@@ -28,7 +28,7 @@ const ProgressBar = ({ value, max = 100, color }: any) => {
   const percentage = (value / max) * 100
 
   return (
-    <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+    <div className="w-full h-1.5 bg-gray-200 dark:bg-white/5 rounded-full overflow-hidden">
       <motion.div
         initial={{ width: 0 }}
         animate={{ width: `${percentage}%` }}
@@ -121,8 +121,8 @@ export default function StatsCards({ stats }: StatsCardsProps) {
                 <div
                   className={`text-xs px-2 py-1 rounded-full font-medium ${
                     card.status === 'good'
-                      ? 'bg-green-500/15 text-green-300 border border-green-500/30'
-                      : 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
+                      ? 'bg-green-500/15 text-green-700 dark:text-green-300 border border-green-500/30'
+                      : 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30'
                   }`}
                 >
                   {card.status === 'good' ? '✓' : '⚠'}
@@ -132,10 +132,10 @@ export default function StatsCards({ stats }: StatsCardsProps) {
 
             {/* Value */}
             <div className="space-y-1">
-              <p className="text-xs text-gray-400 uppercase tracking-wide">
+              <p className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide">
                 {card.label}
               </p>
-              <p className="text-xl font-bold text-white">
+              <p className="text-xl font-bold text-gray-900 dark:text-white">
                 <DisplayValue
                   value={card.value}
                   suffix={card.suffix}

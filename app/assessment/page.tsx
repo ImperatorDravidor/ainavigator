@@ -6,7 +6,7 @@ import {
   Filter, Download, Activity,
   Users, Target, ChevronRight,
   BarChart3, Brain, FileText, Settings,
-  Maximize2, Minimize2, Bot, Search, Lightbulb
+  Maximize2, Minimize2, Search, Lightbulb, Sparkles
 } from 'lucide-react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/hooks/useAuth'
@@ -22,11 +22,9 @@ import { KeyboardShortcutsHelp } from '@/components/ui/keyboard-shortcuts-help'
 import { useKeyboardNavigation } from '@/hooks/use-keyboard-navigation'
 import { toast } from 'react-hot-toast'
 import { EasterEggAchievement, useAchievements } from '@/components/ui/easter-egg-achievement'
-import { QuirkyLoadingMessage } from '@/components/ui/loading-messages'
 import { useFunInteractions } from '@/hooks/use-fun-interactions'
 import { ViewState, FilterState, CompanyProfile } from '@/lib/types/assessment'
 import { cn } from '@/lib/utils'
-import { brandColors, viewColors, brandGradients } from '@/lib/constants/brand-colors'
 import FilterPanel from '@/components/dashboard/FilterPanel'
 import ExecutiveDashboard from '@/components/dashboard/ExecutiveDashboard'
 import SentimentHeatmapRevised from '@/components/sentiment/SentimentHeatmapRevised'
@@ -71,7 +69,7 @@ export default function AssessmentPage() {
   const [showKeyboardHelp, setShowKeyboardHelp] = useState(false)
   const [showComparison, setShowComparison] = useState(false)
   const [selectedWave, setSelectedWave] = useState<string | undefined>(undefined)
-  const [visitedSections, setVisitedSections] = useState<Set<string>>(new Set())
+  const [visitedSections, setVisitedSections] = useState<Set<NavigationView>>(new Set())
   const [keyboardShortcutCount, setKeyboardShortcutCount] = useState(0)
   const { achievementToShow, unlock, dismiss } = useAchievements()
 
@@ -446,132 +444,80 @@ export default function AssessmentPage() {
 
   if (isLoading) {
     return (
-      <div className="fixed inset-0 bg-white dark:bg-black flex items-center justify-center overflow-hidden">
-        {/* Playful gradient background */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="fixed inset-0 bg-white dark:bg-black flex items-center justify-center overflow-hidden"
+      >
+        {/* Simplified gradient background */}
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-teal-50 via-purple-50 to-pink-50 dark:from-gray-950 dark:via-black dark:to-gray-950" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-teal-200/40 via-transparent to-transparent dark:from-teal-900/20" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-purple-200/40 via-transparent to-transparent dark:from-purple-900/20" />
-          
-          {/* Floating orbs */}
-          {[0, 1, 2].map((i) => (
-            <motion.div
-              key={i}
-              className="absolute rounded-full"
-              style={{
-                width: 200,
-                height: 200,
-                left: `${20 + i * 30}%`,
-                top: `${20 + i * 20}%`,
-                background: i === 0 
-                  ? 'radial-gradient(circle, rgba(20, 184, 166, 0.15), transparent)'
-                  : i === 1
-                  ? 'radial-gradient(circle, rgba(168, 85, 247, 0.15), transparent)'
-                  : 'radial-gradient(circle, rgba(236, 72, 153, 0.15), transparent)',
-                filter: 'blur(60px)',
-              }}
-              animate={{
-                y: [0, -30, 0],
-                scale: [1, 1.2, 1],
-              }}
-              transition={{
-                duration: 8 + i * 2,
-                repeat: Infinity,
-                ease: 'easeInOut',
-                delay: i,
-              }}
-            />
-          ))}
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-black dark:to-gray-950" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-teal-500/5 via-transparent to-transparent dark:from-teal-900/10" />
         </div>
         
         {/* Loading content */}
-        <div className="relative z-10 text-center">
-          {/* Animated logo with multiple effects */}
+        <div className="relative z-10 text-center px-4">
+          {/* Simplified animated logo */}
           <motion.div
-            className="relative mb-8 flex justify-center"
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.5, type: "spring", stiffness: 200 }}
+            className="relative mb-6 flex justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
           >
-            {/* Outer pulse ring */}
             <motion.div
-              className="absolute inset-0 rounded-2xl bg-gradient-to-br from-teal-500 to-purple-500"
+              className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-500 to-purple-500 flex items-center justify-center shadow-lg"
               animate={{
-                scale: [1, 1.5, 1],
-                opacity: [0.5, 0, 0.5],
+                scale: [1, 1.05, 1],
               }}
               transition={{
                 duration: 2,
                 repeat: Infinity,
-                ease: "easeOut"
-              }}
-            />
-            
-            {/* Main logo */}
-            <motion.div
-              className="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-teal-500 to-purple-500 flex items-center justify-center shadow-2xl"
-              animate={{
-                rotate: [0, 5, -5, 0],
-                boxShadow: [
-                  "0 0 40px rgba(20, 184, 166, 0.4)",
-                  "0 0 80px rgba(168, 85, 247, 0.6)",
-                  "0 0 40px rgba(20, 184, 166, 0.4)"
-                ]
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
                 ease: "easeInOut"
               }}
             >
-              <Activity className="w-12 h-12 text-white" />
+              <Activity className="w-8 h-8 text-white" />
             </motion.div>
           </motion.div>
 
           <motion.h2
-            className="text-3xl font-bold text-gray-900 dark:text-white mb-3"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
+            className="text-xl font-semibold text-gray-900 dark:text-white mb-2"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.1 }}
           >
             Loading Your Assessment
           </motion.h2>
           
-          <motion.div
-            className="mb-8"
+          <motion.p
+            className="text-sm text-gray-600 dark:text-gray-400 mb-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.2 }}
           >
-            <QuirkyLoadingMessage />
-          </motion.div>
+            Preparing your insights...
+          </motion.p>
 
-          {/* Animated progress dots with brand colors */}
-          <div className="flex items-center justify-center gap-3">
-            {[
-              { color: 'from-teal-400 to-teal-500', delay: 0 },
-              { color: 'from-purple-400 to-purple-500', delay: 0.2 },
-              { color: 'from-pink-400 to-pink-500', delay: 0.4 },
-              { color: 'from-orange-400 to-orange-500', delay: 0.6 },
-            ].map((dot, i) => (
+          {/* Simple progress dots */}
+          <div className="flex items-center justify-center gap-2">
+            {[0, 1, 2].map((i) => (
               <motion.div
                 key={i}
-                className={`w-3 h-3 rounded-full bg-gradient-to-r ${dot.color} shadow-lg`}
+                className="w-2 h-2 rounded-full bg-teal-500"
                 animate={{
-                  scale: [1, 1.8, 1],
-                  opacity: [0.4, 1, 0.4]
+                  scale: [1, 1.3, 1],
+                  opacity: [0.3, 1, 0.3]
                 }}
                 transition={{
-                  duration: 1.5,
+                  duration: 1.2,
                   repeat: Infinity,
-                  delay: dot.delay,
+                  delay: i * 0.2,
                   ease: "easeInOut"
                 }}
               />
             ))}
           </div>
         </div>
-      </div>
+      </motion.div>
     )
   }
 
@@ -632,10 +578,10 @@ export default function AssessmentPage() {
       items: [
         { 
           id: 'ai-agent' as NavigationView, 
-          icon: Bot, 
+          icon: Sparkles, 
           label: 'AI Assistant', 
-          description: 'Ask questions',
-          tooltip: 'Chat with your AI assistant to explore your data and get instant answers.'
+          description: 'Insights & Analysis',
+          tooltip: 'AI-powered analysis and recommendations based on your assessment data'
         },
         { 
           id: 'reports' as NavigationView, 
@@ -656,7 +602,7 @@ export default function AssessmentPage() {
       {/* Light mode optimized gradient background */}
       <div className="absolute inset-0 z-0">
         {/* Base gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-teal-50 via-white to-purple-50 dark:from-gray-950 dark:via-black dark:to-gray-950" />
+        <div className="absolute inset-0 bg-gradient-to-br from-teal-50 via-white to-purple-50 dark:from-slate-950 dark:via-black dark:to-slate-950" />
         
         {/* Radial overlays - subtle and refined */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-teal-100/40 via-transparent to-transparent dark:from-teal-900/20" />
@@ -920,9 +866,9 @@ export default function AssessmentPage() {
         {/* Main Content Area - Fixed Height, No Scroll */}
         <div className="flex-1 flex flex-col h-full overflow-hidden pb-20 md:pb-0">
           
-          {/* Top Action Bar - Light mode with brand colors */}
+          {/* Top Action Bar - Solid, always on top */}
           <motion.div 
-            className="relative flex-shrink-0 h-14 bg-white/90 dark:bg-black/20 backdrop-blur-xl border-b border-gray-200 dark:border-white/[0.08] px-4 md:px-6 flex items-center justify-between gap-4 shadow-sm"
+            className="relative flex-shrink-0 h-14 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-white/[0.12] px-4 md:px-6 flex items-center justify-between gap-4 shadow-md z-50"
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
           >
@@ -961,6 +907,18 @@ export default function AssessmentPage() {
                   </div>
                 </EnhancedTooltip>
                 
+                {/* Wave Selector for Progress Tracking */}
+                <select
+                  value={selectedWave || 'all'}
+                  onChange={(e) => setSelectedWave(e.target.value === 'all' ? undefined : e.target.value)}
+                  className="px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs font-medium text-slate-700 dark:text-gray-300 hover:border-teal-300 dark:hover:border-teal-500/30 transition-all cursor-pointer"
+                >
+                  <option value="all">All Data</option>
+                  <option value="baseline">Baseline Assessment</option>
+                  <option value="wave-2">After Interventions (Wave 2)</option>
+                  <option value="wave-3">Latest (Wave 3)</option>
+                </select>
+
                 <EnhancedTooltip
                   content="Data is synced and up-to-date"
                   icon="sparkle"
@@ -980,12 +938,12 @@ export default function AssessmentPage() {
               <div className="relative hidden lg:block">
                 <button
                   onClick={() => setShowCommandPalette(true)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 shadow-sm hover:shadow-md ring-1 ring-slate-200/50 dark:ring-white/5 transition-all group"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-md hover:shadow-lg border border-slate-200 dark:border-white/20 transition-all group relative z-50"
                   aria-label="Open command palette"
                 >
-                  <Search className="w-3.5 h-3.5 text-slate-400 dark:text-gray-500 group-hover:text-teal-500 dark:group-hover:text-teal-400 transition-colors" />
-                  <span className="text-[11px] text-slate-500 dark:text-gray-500">Search</span>
-                  <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-[9px] text-slate-600 dark:text-gray-400 font-mono">⌘K</kbd>
+                  <Search className="w-3.5 h-3.5 text-slate-400 dark:text-gray-400 group-hover:text-teal-500 dark:group-hover:text-teal-400 transition-colors" />
+                  <span className="text-[11px] text-slate-600 dark:text-gray-300">Search</span>
+                  <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-[9px] text-slate-600 dark:text-gray-300 font-mono border border-slate-200 dark:border-white/10">⌘K</kbd>
                 </button>
               </div>
 
@@ -1039,7 +997,7 @@ export default function AssessmentPage() {
               >
                 <motion.button
                   onClick={handleExportPDF}
-                  className="px-3 py-1.5 rounded-lg bg-white dark:bg-white/5 hover:bg-teal-50 dark:hover:bg-teal-500/10 transition-all flex items-center gap-1.5 text-slate-700 dark:text-gray-300 hover:text-teal-700 dark:hover:text-teal-400 shadow-sm hover:shadow-md ring-1 ring-slate-200/50 dark:ring-white/5"
+                  className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-teal-50 dark:hover:bg-teal-500/20 transition-all flex items-center gap-1.5 text-slate-700 dark:text-gray-200 hover:text-teal-700 dark:hover:text-teal-300 shadow-md hover:shadow-lg border border-slate-200 dark:border-white/20 relative z-50"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   aria-label="Export PDF report"

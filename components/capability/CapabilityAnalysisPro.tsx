@@ -326,10 +326,10 @@ export default function CapabilityAnalysisPro({
         </div>
 
         {/* Radar Chart */}
-        <div className="flex-1 bg-gradient-to-br from-white/[0.08] to-white/[0.02] rounded-lg border border-white/10 p-4 flex flex-col min-h-0">
+        <div className="flex-1 glass-dark rounded-lg p-4 flex flex-col min-h-0">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs text-slate-600 dark:text-gray-400">{chartViews.find(v => v.id === chartView)?.description}</span>
-            <span className="text-xs text-purple-400 font-medium">{benchmarkComparisons[benchmarkType].label}</span>
+            <span className="text-xs text-gray-700 dark:text-gray-400">{chartViews.find(v => v.id === chartView)?.description}</span>
+            <span className="text-xs text-purple-600 dark:text-purple-400 font-medium">{benchmarkComparisons[benchmarkType].label}</span>
           </div>
 
           <div className="flex-1 min-h-0">
@@ -447,16 +447,16 @@ export default function CapabilityAnalysisPro({
           </div>
 
           {/* Custom Legend */}
-          <div className="flex items-center justify-center gap-4 pt-3 border-t border-white/5">
+          <div className="flex items-center justify-center gap-4 pt-3 border-t border-gray-200 dark:border-white/5">
             {chartView === 'comparison' && (
               <>
                 <div className="flex items-center gap-1.5">
                   <div className="w-3 h-3 rounded-full bg-teal-400" />
-                  <span className="text-xs text-slate-700 dark:text-gray-400">Your Score</span>
+                  <span className="text-xs text-gray-700 dark:text-gray-400">Your Score</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <div className="w-6 h-0.5 bg-purple-400" style={{ borderTop: '2px dashed #a855f7' }} />
-                  <span className="text-xs text-slate-700 dark:text-gray-400">Benchmark</span>
+                  <span className="text-xs text-gray-700 dark:text-gray-400">Benchmark</span>
                 </div>
               </>
             )}
@@ -464,15 +464,15 @@ export default function CapabilityAnalysisPro({
               <>
                 <div className="flex items-center gap-1.5">
                   <div className="w-6 h-0.5 bg-green-400" style={{ borderTop: '2px dashed #10b981' }} />
-                  <span className="text-xs text-slate-700 dark:text-gray-400">Max</span>
+                  <span className="text-xs text-gray-700 dark:text-gray-400">Max</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <div className="w-3 h-3 rounded-full bg-teal-400" />
-                  <span className="text-xs text-slate-700 dark:text-gray-400">Average</span>
+                  <span className="text-xs text-gray-700 dark:text-gray-400">Average</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <div className="w-6 h-0.5 bg-red-400" style={{ borderTop: '2px dashed #ef4444' }} />
-                  <span className="text-xs text-slate-700 dark:text-gray-400">Min</span>
+                  <span className="text-xs text-gray-700 dark:text-gray-400">Min</span>
                 </div>
               </>
             )}
@@ -480,11 +480,11 @@ export default function CapabilityAnalysisPro({
               <>
                 <div className="flex items-center gap-1.5">
                   <div className="w-3 h-3 rounded-full bg-teal-400" />
-                  <span className="text-xs text-slate-700 dark:text-gray-400">Current</span>
+                  <span className="text-xs text-gray-700 dark:text-gray-400">Current</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <div className="w-6 h-0.5 bg-gray-500" style={{ borderTop: '2px dashed #6b7280' }} />
-                  <span className="text-xs text-slate-700 dark:text-gray-400">Target (7.0)</span>
+                  <span className="text-xs text-gray-700 dark:text-gray-400">Target (7.0)</span>
                 </div>
               </>
             )}
@@ -544,18 +544,18 @@ export default function CapabilityAnalysisPro({
         </div>
 
         {/* Table */}
-        <div className="flex-1 bg-gradient-to-br from-white/[0.08] to-white/[0.02] rounded-lg border border-white/10 overflow-hidden flex flex-col min-h-0">
+        <div className="flex-1 glass-dark rounded-lg overflow-hidden flex flex-col min-h-0">
           <div className="flex-1 overflow-y-auto overflow-x-auto scrollbar-thin">
             <table className="w-full text-sm min-w-[600px]">
-              <thead className="sticky top-0 bg-black/90 backdrop-blur-xl z-10">
-                <tr className="border-b border-white/10">
-                  <th className="text-left py-3 px-4 text-slate-600 dark:text-gray-400 font-semibold uppercase tracking-wider text-xs">Dimension</th>
-                  <th className="text-center py-3 px-3 text-slate-600 dark:text-gray-400 font-semibold uppercase tracking-wider text-xs">Score</th>
-                  <th className="text-center py-3 px-3 text-slate-600 dark:text-gray-400 font-semibold uppercase tracking-wider text-xs">Max</th>
-                  <th className="text-center py-3 px-3 text-slate-600 dark:text-gray-400 font-semibold uppercase tracking-wider text-xs">Min</th>
-                  <th className="text-center py-3 px-3 text-slate-600 dark:text-gray-400 font-semibold uppercase tracking-wider text-xs">Benchmark</th>
-                  <th className="text-center py-3 px-3 text-slate-600 dark:text-gray-400 font-semibold uppercase tracking-wider text-xs">Gap</th>
-                  <th className="text-right py-3 px-4 text-slate-600 dark:text-gray-400 font-semibold uppercase tracking-wider text-xs">Status</th>
+              <thead className="sticky top-0 bg-white/90 dark:bg-black/90 backdrop-blur-xl z-10">
+                <tr className="border-b border-gray-200 dark:border-white/10">
+                  <th className="text-left py-3 px-4 text-gray-700 dark:text-gray-400 font-semibold uppercase tracking-wider text-xs">Dimension</th>
+                  <th className="text-center py-3 px-3 text-gray-700 dark:text-gray-400 font-semibold uppercase tracking-wider text-xs">Score</th>
+                  <th className="text-center py-3 px-3 text-gray-700 dark:text-gray-400 font-semibold uppercase tracking-wider text-xs">Max</th>
+                  <th className="text-center py-3 px-3 text-gray-700 dark:text-gray-400 font-semibold uppercase tracking-wider text-xs">Min</th>
+                  <th className="text-center py-3 px-3 text-gray-700 dark:text-gray-400 font-semibold uppercase tracking-wider text-xs">Benchmark</th>
+                  <th className="text-center py-3 px-3 text-gray-700 dark:text-gray-400 font-semibold uppercase tracking-wider text-xs">Gap</th>
+                  <th className="text-right py-3 px-4 text-gray-700 dark:text-gray-400 font-semibold uppercase tracking-wider text-xs">Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -565,15 +565,15 @@ export default function CapabilityAnalysisPro({
                     <tr 
                       key={dim.dimensionId} 
                       className={cn(
-                        "border-b border-white/5 hover:bg-white/5 cursor-pointer transition-colors group",
-                        index % 2 === 0 ? "bg-white/[0.02]" : ""
+                        "border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer transition-colors group",
+                        index % 2 === 0 ? "bg-gray-50/50 dark:bg-white/[0.02]" : ""
                       )}
                       onClick={() => onDimensionClick(dim.dimensionId)}
                     >
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-slate-900 dark:text-white group-hover:text-teal-700 dark:group-hover:text-teal-300 transition-colors">{dim.name}</span>
-                          <ChevronRight className="w-4 h-4 text-slate-400 dark:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                          <span className="font-semibold text-gray-900 dark:text-white group-hover:text-teal-700 dark:group-hover:text-teal-300 transition-colors">{dim.name}</span>
+                          <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
                       </td>
                       <td className="text-center px-3 tabular-nums">
@@ -583,7 +583,7 @@ export default function CapabilityAnalysisPro({
                         )}>
                           {dim.average.toFixed(1)}
                         </span>
-                        <span className="text-slate-500 dark:text-gray-600 text-sm ml-0.5">/10</span>
+                        <span className="text-gray-600 dark:text-gray-600 text-sm ml-0.5">/10</span>
                       </td>
                       <td className="text-center px-3 text-green-700 dark:text-green-400 tabular-nums font-medium">{dim.max.toFixed(1)}</td>
                       <td className="text-center px-3 text-orange-700 dark:text-orange-400 tabular-nums font-medium">{dim.min.toFixed(1)}</td>
@@ -600,9 +600,9 @@ export default function CapabilityAnalysisPro({
                       <td className="text-right px-4">
                         <span className={cn(
                           "inline-block px-2.5 py-1 rounded text-xs font-bold uppercase tracking-wider",
-                          dim.status === 'above' ? "bg-green-500/10 text-green-700 dark:text-green-400 border border-green-500/20" :
-                          dim.status === 'below' ? "bg-orange-500/10 text-orange-400 border border-orange-500/20" :
-                          "bg-red-500/10 text-red-700 dark:text-red-400 border border-red-500/20"
+                          dim.status === 'above' ? "bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-500/20" :
+                          dim.status === 'below' ? "bg-orange-100 dark:bg-orange-500/10 text-orange-700 dark:text-orange-400 border border-orange-300 dark:border-orange-500/20" :
+                          "bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-500/20"
                         )}>
                           {dim.status === 'above' ? 'EXCEEDS' : dim.status === 'below' ? 'BELOW' : 'CRITICAL'}
                         </span>
@@ -615,14 +615,14 @@ export default function CapabilityAnalysisPro({
           </div>
           
           {/* Footer */}
-          <div className="flex-shrink-0 px-4 py-2.5 border-t border-white/5 bg-black/40 backdrop-blur-sm">
+          <div className="flex-shrink-0 px-4 py-2.5 border-t border-gray-200 dark:border-white/5 bg-gray-50/80 dark:bg-black/40 backdrop-blur-sm">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
-              <span className="text-gray-500">
-                Industry benchmark: <span className="text-slate-600 dark:text-gray-400 font-medium">Financial Services (1000-5000 employees)</span>
+              <span className="text-gray-600 dark:text-gray-500">
+                Industry benchmark: <span className="text-gray-700 dark:text-gray-400 font-medium">Financial Services (1000-5000 employees)</span>
               </span>
-              <span className="hidden sm:inline text-gray-600">•</span>
-              <span className="text-gray-500">
-                Scale: <span className="text-slate-600 dark:text-gray-400 font-medium">1-10 Capability Maturity</span>
+              <span className="hidden sm:inline text-gray-400 dark:text-gray-600">•</span>
+              <span className="text-gray-600 dark:text-gray-500">
+                Scale: <span className="text-gray-700 dark:text-gray-400 font-medium">1-10 Capability Maturity</span>
               </span>
             </div>
             </div>

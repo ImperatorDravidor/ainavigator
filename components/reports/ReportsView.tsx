@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import { 
   FileText, Download, Share2, Presentation, FileSpreadsheet,
-  CheckCircle, Clock, Users, BarChart3, Calendar, Mail
+  CheckCircle, Clock, Users, BarChart3, Calendar, Mail, Target
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -14,28 +14,168 @@ interface ReportsViewProps {
 
 export default function ReportsView({ companyName, onExportPDF }: ReportsViewProps) {
 
+  const exportInterventionsReport = async () => {
+    try {
+      const { generateInterventionsPDF } = await import('@/lib/utils/pdfExport-interventions-v2')
+      
+      const interventionsData = {
+        companyName: companyName,
+        industry: 'Financial Services',
+        date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+        respondents: 1000,
+        interventions: [
+          {
+            code: 'A1',
+            name: 'AI Transparency and Explainability Program',
+            level: 'Strategy and Governance',
+            description: 'Implement comprehensive transparency frameworks to build trust in AI systems. Establish clear communication protocols about how AI makes decisions, what data it uses, and how employees can question or appeal AI-driven outcomes.',
+            outcomes: [
+              'Increased trust in AI systems through clear explanations of decision-making processes',
+              'Reduced anxiety about opaque AI by 40-50% based on follow-up sentiment surveys',
+              'Established audit trails for all AI-driven decisions affecting employees',
+              'Created plain-language documentation for all AI tools and their logic'
+            ],
+            steps: [
+              'Conduct stakeholder workshops to identify transparency requirements',
+              'Develop AI decision documentation templates and standards',
+              'Train managers on explaining AI outputs to their teams',
+              'Implement quarterly AI transparency audits',
+              'Create employee-facing dashboard showing AI system logic'
+            ],
+            timeline: '12 weeks',
+            investment: '$150,000 - $350,000',
+            roi: '30-50% reduction in resistance',
+            risk: 'Medium' as const
+          },
+          {
+            code: 'B2',
+            name: 'AI Literacy and Skills Development',
+            level: 'Adoption and Behavior',
+            description: 'Comprehensive training program to build practical AI skills across all employee levels. Includes hands-on workshops, certification paths, and peer learning networks to reduce competence anxiety and increase confidence.',
+            outcomes: [
+              '80% of employees complete foundational AI literacy training within 6 months',
+              'AI champions identified and trained in each department',
+              'Measurable 35-45% increase in AI tool adoption rates',
+              'Reduction in support tickets and "fear of AI" complaints by 50%'
+            ],
+            steps: [
+              'Assess current AI literacy levels across organization',
+              'Design role-specific training curricula (technical vs. business users)',
+              'Launch pilot training with early adopters and champions',
+              'Roll out organization-wide learning programs with certification',
+              'Establish ongoing learning resources and peer support networks'
+            ],
+            timeline: '16 weeks initial rollout, ongoing',
+            investment: '$120,000 - $280,000',
+            roi: '40-60% productivity improvement',
+            risk: 'Low' as const
+          },
+          {
+            code: 'C1',
+            name: 'Rapid AI Prototyping Initiative',
+            level: 'Implementation and Value Creation',
+            description: 'Fast-track 3-5 high-impact AI use cases from concept to working prototype. Demonstrate tangible value quickly to build organizational confidence and momentum. Focus on quick wins that showcase AI capabilities.',
+            outcomes: [
+              'Working prototypes delivered in 6-8 weeks for 3-5 use cases',
+              'Measurable business value demonstrated (cost savings or revenue impact)',
+              'Team confidence in AI delivery capabilities increased significantly',
+              'Reusable patterns and best practices documented for future projects'
+            ],
+            steps: [
+              'Identify and prioritize 3-5 high-value, low-complexity use cases',
+              'Assemble cross-functional prototype teams with clear ownership',
+              'Sprint through rapid development cycles (2-week sprints)',
+              'Pilot with friendly user groups and gather feedback',
+              'Package successful prototypes for broader deployment'
+            ],
+            timeline: '8-10 weeks per prototype',
+            investment: '$100,000 - $180,000',
+            roi: '25-40% faster time-to-value',
+            risk: 'Medium' as const
+          },
+          {
+            code: 'B4',
+            name: 'AI Ambassador Network',
+            level: 'Adoption and Behavior',
+            description: 'Build a network of AI champions across departments to drive grassroots adoption. Train ambassadors to provide peer support, answer questions, and model effective AI use in their daily work.',
+            outcomes: [
+              '25-30 trained AI ambassadors across all departments',
+              'Peer-to-peer support reducing IT helpdesk load by 30%',
+              'Organic adoption spreading through social influence',
+              'Early identification of friction points and resistance patterns'
+            ],
+            steps: [
+              'Nominate and recruit ambassadors from each team (self-nomination encouraged)',
+              'Provide intensive training and certification for ambassadors',
+              'Establish regular ambassador network meetings and knowledge sharing',
+              'Create ambassador playbook with FAQs and troubleshooting guides',
+              'Recognize and reward ambassador contributions publicly'
+            ],
+            timeline: '12 weeks to establish network',
+            investment: '$60,000 - $120,000',
+            roi: '35-50% adoption acceleration',
+            risk: 'Low' as const
+          },
+          {
+            code: 'A3',
+            name: 'AI Governance and Ethics Framework',
+            level: 'Strategy and Governance',
+            description: 'Establish formal governance structures to ensure responsible, ethical AI deployment. Create clear policies, review processes, and accountability mechanisms that address fairness and bias concerns.',
+            outcomes: [
+              'Published AI ethics guidelines and governance policies',
+              'AI review board established with cross-functional representation',
+              'Regular ethical impact assessments for all AI deployments',
+              'Reduced concerns about fairness and bias by 40-60%'
+            ],
+            steps: [
+              'Form AI governance committee with diverse stakeholder representation',
+              'Draft AI ethics principles and usage policies',
+              'Implement mandatory ethics review for new AI projects',
+              'Train review board members on ethical AI evaluation',
+              'Publish policies and create transparency mechanisms'
+            ],
+            timeline: '10-12 weeks',
+            investment: '$90,000 - $180,000',
+            roi: '25-35% risk reduction',
+            risk: 'Low' as const
+          }
+        ],
+        priorityGaps: [
+          { dimension: 'Strategy and Vision', score: 4.0, benchmark: 4.3, gap: -0.3, status: 'Below Benchmark' },
+          { dimension: 'Data Infrastructure', score: 3.9, benchmark: 5.5, gap: -1.6, status: 'Critical Gap' },
+          { dimension: 'Talent and Skills', score: 4.1, benchmark: 3.7, gap: +0.4, status: 'Above Benchmark' },
+          { dimension: 'Ethics and Governance', score: 5.2, benchmark: 4.9, gap: +0.3, status: 'Strength' },
+          { dimension: 'Technology Platform', score: 4.5, benchmark: 4.1, gap: +0.4, status: 'Above Benchmark' }
+        ]
+      }
+      
+      await generateInterventionsPDF(interventionsData)
+    } catch (error) {
+      console.error('Failed to generate interventions report:', error)
+      alert('Failed to generate PDF. Please try again.')
+    }
+  }
+
   const reportTypes = [
     {
       id: 'executive',
       icon: FileText,
       title: 'Executive Summary Report',
-      description: 'Comprehensive 25-page PDF with all findings, insights, and recommendations',
+      description: 'Comprehensive PDF with all findings, insights, and recommendations',
       features: ['Sentiment analysis', 'Capability assessment', 'AI insights', 'Action plan', 'ROI estimates'],
       format: 'PDF',
-      pages: '25-30 pages',
       status: 'ready',
       action: onExportPDF
     },
     {
-      id: 'board',
-      icon: Presentation,
-      title: 'Board Presentation Deck',
-      description: 'Executive summary slides formatted for board meetings and stakeholder presentations',
-      features: ['Key findings', 'Visual dashboards', 'Recommendations', 'Financial impact'],
-      format: 'PowerPoint',
-      pages: '12-15 slides',
-      status: 'coming_soon',
-      action: null
+      id: 'interventions',
+      icon: Target,
+      title: 'Interventions Action Plan',
+      description: 'Detailed intervention recommendations with implementation roadmap and ROI analysis',
+      features: ['Recommended programs', 'Implementation steps', 'Resource requirements', 'Expected outcomes', 'ROI projections'],
+      format: 'PDF',
+      status: 'ready',
+      action: () => exportInterventionsReport()
     },
     {
       id: 'detailed',
@@ -44,7 +184,6 @@ export default function ReportsView({ companyName, onExportPDF }: ReportsViewPro
       description: 'In-depth statistical analysis with all data points, segmentations, and methodology',
       features: ['Full data set', 'Statistical breakdowns', 'Demographic segments', 'Methodology notes'],
       format: 'PDF',
-      pages: '40-50 pages',
       status: 'coming_soon',
       action: null
     },
@@ -55,7 +194,6 @@ export default function ReportsView({ companyName, onExportPDF }: ReportsViewPro
       description: 'Complete dataset in CSV format for custom analysis and integration',
       features: ['All responses', 'Calculated scores', 'Demographics', 'Timestamps'],
       format: 'CSV',
-      pages: 'Full dataset',
       status: 'coming_soon',
       action: null
     }
@@ -173,9 +311,7 @@ export default function ReportsView({ companyName, onExportPDF }: ReportsViewPro
                     <div>
                       <h4 className="text-base font-semibold text-slate-900 dark:text-white mb-0.5">{report.title}</h4>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500">{report.format}</span>
-                        <span className="text-xs text-gray-600">•</span>
-                        <span className="text-xs text-gray-500">{report.pages}</span>
+                        <span className="text-xs text-gray-500">{report.format} Format</span>
                       </div>
                     </div>
                   </div>

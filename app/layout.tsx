@@ -46,11 +46,23 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="light" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} font-sans antialiased bg-slate-50 dark:bg-black text-slate-900 dark:text-white min-h-screen transition-colors duration-300`}
+        className={`${inter.variable} font-sans antialiased bg-background text-foreground min-h-screen transition-colors duration-300`}
         suppressHydrationWarning
       >
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const theme = localStorage.getItem('theme') || 'light';
+                  document.documentElement.classList.add(theme);
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
         <ProvidersWithChat>
           {children}
         </ProvidersWithChat>

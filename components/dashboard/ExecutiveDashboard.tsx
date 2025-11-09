@@ -497,18 +497,18 @@ export default function ExecutiveDashboard({
           </button>
         </div>
 
-        <div className="flex-1 bg-gradient-to-br from-white/[0.08] to-white/[0.02] rounded-lg border border-white/10 overflow-hidden flex flex-col min-h-0">
+        <div className="flex-1 bg-white dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-white/10 overflow-hidden flex flex-col min-h-0 shadow-sm">
           {/* Table Container with Scroll */}
           <div className="flex-1 overflow-y-auto scrollbar-thin">
             <table className="w-full text-xs">
-              <thead className="sticky top-0 bg-black/80 backdrop-blur-xl z-10">
-                <tr className="border-b border-white/10">
-                  <th className="text-left py-3 px-4 text-slate-600 dark:text-gray-400 font-semibold uppercase tracking-wider text-xs">Dimension</th>
-                  <th className="text-center py-3 px-3 text-slate-600 dark:text-gray-400 font-semibold uppercase tracking-wider text-xs">Your Score</th>
-                  <th className="text-center py-3 px-3 text-slate-600 dark:text-gray-400 font-semibold uppercase tracking-wider text-xs">Industry Avg</th>
-                  <th className="text-center py-3 px-3 text-slate-600 dark:text-gray-400 font-semibold uppercase tracking-wider text-xs">Gap</th>
-                  <th className="text-center py-3 px-3 text-slate-600 dark:text-gray-400 font-semibold uppercase tracking-wider text-xs">Items</th>
-                  <th className="text-right py-3 px-4 text-slate-600 dark:text-gray-400 font-semibold uppercase tracking-wider text-xs">Performance</th>
+              <thead className="sticky top-0 bg-white dark:bg-slate-900 backdrop-blur-xl z-10 border-b border-slate-200 dark:border-white/10">
+                <tr>
+                  <th className="text-left py-3 px-4 text-slate-700 dark:text-gray-300 font-semibold uppercase tracking-wider text-xs">Dimension</th>
+                  <th className="text-center py-3 px-3 text-slate-700 dark:text-gray-300 font-semibold uppercase tracking-wider text-xs">Your Score</th>
+                  <th className="text-center py-3 px-3 text-slate-700 dark:text-gray-300 font-semibold uppercase tracking-wider text-xs">Industry Avg</th>
+                  <th className="text-center py-3 px-3 text-slate-700 dark:text-gray-300 font-semibold uppercase tracking-wider text-xs">Gap</th>
+                  <th className="text-center py-3 px-3 text-slate-700 dark:text-gray-300 font-semibold uppercase tracking-wider text-xs">Items</th>
+                  <th className="text-right py-3 px-4 text-slate-700 dark:text-gray-300 font-semibold uppercase tracking-wider text-xs">Performance</th>
                 </tr>
               </thead>
               <tbody>
@@ -516,14 +516,14 @@ export default function ExecutiveDashboard({
                   <tr 
                     key={dim.name} 
                     className={cn(
-                      "border-b border-white/5 hover:bg-white/5 cursor-pointer transition-colors group",
-                      index % 2 === 0 ? "bg-white/[0.02]" : "bg-transparent"
+                      "border-b border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-slate-800/50 cursor-pointer transition-colors group",
+                      index % 2 === 0 ? "bg-slate-50 dark:bg-slate-800/30" : "bg-white dark:bg-transparent"
                     )}
                   >
-                    <td className="py-2.5 px-4">
+                    <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
-                        <span className="text-slate-900 dark:text-white font-semibold group-hover:text-teal-700 dark:text-teal-300 transition-colors">{dim.name}</span>
-                        <Info className="w-3.5 h-3.5 text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <span className="text-slate-900 dark:text-white font-semibold group-hover:text-teal-700 dark:group-hover:text-teal-300 transition-colors">{dim.name}</span>
+                        <Info className="w-3.5 h-3.5 text-slate-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
                     </td>
                     <td className="text-center px-3 tabular-nums">
@@ -533,9 +533,9 @@ export default function ExecutiveDashboard({
                       )}>
                         {dim.score.toFixed(1)}
                       </span>
-                      <span className="text-gray-600 text-sm ml-0.5">/7.0</span>
+                      <span className="text-slate-500 dark:text-gray-400 text-sm ml-0.5">/7.0</span>
                     </td>
-                    <td className="text-center px-3 text-slate-600 dark:text-gray-400 tabular-nums font-medium text-sm">{dim.benchmark.toFixed(1)}</td>
+                    <td className="text-center px-3 text-slate-700 dark:text-gray-300 tabular-nums font-medium text-sm">{dim.benchmark.toFixed(1)}</td>
                     <td className="text-center px-3 tabular-nums">
                       <span className={cn(
                         "inline-flex items-center gap-1 font-semibold",
@@ -545,13 +545,13 @@ export default function ExecutiveDashboard({
                         {dim.gap >= 0 ? '+' : ''}{dim.gap.toFixed(1)}
                       </span>
                     </td>
-                    <td className="text-center px-3 text-slate-600 dark:text-gray-400 font-medium">{dim.constructs}</td>
+                    <td className="text-center px-3 text-slate-700 dark:text-gray-300 font-medium">{dim.constructs}</td>
                     <td className="text-right px-4">
                       <span className={cn(
                         "inline-block px-2.5 py-1 rounded text-xs font-bold uppercase tracking-wider",
-                        dim.score >= 5 ? "bg-green-500/10 text-green-700 dark:text-green-400 border border-green-500/20" :
-                        dim.score >= 4 ? "bg-blue-500/10 text-blue-400 border border-blue-500/20" :
-                        "bg-orange-500/10 text-orange-700 dark:text-orange-400 border border-orange-500/20"
+                        dim.score >= 5 ? "bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-500/30" :
+                        dim.score >= 4 ? "bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 border border-blue-300 dark:border-blue-500/30" :
+                        "bg-orange-100 dark:bg-orange-500/20 text-orange-700 dark:text-orange-400 border border-orange-300 dark:border-orange-500/30"
                       )}>
                         {dim.score >= 5 ? 'EXCEEDS' : dim.score >= 4 ? 'MEETS' : 'BELOW'}
                       </span>
@@ -563,14 +563,14 @@ export default function ExecutiveDashboard({
           </div>
           
           {/* Footer - Always visible */}
-          <div className="flex-shrink-0 px-4 py-3 border-t border-white/5 bg-black/40 backdrop-blur-sm">
+          <div className="flex-shrink-0 px-4 py-3 border-t border-gray-200 dark:border-white/5 bg-gray-50/80 dark:bg-black/40 backdrop-blur-sm">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-gray-500">
-                Industry benchmark: <span className="text-slate-600 dark:text-gray-400 font-medium">Financial Services (1000-5000 employees)</span>
+              <span className="text-gray-600 dark:text-gray-500">
+                Industry benchmark: <span className="text-gray-800 dark:text-gray-400 font-medium">Financial Services (1000-5000 employees)</span>
               </span>
-              <span className="text-gray-600">•</span>
-              <span className="text-gray-500">
-                Framework: <span className="text-slate-600 dark:text-gray-400 font-medium">AI Capability Maturity Model v2.0</span>
+              <span className="text-gray-400 dark:text-gray-600">•</span>
+              <span className="text-gray-600 dark:text-gray-500">
+                Framework: <span className="text-gray-800 dark:text-gray-400 font-medium">AI Capability Maturity Model v2.0</span>
               </span>
             </div>
           </div>
@@ -578,7 +578,7 @@ export default function ExecutiveDashboard({
       </div>
 
       {/* SECTION 5: DEEP DIVE NAVIGATION */}
-      <div className="flex-shrink-0 grid grid-cols-1 md:grid-cols-2 gap-3 pt-3 border-t border-white/5">
+      <div className="flex-shrink-0 grid grid-cols-1 md:grid-cols-2 gap-3 pt-3 border-t border-gray-200 dark:border-white/5">
         <button
           onClick={() => onNavigate('sentiment')}
           className="group bg-gradient-to-r from-teal-500/10 to-purple-500/10 hover:from-teal-500/15 hover:to-purple-500/15 rounded-lg border border-teal-500/30 hover:border-teal-400/50 transition-all p-3.5 flex items-center gap-3"
@@ -613,21 +613,21 @@ export default function ExecutiveDashboard({
           className="group bg-gradient-to-r from-blue-500/10 to-purple-500/10 hover:from-blue-500/15 hover:to-purple-500/15 rounded-lg border border-blue-500/30 hover:border-blue-400/50 transition-all p-3.5 flex items-center gap-3"
         >
           <div className="flex-shrink-0 w-11 h-11 rounded-lg bg-blue-500/20 border border-blue-500/30 flex items-center justify-center shadow-lg shadow-blue-500/10">
-            <Target className="w-5 h-5 text-blue-400" />
+            <Target className="w-5 h-5 text-blue-600 dark:text-blue-400" />
           </div>
           <div className="flex-1 text-left">
             <div className="flex items-center justify-between mb-1">
               <span className="text-sm font-semibold text-slate-900 dark:text-white">Analyze Capability Gaps</span>
-              <ArrowRight className="w-4 h-4 text-blue-400 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-4 h-4 text-blue-600 dark:text-blue-400 group-hover:translate-x-1 transition-transform" />
             </div>
             <p className="text-[10px] text-slate-600 dark:text-gray-400 leading-relaxed mb-2">
               Deep dive into the 8 capability dimensions with radar charts. Compare against industry benchmarks and identify specific constructs needing improvement.
             </p>
             <div className="flex items-center gap-1.5 text-[9px]">
-              <span className="px-1.5 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 text-blue-400 font-semibold">
+              <span className="px-1.5 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 text-blue-700 dark:text-blue-400 font-semibold">
                 8 dimensions
               </span>
-              <span className="px-1.5 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 text-blue-400 font-semibold">
+              <span className="px-1.5 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 text-blue-700 dark:text-blue-400 font-semibold">
                 32 constructs
               </span>
               <span className="px-1.5 py-0.5 rounded bg-orange-500/10 border border-orange-500/20 text-orange-700 dark:text-orange-400 font-semibold">

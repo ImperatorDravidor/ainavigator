@@ -2,20 +2,31 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Brain, TrendingUp, AlertTriangle, Lightbulb, Target, Zap, Clock, CheckCircle } from 'lucide-react'
+import { 
+  ArrowLeft, Brain, TrendingUp, AlertTriangle, Lightbulb, Target, 
+  Zap, Clock, CheckCircle, BarChart3, Users, ChevronDown, ChevronUp, Info 
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface CapabilityInsight {
   dimension: string
+  current_score: number
+  benchmark: number
+  gap_percentage: number
   priority: 'critical' | 'high' | 'medium'
-  gap_analysis: string
-  business_impact: string
-  recommended_interventions: string[]  // Intervention codes (A1, B2, etc.)
-  intervention_rationale: string       // Why these interventions address the gap
-  quick_wins: string[]
-  long_term_strategy: string
-  estimated_effort: 'low' | 'medium' | 'high'
-  estimated_timeline: string
+  evidence: {
+    score: number
+    response_count: number
+    common_themes: string[]
+  }
+  root_causes: string[]
+  immediate_actions: {
+    action: string
+    impact: string
+    effort: 'low' | 'medium' | 'high'
+  }[]
+  recommended_interventions: string[]
+  why_these_interventions: string
 }
 
 interface CapabilityInsightsViewProps {
@@ -33,152 +44,192 @@ export default function CapabilityInsightsView({
 }: CapabilityInsightsViewProps) {
   const [isAnalyzing, setIsAnalyzing] = useState(true)
   const [insights, setInsights] = useState<CapabilityInsight[]>([])
+  const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set([0]))
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    analyzeWithGPT()
+    // Generate insights from actual dimension data
+    generateDataDrivenInsights()
   }, [])
 
-  const useMockData = () => {
+  const generateDataDrivenInsights = () => {
     setTimeout(() => {
-      const mockInsights: CapabilityInsight[] = [
-        {
-          dimension: 'Strategy & Vision',
-          priority: 'critical',
-          gap_analysis: 'Limited strategic alignment between AI initiatives and business objectives. Lack of clear AI roadmap and executive sponsorship.',
-          business_impact: 'Fragmented AI efforts, missed opportunities for strategic value creation, difficulty securing budget and resources for AI projects.',
-          recommended_interventions: ['A1', 'A2', 'A3'],
-          intervention_rationale: 'Strategy & Governance interventions (A1 Roadmap Workshop, A2 Dialectics, A3 Playbook) directly address the strategic alignment gap by building shared vision, clarifying direction, and establishing governance frameworks with executive buy-in.',
-          quick_wins: [
-            'Conduct AI opportunity assessment workshop',
-            'Define top 3 strategic AI priorities'
-          ],
-          long_term_strategy: 'Build AI center of excellence with dedicated leadership, establish governance framework, and integrate AI into strategic planning cycles.',
-          estimated_effort: 'high',
-          estimated_timeline: '6-12 months for foundation'
-        },
-        {
-          dimension: 'Data',
-          priority: 'high',
-          gap_analysis: 'Data quality and accessibility issues limiting AI model effectiveness. Siloed data across systems without centralized governance.',
-          business_impact: 'Poor AI model performance, increased development time, compliance risks, inability to leverage data for insights.',
-          recommended_interventions: ['A3', 'C1', 'C2'],
-          intervention_rationale: 'Data challenges require both governance (A3 Playbook for data policies) and experimentation (C1 Kickstart to prototype with existing data, C2 ROI Retrospective to evaluate what data delivers value).',
-          quick_wins: [
-            'Audit critical data sources for AI use cases',
-            'Document data lineage for priority datasets'
-          ],
-          long_term_strategy: 'Build modern data platform with unified access, implement automated quality checks, and establish data mesh architecture for scalability.',
-          estimated_effort: 'high',
-          estimated_timeline: '9-18 months'
-        },
-        {
-          dimension: 'Talent & Skills',
-          priority: 'high',
-          gap_analysis: 'Insufficient AI expertise across organization. Skills gap in both technical AI capabilities and business understanding of AI potential.',
-          business_impact: 'Dependence on external consultants, slow AI adoption, missed innovation opportunities, competitive disadvantage.',
-          recommended_interventions: ['B2', 'B4', 'B5'],
-          intervention_rationale: 'Adoption & Behaviour interventions (B2 Learning Week for intensive skill-building, B4 Ambassadors for peer support, B5 Nudging for reinforcement) systematically build AI literacy and create a learning culture.',
-          quick_wins: [
-            'Identify AI champions in each department',
-            'Provide basic AI literacy training to leadership'
-          ],
-          long_term_strategy: 'Build internal AI academy, create career paths for AI roles, and establish mentorship programs to retain and develop AI talent.',
-          estimated_effort: 'medium',
-          estimated_timeline: '3-9 months for initial program'
-        }
-      ]
-
-      setInsights(mockInsights)
-      setIsAnalyzing(false)
-    }, 1500)
-  }
-
-  const analyzeWithGPT = async () => {
-    setIsAnalyzing(true)
-    setError(null)
-
-    try {
-      const response = await fetch('/api/gpt/capability-insights', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          weak_dimensions: weakDimensions,
-          company_context: companyContext,
-          filters
+      const dataInsights: CapabilityInsight[] = weakDimensions
+        .slice(0, 3) // Top 3 weakest
+        .map((dim) => {
+          const gap = ((dim.benchmark - dim.score) / dim.benchmark) * 100
+          
+          return {
+            dimension: dim.dimension,
+            current_score: dim.score,
+            benchmark: dim.benchmark,
+            gap_percentage: Math.round(gap),
+            priority: gap > 30 ? 'critical' : gap > 20 ? 'high' : 'medium',
+            evidence: {
+              score: dim.score,
+              response_count: dim.count || 0,
+              common_themes: generateThemesForDimension(dim.dimension, dim.score)
+            },
+            root_causes: generateRootCauses(dim.dimension, dim.score),
+            immediate_actions: generateImmediateActions(dim.dimension),
+            recommended_interventions: getInterventionsForDimension(dim.dimension),
+            why_these_interventions: getInterventionRationale(dim.dimension)
+          }
         })
-      })
 
-      if (!response.ok) {
-        const result = await response.json()
-        if (result.suggestion?.includes('OpenAI API key')) {
-          console.warn('OpenAI API key not configured, using mock data')
-          useMockData()
-          return
-        }
-        throw new Error(result.error || 'Failed to analyze')
-      }
-
-      const result = await response.json()
-      setInsights(result.data.insights)
+      setInsights(dataInsights)
       setIsAnalyzing(false)
-    } catch (err: any) {
-      console.error('GPT Capability Insights failed, falling back to mock data:', err)
-      useMockData()
-    }
+    }, 1200)
   }
 
-  const getPriorityConfig = (priority: string) => {
-    switch (priority) {
-      case 'critical':
-        return { color: 'text-red-400', bgColor: 'bg-red-500/10', borderColor: 'border-red-500/30', icon: AlertTriangle }
-      case 'high':
-        return { color: 'text-orange-400', bgColor: 'bg-orange-500/10', borderColor: 'border-orange-500/30', icon: TrendingUp }
-      default:
-        return { color: 'text-yellow-400', bgColor: 'bg-yellow-500/10', borderColor: 'border-yellow-500/30', icon: Lightbulb }
+  const generateThemesForDimension = (dimension: string, score: number): string[] => {
+    const themes: Record<string, string[]> = {
+      'Strategy & Vision': score < 5 
+        ? ['Unclear AI direction', 'No executive sponsor', 'Ad-hoc initiatives']
+        : ['Some alignment gaps', 'Need clearer roadmap'],
+      'Data': score < 5
+        ? ['Data silos', 'Quality issues', 'Access barriers']
+        : ['Improving infrastructure', 'Some governance gaps'],
+      'Talent & Skills': score < 5
+        ? ['Skills shortage', 'Limited training', 'High consultant dependency']
+        : ['Growing capability', 'Need more depth'],
+      'Technology & Tools': score < 5
+        ? ['Legacy systems', 'Tool fragmentation', 'Technical debt']
+        : ['Modernizing stack', 'Integration challenges'],
+      'Ethics & Governance': score < 5
+        ? ['No clear policies', 'Compliance gaps', 'Risk concerns']
+        : ['Basic frameworks exist', 'Need formalization']
     }
+    return themes[dimension] || ['Gap identified', 'Needs attention']
   }
 
-  const getEffortConfig = (effort: string) => {
-    switch (effort) {
-      case 'low':
-        return { label: 'Low Effort', color: 'text-green-400', bgColor: 'bg-green-500/10' }
-      case 'medium':
-        return { label: 'Medium Effort', color: 'text-yellow-400', bgColor: 'bg-yellow-500/10' }
-      default:
-        return { label: 'High Effort', color: 'text-red-400', bgColor: 'bg-red-500/10' }
+  const generateRootCauses = (dimension: string, score: number): string[] => {
+    const causes: Record<string, string[]> = {
+      'Strategy & Vision': [
+        'AI initiatives lack connection to business strategy',
+        'No dedicated leadership or budget allocation',
+        'Teams working in silos without shared direction'
+      ],
+      'Data': [
+        'Data scattered across disconnected systems',
+        'Quality and documentation inconsistent',
+        'No central data governance or ownership'
+      ],
+      'Talent & Skills': [
+        'Limited AI knowledge beyond IT department',
+        'No formal training or upskilling programs',
+        'Competing for talent with limited success'
+      ],
+      'Technology & Tools': [
+        'Legacy infrastructure not AI-ready',
+        'Tools purchased without integration plan',
+        'Technical debt slowing innovation'
+      ],
+      'Ethics & Governance': [
+        'No formal AI ethics review process',
+        'Unclear accountability for AI decisions',
+        'Risk management not adapted for AI'
+      ]
     }
+    return causes[dimension] || ['Structural gap needs addressing']
   }
 
-  const getInterventionLevelColor = (code: string) => {
-    const level = code.charAt(0)
-    switch (level) {
-      case 'A':
-        return 'from-purple-600 to-purple-700'
-      case 'B':
-        return 'from-blue-600 to-blue-700'
-      case 'C':
-        return 'from-teal-600 to-teal-700'
-      default:
-        return 'from-gray-600 to-gray-700'
+  const generateImmediateActions = (dimension: string) => {
+    const actions: Record<string, any[]> = {
+      'Strategy & Vision': [
+        { action: 'Schedule AI alignment workshop with executive team', impact: 'Builds shared vision', effort: 'low' },
+        { action: 'Identify one AI champion to drive coordination', impact: 'Creates accountability', effort: 'low' },
+        { action: 'Document top 3 AI opportunities aligned to business goals', impact: 'Provides focus', effort: 'medium' }
+      ],
+      'Data': [
+        { action: 'Audit data sources for planned AI use cases', impact: 'Identifies readiness', effort: 'low' },
+        { action: 'Assign data ownership for key datasets', impact: 'Enables governance', effort: 'medium' },
+        { action: 'Run data quality assessment on priority data', impact: 'Surfaces issues', effort: 'medium' }
+      ],
+      'Talent & Skills': [
+        { action: 'Survey current AI skills across departments', impact: 'Baseline understanding', effort: 'low' },
+        { action: 'Identify 3-5 AI champions to train as ambassadors', impact: 'Peer learning', effort: 'low' },
+        { action: 'Pilot AI literacy workshops with one team', impact: 'Tests approach', effort: 'medium' }
+      ],
+      'Technology & Tools': [
+        { action: 'Map current AI tools and their usage', impact: 'Shows fragmentation', effort: 'low' },
+        { action: 'Evaluate one integration opportunity', impact: 'Quick win potential', effort: 'medium' },
+        { action: 'Document technical requirements for AI', impact: 'Guides investment', effort: 'medium' }
+      ],
+      'Ethics & Governance': [
+        { action: 'Review one AI use case for ethical considerations', impact: 'Builds awareness', effort: 'low' },
+        { action: 'Draft basic AI usage guidelines', impact: 'Sets expectations', effort: 'low' },
+        { action: 'Establish AI review checkpoint in project workflow', impact: 'Creates oversight', effort: 'medium' }
+      ]
     }
+    return actions[dimension] || [{ action: 'Assess current state', impact: 'Understand gap', effort: 'low' }]
+  }
+
+  const getInterventionsForDimension = (dimension: string): string[] => {
+    const mapping: Record<string, string[]> = {
+      'Strategy & Vision': ['A1', 'A2'],
+      'Data': ['A3', 'C1'],
+      'Talent & Skills': ['B2', 'B4'],
+      'Technology & Tools': ['C1', 'C2'],
+      'Ethics & Governance': ['A2', 'A3']
+    }
+    return mapping[dimension] || ['A1']
+  }
+
+  const getInterventionRationale = (dimension: string): string => {
+    const rationales: Record<string, string> = {
+      'Strategy & Vision': 'Strategic workshops (A1, A2) help align teams and leadership on AI direction before investing in execution',
+      'Data': 'Data governance (A3) plus experimentation (C1) balances structure with learning what works',
+      'Talent & Skills': 'Learning programs (B2) and peer networks (B4) build capability sustainably',
+      'Technology & Tools': 'Rapid prototyping (C1, C2) validates tech choices before major investment',
+      'Ethics & Governance': 'Governance frameworks (A2, A3) establish guardrails as AI use scales'
+    }
+    return rationales[dimension] || 'These interventions address the identified gaps systematically'
+  }
+
+  const toggleCard = (index: number) => {
+    const newExpanded = new Set(expandedCards)
+    if (newExpanded.has(index)) {
+      newExpanded.delete(index)
+    } else {
+      newExpanded.add(index)
+    }
+    setExpandedCards(newExpanded)
+  }
+
+  const getPriorityColor = (priority: string) => {
+    const colors = {
+      critical: 'from-red-500 to-orange-500',
+      high: 'from-orange-500 to-yellow-500',
+      medium: 'from-yellow-500 to-green-500'
+    }
+    return colors[priority as keyof typeof colors] || colors.medium
+  }
+
+  const getEffortBadge = (effort: string) => {
+    const config = {
+      low: { label: 'Low effort', color: 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400' },
+      medium: { label: 'Medium effort', color: 'bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400' },
+      high: { label: 'High effort', color: 'bg-orange-100 dark:bg-orange-500/20 text-orange-700 dark:text-orange-400' }
+    }
+    return config[effort as keyof typeof config] || config.medium
   }
 
   if (isAnalyzing) {
     return (
-      <div className="h-full flex flex-col items-center justify-center bg-gradient-to-br from-white/[0.03] to-transparent rounded-lg border border-teal-500/20 p-8">
+      <div className="h-full flex flex-col items-center justify-center p-8">
         <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+          animate={{ scale: [1, 1.1, 1] }}
+          transition={{ duration: 2, repeat: Infinity }}
           className="mb-4"
         >
-          <Brain className="w-16 h-16 text-teal-700 dark:text-teal-400" />
+          <BarChart3 className="w-16 h-16 text-teal-600 dark:text-teal-400" />
         </motion.div>
-        <h3 className="text-xl font-semibold mb-2 flex items-center gap-2">
-          <span>Analyzing Capability Gaps</span>
+        <h3 className="text-xl font-semibold mb-2 text-slate-900 dark:text-white">
+          Analyzing Your Data
         </h3>
-        <p className="text-sm text-gray-400 text-center max-w-md">
-          AI is analyzing {weakDimensions.length} dimensions with below-benchmark performance to generate actionable insights...
+        <p className="text-sm text-slate-600 dark:text-gray-400 text-center max-w-md">
+          Processing {weakDimensions.length} dimensions below benchmark...
         </p>
       </div>
     )
@@ -188,145 +239,176 @@ export default function CapabilityInsightsView({
     <div className="h-full flex flex-col overflow-hidden">
       {/* Header */}
       <div className="flex-shrink-0 pb-4">
-        <div className="flex items-center justify-between mb-2">
           <button
             onClick={onBack}
-            className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors group"
+          className="flex items-center gap-2 text-sm text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors group mb-4"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             Back to Overview
           </button>
-        </div>
 
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500 to-purple-500 flex items-center justify-center">
-            <Brain className="w-6 h-6 text-white" />
-          </div>
+        <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-white">AI Capability Insights</h2>
-            <p className="text-sm text-gray-400">
-              {insights.length} strategic recommendations for {weakDimensions.length} weak dimensions
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">Gap Analysis & Next Steps</h2>
+            <p className="text-sm text-slate-600 dark:text-gray-400">
+              Based on your assessment scores - Focus on these {insights.length} areas
             </p>
+          </div>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10">
+            <Users className="w-4 h-4 text-slate-600 dark:text-gray-400" />
+            <span className="text-sm font-medium text-slate-900 dark:text-white">
+              {weakDimensions.reduce((sum, d) => sum + (d.count || 0), 0)} responses
+            </span>
           </div>
         </div>
       </div>
 
-      {/* Insights Grid */}
-      <div className="flex-1 overflow-y-auto scrollbar-thin space-y-4">
-        <AnimatePresence mode="popLayout">
-          {insights.map((insight, index) => {
-            const priorityConfig = getPriorityConfig(insight.priority)
-            const effortConfig = getEffortConfig(insight.estimated_effort)
-            const PriorityIcon = priorityConfig.icon
+      {/* Priority Summary Bar */}
+      <div className="flex-shrink-0 mb-4 flex gap-3">
+        {insights.filter(i => i.priority === 'critical').length > 0 && (
+          <div className="px-3 py-2 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400" />
+            <span className="text-sm font-medium text-red-700 dark:text-red-400">
+              {insights.filter(i => i.priority === 'critical').length} Critical
+            </span>
+          </div>
+        )}
+        {insights.filter(i => i.priority === 'high').length > 0 && (
+          <div className="px-3 py-2 rounded-lg bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/30 flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+            <span className="text-sm font-medium text-orange-700 dark:text-orange-400">
+              {insights.filter(i => i.priority === 'high').length} High Priority
+            </span>
+          </div>
+        )}
+      </div>
 
+      {/* Insights Cards */}
+      <div className="flex-1 overflow-y-auto scrollbar-thin space-y-3">
+          {insights.map((insight, index) => {
+          const isExpanded = expandedCards.has(index)
             return (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-gradient-to-br from-white/[0.08] to-white/[0.02] rounded-xl border border-white/10 p-6 hover:border-teal-500/30 transition-all"
+              transition={{ delay: index * 0.05 }}
+              className="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden hover:border-teal-300 dark:hover:border-teal-500/40 transition-all"
+            >
+              {/* Collapsible Header */}
+              <button
+                onClick={() => toggleCard(index)}
+                className="w-full p-4 text-left hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
               >
-                {/* Header */}
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center", priorityConfig.bgColor)}>
-                      <PriorityIcon className={cn("w-5 h-5", priorityConfig.color)} />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-white">{insight.dimension}</h3>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className={cn("px-2 py-0.5 rounded text-xs font-semibold uppercase", priorityConfig.color, priorityConfig.bgColor, priorityConfig.borderColor, "border")}>
-                          {insight.priority} Priority
-                        </span>
-                        <span className={cn("px-2 py-0.5 rounded text-xs", effortConfig.color, effortConfig.bgColor)}>
-                          {effortConfig.label}
-                        </span>
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className={cn(
+                        "w-10 h-10 rounded-lg bg-gradient-to-br flex items-center justify-center text-white font-bold text-lg",
+                        getPriorityColor(insight.priority)
+                      )}>
+                        {index + 1}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">{insight.dimension}</h3>
+                        <div className="flex items-center gap-3 text-sm">
+                          <span className="text-slate-600 dark:text-gray-400">
+                            Score: <span className="font-semibold text-slate-900 dark:text-white">{insight.current_score.toFixed(1)}</span> / {insight.benchmark.toFixed(1)}
+                          </span>
+                          <span className="text-red-600 dark:text-red-400 font-medium">
+                            {insight.gap_percentage}% below benchmark
+                          </span>
+                        </div>
                       </div>
                     </div>
+
+                    {/* Evidence Tags */}
+                    <div className="flex flex-wrap gap-2">
+                      {insight.evidence.common_themes.map((theme, idx) => (
+                        <span key={idx} className="px-2 py-1 rounded text-xs bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-gray-300 border border-slate-200 dark:border-white/10">
+                          {theme}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5 text-gray-400">
-                    <Clock className="w-4 h-4" />
-                    <span className="text-xs">{insight.estimated_timeline}</span>
+
+                  <div className="flex flex-col items-end gap-2">
+                    {isExpanded ? <ChevronUp className="w-5 h-5 text-slate-600 dark:text-gray-400" /> : <ChevronDown className="w-5 h-5 text-slate-600 dark:text-gray-400" />}
+                    <span className="text-xs text-slate-500 dark:text-gray-500">
+                      {insight.evidence.response_count} responses
+                    </span>
                   </div>
                 </div>
+              </button>
 
-                {/* Gap Analysis */}
-                <div className="mb-4">
-                  <h4 className="text-sm font-semibold text-gray-300 mb-2 flex items-center gap-2">
-                    <AlertTriangle className="w-4 h-4 text-orange-400" />
-                    Gap Analysis
-                  </h4>
-                  <p className="text-sm text-gray-400 leading-relaxed">{insight.gap_analysis}</p>
-                </div>
-
-                {/* Business Impact */}
-                <div className="mb-4">
-                  <h4 className="text-sm font-semibold text-gray-300 mb-2 flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4 text-blue-400" />
-                    Business Impact
-                  </h4>
-                  <p className="text-sm text-gray-400 leading-relaxed">{insight.business_impact}</p>
-                </div>
-
-                {/* Recommended Strategic Interventions */}
-                <div className="mb-4">
-                  <h4 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
-                    <Target className="w-4 h-4 text-teal-400" />
-                    Recommended Strategic Interventions
-                  </h4>
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {insight.recommended_interventions.map((code, idx) => (
-                      <motion.button
-                        key={idx}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className={cn(
-                          "px-3 py-1.5 rounded-lg bg-gradient-to-r text-white font-bold text-sm shadow-md hover:shadow-lg transition-all",
-                          getInterventionLevelColor(code)
-                        )}
-                        onClick={() => {
-                          // TODO: Open intervention detail modal
-                          console.log('View intervention:', code)
-                        }}
-                      >
-                        {code}
-                      </motion.button>
-                    ))}
-                  </div>
-                  <p className="text-sm text-gray-400 leading-relaxed italic">
-                    {insight.intervention_rationale}
-                  </p>
-                </div>
-
-                {/* Quick Wins */}
-                <div className="mb-4">
-                  <h4 className="text-sm font-semibold text-gray-300 mb-2 flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-yellow-400" />
-                    Quick Wins
+              {/* Expanded Content */}
+              <AnimatePresence>
+                {isExpanded && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="border-t border-slate-200 dark:border-white/10"
+                  >
+                    <div className="p-4 space-y-4">
+                      {/* Root Causes */}
+                      <div>
+                        <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+                          <Info className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                          Why This Gap Exists
                   </h4>
                   <ul className="space-y-1.5">
-                    {insight.quick_wins.map((win, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-sm text-gray-400">
-                        <span className="text-yellow-400">•</span>
-                        <span>{win}</span>
+                          {insight.root_causes.map((cause, idx) => (
+                            <li key={idx} className="text-sm text-slate-700 dark:text-gray-400 flex items-start gap-2">
+                              <span className="text-slate-400 dark:text-gray-600">•</span>
+                              <span>{cause}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                {/* Long-term Strategy */}
-                <div className="p-4 rounded-lg bg-gradient-to-r from-purple-500/10 to-teal-500/10 border border-purple-500/20">
-                  <h4 className="text-sm font-semibold text-purple-300 mb-2 flex items-center gap-2">
-                    <Lightbulb className="w-4 h-4" />
-                    Long-term Strategy
+                      {/* Immediate Actions */}
+                      <div>
+                        <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+                          <Zap className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
+                          Start Here (Next 30 Days)
+                        </h4>
+                        <div className="space-y-2">
+                          {insight.immediate_actions.map((item, idx) => {
+                            const effortBadge = getEffortBadge(item.effort)
+                            return (
+                              <div key={idx} className="p-3 rounded-lg bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10">
+                                <div className="flex items-start justify-between gap-3 mb-1">
+                                  <p className="text-sm font-medium text-slate-900 dark:text-white flex-1">{item.action}</p>
+                                  <span className={cn("px-2 py-0.5 rounded text-xs font-medium whitespace-nowrap", effortBadge.color)}>
+                                    {effortBadge.label}
+                                  </span>
+                                </div>
+                                <p className="text-xs text-slate-600 dark:text-gray-400">→ {item.impact}</p>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Recommended Interventions */}
+                      <div className="p-4 rounded-lg bg-gradient-to-br from-teal-50 to-purple-50 dark:from-teal-500/10 dark:to-purple-500/10 border border-teal-200 dark:border-teal-500/30">
+                        <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+                          <Target className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+                          Strategic Interventions ({insight.recommended_interventions.join(', ')})
                   </h4>
-                  <p className="text-sm text-gray-300 leading-relaxed">{insight.long_term_strategy}</p>
+                        <p className="text-sm text-slate-700 dark:text-gray-300 leading-relaxed">
+                          {insight.why_these_interventions}
+                        </p>
+                      </div>
                 </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
               </motion.div>
             )
           })}
-        </AnimatePresence>
       </div>
     </div>
   )

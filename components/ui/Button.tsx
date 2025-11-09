@@ -6,14 +6,14 @@ import { cn } from '@/lib/utils'
 import { motion, HTMLMotionProps } from 'framer-motion'
 
 const buttonVariants = cva(
-  'relative inline-flex items-center justify-center gap-2 font-medium rounded-lg overflow-hidden transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black',
+  'relative inline-flex items-center justify-center gap-2 font-medium rounded-lg overflow-hidden transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-black focus:ring-offset-white',
   {
     variants: {
       variant: {
-        primary: 'bg-teal-500/20 text-teal-300 border border-teal-400/30 hover:bg-teal-500/30 hover:border-teal-400/50 focus:ring-teal-400/50 hover:shadow-[0_0_20px_rgba(20,184,166,0.3)]',
-        secondary: 'bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10 hover:border-white/20 focus:ring-white/30',
-        ghost: 'bg-transparent text-gray-400 hover:text-white hover:bg-white/5 focus:ring-white/20',
-        danger: 'bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 hover:border-red-500/30 focus:ring-red-500/30',
+        primary: 'dark:bg-teal-500/20 dark:text-teal-300 dark:border-teal-400/30 dark:hover:bg-teal-500/30 dark:hover:border-teal-400/50 dark:focus:ring-teal-400/50 dark:hover:shadow-[0_0_20px_rgba(20,184,166,0.3)] bg-[#5380b3] text-white border-[#5380b3] hover:bg-[#4a739f] hover:border-[#4a739f] focus:ring-[#5380b3]/50 hover:shadow-lg',
+        secondary: 'dark:bg-white/5 dark:text-gray-300 dark:border-white/10 dark:hover:bg-white/10 dark:hover:border-white/20 dark:focus:ring-white/30 bg-gray-100 text-gray-900 border-gray-300 hover:bg-gray-200 hover:border-gray-400 focus:ring-gray-500/50',
+        ghost: 'dark:bg-transparent dark:text-gray-400 dark:hover:text-white dark:hover:bg-white/5 dark:focus:ring-white/20 bg-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:ring-gray-500/30',
+        danger: 'dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20 dark:hover:bg-red-500/20 dark:hover:border-red-500/30 dark:focus:ring-red-500/30 bg-red-50 text-red-700 border-red-200 hover:bg-red-100 hover:border-red-300 focus:ring-red-500/50',
         gradient: 'bg-gradient-to-r from-[#5380b3] to-[#a74f8b] text-white hover:shadow-[0_0_30px_rgba(167,79,139,0.4)] focus:ring-purple-500/50'
       },
       size: {
@@ -60,9 +60,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             initial={{ opacity: 0 }}
             whileHover={{ 
               opacity: 1,
-              background: "radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 70%)"
             }}
             transition={{ duration: 0.3 }}
+            style={{
+              background: variant === 'primary' && !className?.includes('dark:')
+                ? "radial-gradient(circle at center, rgba(255,255,255,0.2) 0%, transparent 70%)"
+                : "radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 70%)"
+            }}
           />
         )}
 

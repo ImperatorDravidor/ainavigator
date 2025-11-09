@@ -22,9 +22,6 @@ export default function SentimentHeatmapRevised({ data, filters, onAnalyzeProble
   const [showExplanation, setShowExplanation] = useState(false)
   const [categoryDataLoaded, setCategoryDataLoaded] = useState(false)
   const [showHint, setShowHint] = useState(true)
-  const [showInterventions, setShowInterventions] = useState(false)
-  const [interventionSize, setInterventionSize] = useState<'small' | 'large'>('small')
-  const [showTaboos, setShowTaboos] = useState(false)
 
   // Load category data on mount
   useEffect(() => {
@@ -94,65 +91,6 @@ export default function SentimentHeatmapRevised({ data, filters, onAnalyzeProble
               {showExplanation ? 'Hide' : 'Show'} Guide
             </span>
           </button>
-          <div className="flex items-center gap-2">
-            {/* Interventions Toggle */}
-            <button
-              onClick={() => setShowInterventions(!showInterventions)}
-              className={cn(
-                "inline-flex items-center gap-2 px-3 py-2 rounded-lg border transition-all",
-                showInterventions
-                  ? "bg-purple-500/15 border-purple-500/30 text-purple-700 dark:text-purple-300"
-                  : "bg-purple-500/10 hover:bg-purple-500/15 border-purple-500/20 hover:border-purple-500/30 text-purple-700 dark:text-purple-400"
-              )}
-            >
-              <Lightbulb className="w-4 h-4" />
-              <span className="text-sm font-medium">
-                {showInterventions ? 'Hide' : 'Show'} Interventions
-              </span>
-            </button>
-            {showInterventions && (
-              <div className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-white/5 border border-white/10">
-                <button
-                  onClick={() => setInterventionSize('small')}
-                  className={cn(
-                    "px-3 py-1 rounded text-sm font-medium transition-all min-w-[50px]",
-                    interventionSize === 'small'
-                      ? "bg-purple-500 text-white"
-                      : "text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white"
-                  )}
-                >
-                  Small
-                </button>
-                <button
-                  onClick={() => setInterventionSize('large')}
-                  className={cn(
-                    "px-3 py-1 rounded text-sm font-medium transition-all min-w-[50px]",
-                    interventionSize === 'large'
-                      ? "bg-purple-500 text-white"
-                      : "text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white"
-                  )}
-                >
-                  Large
-                </button>
-              </div>
-            )}
-
-            {/* Taboos Toggle */}
-            <button
-              onClick={() => setShowTaboos(!showTaboos)}
-              className={cn(
-                "inline-flex items-center gap-2 px-3 py-2 rounded-lg border transition-all",
-                showTaboos
-                  ? "bg-red-500/15 border-red-500/30 text-red-700 dark:text-red-300"
-                  : "bg-red-500/10 hover:bg-red-500/15 border-red-500/20 hover:border-red-500/30 text-red-700 dark:text-red-400"
-              )}
-            >
-              <AlertTriangle className="w-4 h-4" />
-              <span className="text-sm font-medium">
-                {showTaboos ? 'Hide' : 'Show'} Taboos
-              </span>
-            </button>
-          </div>
         </div>
       </div>
 
@@ -282,32 +220,32 @@ export default function SentimentHeatmapRevised({ data, filters, onAnalyzeProble
       </AnimatePresence>
 
       {/* HEATMAP GRID */}
-      <div className="flex-1 bg-gradient-to-br from-white/[0.08] to-white/[0.02] rounded-lg border border-white/10 p-3 flex flex-col overflow-hidden">
+      <div className="flex-1 bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-white/10 p-4 flex flex-col overflow-hidden shadow-sm">
         
-        {/* Legend - Ultra compact inline */}
-        <div className="flex items-center justify-between gap-3 pb-1.5 mb-2 border-b border-white/5 flex-shrink-0">
-          <span className="text-[10px] font-semibold text-slate-600 dark:text-gray-400 uppercase tracking-wider">Legend:</span>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1">
-              <div className="w-5 h-5 rounded flex items-center justify-center text-white font-bold text-[9px]" style={{ backgroundColor: '#15803d' }}>✓</div>
-              <span className="text-[11px] text-slate-900 dark:text-white font-semibold">Top 3</span>
+        {/* Legend - Enhanced with scale explanation */}
+        <div className="flex items-center justify-between gap-4 pb-2 mb-3 border-b border-slate-200 dark:border-white/10 flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-bold text-slate-700 dark:text-gray-300 uppercase tracking-wider">Resistance Level:</span>
+            <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-gray-400">
+              <span className="font-medium">1 = Minimal</span>
+              <span className="text-slate-400 dark:text-gray-500">→</span>
+              <span className="font-medium">10 = Critical</span>
             </div>
-            <div className="flex items-center gap-1">
-              <div className="w-5 h-5 rounded flex items-center justify-center text-white font-bold text-[9px]" style={{ backgroundColor: '#84cc16' }}>+</div>
-              <span className="text-[11px] text-slate-900 dark:text-white">Strong</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30">
+              <div className="w-3 h-3 rounded" style={{ backgroundColor: '#15803d' }}></div>
+              <span className="text-[10px] text-slate-700 dark:text-green-300 font-medium">Lowest</span>
             </div>
-            <div className="flex items-center gap-1">
-              <div className="w-5 h-5 rounded flex items-center justify-center text-white font-bold text-[9px]" style={{ backgroundColor: '#fcd34d' }}>○</div>
-              <span className="text-[11px] text-slate-900 dark:text-white">Average</span>
+            <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-500/30">
+              <div className="w-3 h-3 rounded" style={{ backgroundColor: '#fcd34d' }}></div>
+              <span className="text-[10px] text-slate-700 dark:text-yellow-300 font-medium">Mid</span>
             </div>
-            <div className="flex items-center gap-1">
-              <div className="w-5 h-5 rounded flex items-center justify-center text-white font-bold text-[9px]" style={{ backgroundColor: '#fb923c' }}>!</div>
-              <span className="text-[11px] text-slate-900 dark:text-white">Attention</span>
+            <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30">
+              <div className="w-3 h-3 rounded" style={{ backgroundColor: '#dc2626' }}></div>
+              <span className="text-[10px] text-slate-700 dark:text-red-300 font-medium">Highest</span>
             </div>
-            <div className="flex items-center gap-1">
-              <div className="w-5 h-5 rounded flex items-center justify-center text-white font-bold text-[9px]" style={{ backgroundColor: '#dc2626' }}>⚠</div>
-              <span className="text-[11px] text-slate-900 dark:text-white font-semibold">Priority</span>
-            </div>
+            <div className="text-[10px] text-slate-500 dark:text-gray-400 italic ml-2">Relative to your data</div>
           </div>
         </div>
 
@@ -319,17 +257,17 @@ export default function SentimentHeatmapRevised({ data, filters, onAnalyzeProble
             {/* Row labels aligned with grid rows */}
             <div className="flex-1 grid grid-rows-5 gap-1.5">
               {SENTIMENT_LEVELS.map(level => (
-                <div key={level.id} className="flex items-center justify-end pr-2">
-                  <div className="text-right">
-                    <div className="text-[9px] text-slate-500">L{level.id}</div>
-                    <div className="text-[10px] font-semibold text-slate-900 dark:text-white leading-tight">{level.name}</div>
+                <div key={level.id} className="flex items-center justify-end pr-3">
+                  <div className="text-right bg-slate-100 dark:bg-slate-800/50 rounded-md px-2 py-1.5 border border-slate-200 dark:border-white/20">
+                    <div className="text-[8px] text-slate-600 dark:text-gray-200 font-bold uppercase tracking-wider">L{level.id}</div>
+                    <div className="text-[10px] font-bold text-gray-900 dark:text-white leading-tight mt-0.5">{level.name}</div>
                   </div>
                 </div>
               ))}
             </div>
             {/* Label for column averages row */}
-            <div className="flex items-center justify-end pr-2 h-[35px]">
-              <div className="text-[9px] font-bold text-slate-600 dark:text-gray-400 uppercase">
+            <div className="flex items-start justify-end pr-3 h-[38px] pt-1">
+              <div className="text-[9px] font-bold text-gray-700 dark:text-gray-400 uppercase bg-gray-50 dark:bg-white/5 rounded-md px-2 py-1 border border-gray-200 dark:border-white/10">
                 Col Avg
               </div>
             </div>
@@ -351,70 +289,52 @@ export default function SentimentHeatmapRevised({ data, filters, onAnalyzeProble
                         key={cellId}
                         onClick={() => cell && cell.count > 0 ? setSelectedCell(cellId) : null}
                         className={cn(
-                          "relative rounded transition-all border group min-h-0",
-                          selectedCell === cellId ? 'ring-2 ring-white/30 scale-105 z-20' : 'ring-0',
-                          cell && cell.count > 0 ? 'cursor-pointer hover:scale-[1.03] hover:z-10' : 'cursor-default opacity-40'
+                          "relative rounded-lg transition-all border-2 group min-h-0 shadow-md",
+                          selectedCell === cellId 
+                            ? 'ring-4 ring-teal-400/50 dark:ring-teal-400/50 ring-offset-2 ring-offset-white dark:ring-offset-gray-900 scale-105 z-20 border-white dark:border-white/50' 
+                            : 'ring-0 border-transparent',
+                          cell && cell.count > 0 
+                            ? 'cursor-pointer hover:scale-[1.05] hover:z-10 hover:shadow-xl' 
+                            : 'cursor-default opacity-30'
                         )}
                         style={{
                           backgroundColor: cell?.color || '#374151',
-                          borderColor: selectedCell === cellId ? '#fff' : 'transparent'
+                          boxShadow: selectedCell === cellId 
+                            ? '0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1)' 
+                            : cell && cell.count > 0 
+                              ? '0 4px 6px -1px rgba(0, 0, 0, 0.2)' 
+                              : 'none'
                         }}
-                        whileHover={cell && cell.count > 0 ? { scale: 1.03 } : {}}
-                        whileTap={cell && cell.count > 0 ? { scale: 0.98 } : {}}
+                        whileHover={cell && cell.count > 0 ? { 
+                          scale: 1.05,
+                          boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.2)'
+                        } : {}}
+                        whileTap={cell && cell.count > 0 ? { scale: 0.97 } : {}}
                       >
                         {cell && cell.count > 0 ? (
                           <>
-                            <div className="absolute inset-0 flex flex-col items-center justify-center p-1">
-                              <div className="text-xl font-bold text-white drop-shadow-lg tabular-nums">
+                            {/* Gradient overlay for depth */}
+                            <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
+                            
+                            <div className="absolute inset-0 flex flex-col items-center justify-center p-1.5 z-10">
+                              <div className="text-xl font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] tabular-nums leading-tight">
                                 {cell.score.toFixed(2)}
                               </div>
-                              <div className="text-[8px] text-white/80 font-medium">
+                              <div className="text-[9px] text-white/90 font-semibold mt-0.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
                                 n={cell.count}
                               </div>
                             </div>
                             {/* Sparkle indicator for interactive cells with category data */}
-                            {categoryDataLoaded && CategoryDataService.getCategoryForCell(cellId) && !showInterventions && !showTaboos && (
+                            {categoryDataLoaded && CategoryDataService.getCategoryForCell(cellId) && (
                               <motion.div
                                 initial={{ opacity: 0, scale: 0 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 transition={{ delay: 0.3 }}
-                                className="absolute top-1 right-1"
+                                className="absolute top-1.5 right-1.5 z-20"
                               >
-                                <Sparkles className="w-4 h-4 text-white drop-shadow-lg group-hover:scale-110 transition-transform" />
-                              </motion.div>
-                            )}
-                            {/* Intervention indicator */}
-                            {showInterventions && (
-                              <motion.div
-                                initial={{ opacity: 0, scale: 0 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: 0.1 }}
-                                className={cn(
-                                  "absolute flex items-center justify-center",
-                                  interventionSize === 'large' ? "top-1 right-1 w-6 h-6" : "top-0.5 right-0.5 w-4 h-4"
-                                )}
-                              >
-                                <div className={cn(
-                                  "rounded-full bg-purple-500 flex items-center justify-center shadow-lg",
-                                  interventionSize === 'large' ? "w-6 h-6" : "w-4 h-4"
-                                )}>
-                                  <Lightbulb className={cn(
-                                    "text-white",
-                                    interventionSize === 'large' ? "w-4 h-4" : "w-2.5 h-2.5"
-                                  )} />
-                                </div>
-                              </motion.div>
-                            )}
-                            {/* Taboo indicator */}
-                            {showTaboos && (
-                              <motion.div
-                                initial={{ opacity: 0, scale: 0 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: 0.1 }}
-                                className="absolute top-1 left-1 w-5 h-5 flex items-center justify-center"
-                              >
-                                <div className="rounded-full bg-red-500 w-5 h-5 flex items-center justify-center shadow-lg">
-                                  <AlertTriangle className="w-3 h-3 text-white" />
+                                <div className="relative">
+                                  <div className="absolute inset-0 bg-white/30 rounded-full blur-sm animate-pulse" />
+                                  <Sparkles className="w-4 h-4 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] group-hover:scale-110 transition-transform relative z-10" />
                                 </div>
                               </motion.div>
                             )}
@@ -431,12 +351,12 @@ export default function SentimentHeatmapRevised({ data, filters, onAnalyzeProble
               </div>
 
               {/* Row Averages */}
-              <div className="grid grid-rows-5 gap-1.5 w-14 flex-shrink-0">
+              <div className="grid grid-rows-5 gap-1.5 w-16 flex-shrink-0">
                 {stats.rowAverages.map((avg, idx) => (
-                  <div key={idx} className="flex items-center justify-center rounded-lg bg-slate-500/20 border border-slate-500/30">
+                  <div key={idx} className="flex items-center justify-center rounded-lg bg-gradient-to-br from-gray-100 to-gray-50 dark:from-slate-500/20 dark:to-slate-500/10 border border-gray-300 dark:border-slate-500/30 shadow-sm">
                     <div className="text-center">
-                      <div className="text-sm font-bold text-slate-900 dark:text-white tabular-nums">{avg.toFixed(2)}</div>
-                      <div className="text-[8px] text-slate-600 dark:text-gray-400 uppercase">Row</div>
+                      <div className="text-sm font-bold text-gray-900 dark:text-white tabular-nums">{avg.toFixed(2)}</div>
+                      <div className="text-[8px] text-gray-600 dark:text-gray-400 uppercase font-medium">Row</div>
                     </div>
                   </div>
                 ))}
@@ -444,33 +364,36 @@ export default function SentimentHeatmapRevised({ data, filters, onAnalyzeProble
             </div>
 
             {/* Column Averages + Labels + Overall */}
-            <div className="flex gap-1.5 mt-1">
+            <div className="flex gap-1.5 mt-1.5">
               <div className="flex-1 grid grid-cols-5 gap-1.5">
                 {SENTIMENT_CATEGORIES.map((cat, idx) => (
-                  <div key={cat.id} className="flex flex-col gap-0.5">
+                  <div key={cat.id} className="flex flex-col gap-1">
                     {/* Column Average */}
-                    <div className="flex items-center justify-center rounded-lg bg-slate-500/20 border border-slate-500/30 h-[35px]">
+                    <div className="flex items-center justify-center rounded-lg bg-gradient-to-br from-gray-100 to-gray-50 dark:from-slate-500/20 dark:to-slate-500/10 border border-gray-300 dark:border-slate-500/30 h-[38px] shadow-sm">
                       <div className="text-center">
-                        <div className="text-sm font-bold text-slate-900 dark:text-white tabular-nums">{stats.columnAverages[idx]?.toFixed(2) || '—'}</div>
-                        <div className="text-[7px] text-slate-600 dark:text-gray-400 uppercase">Col</div>
+                        <div className="text-sm font-bold text-gray-900 dark:text-white tabular-nums">{stats.columnAverages[idx]?.toFixed(2) || '—'}</div>
+                        <div className="text-[7px] text-gray-600 dark:text-gray-400 uppercase font-medium">Col</div>
                       </div>
                     </div>
                     {/* Category Label */}
-                    <div className="text-center">
-                      <div className="text-[10px] font-semibold text-slate-900 dark:text-white leading-tight">{cat.shortName}</div>
-                      <div className="text-[7px] text-gray-500">C{cat.id}</div>
+                    <div className="text-center px-1">
+                      <div className="text-[10px] font-bold text-gray-900 dark:text-white leading-tight">{cat.shortName}</div>
+                      <div className="text-[7px] text-gray-500 dark:text-gray-400 font-medium">C{cat.id}</div>
                     </div>
                   </div>
                 ))}
               </div>
 
               {/* Overall Average */}
-              <div className="w-14 flex-shrink-0">
-                <div className="flex items-center justify-center rounded-lg bg-teal-500/20 border-2 border-teal-500/40 h-[35px]">
+              <div className="w-16 flex-shrink-0">
+                <div className="flex items-center justify-center rounded-lg bg-gradient-to-br from-teal-100 to-teal-50 dark:from-teal-500/20 dark:to-teal-500/10 border-2 border-teal-300 dark:border-teal-500/40 h-[38px] shadow-md">
                   <div className="text-center">
                     <div className="text-sm font-bold text-teal-700 dark:text-teal-400 tabular-nums">{stats.overallAverage.toFixed(2)}</div>
-                    <div className="text-[7px] text-teal-600 dark:text-teal-500 uppercase">All</div>
+                    <div className="text-[7px] text-teal-600 dark:text-teal-500 uppercase font-semibold">All</div>
                   </div>
+                </div>
+                <div className="text-center mt-1">
+                  <div className="text-[9px] font-bold text-gray-700 dark:text-gray-300 uppercase">Overall</div>
                 </div>
               </div>
             </div>
@@ -483,8 +406,6 @@ export default function SentimentHeatmapRevised({ data, filters, onAnalyzeProble
           <CategoryDetailModal
             cellData={selectedCellData}
             categoryData={CategoryDataService.getCategoryForCell(selectedCellData.cellId)}
-            interventionSize={interventionSize}
-            showInterventions={showInterventions}
             onClose={() => setSelectedCell(null)}
           />
         )}
@@ -495,20 +416,20 @@ export default function SentimentHeatmapRevised({ data, filters, onAnalyzeProble
         <div className="flex-shrink-0">
           <button
             onClick={() => onAnalyzeProblemAreas(lowestCells)}
-            className="w-full bg-gradient-to-r from-teal-500/10 to-purple-500/10 hover:from-teal-500/15 hover:to-purple-500/15 rounded-lg border border-teal-500/30 hover:border-teal-400/50 transition-all p-2 flex items-center justify-between group"
+            className="w-full bg-gradient-to-r from-teal-50 to-purple-50 dark:from-teal-500/10 dark:to-purple-500/10 hover:from-teal-100 hover:to-purple-100 dark:hover:from-teal-500/15 dark:hover:to-purple-500/15 rounded-lg border border-teal-300 dark:border-teal-500/30 hover:border-teal-400 dark:hover:border-teal-400/50 transition-all p-3 flex items-center justify-between group shadow-sm hover:shadow-md"
           >
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-500 to-purple-500 flex items-center justify-center shadow-lg flex-shrink-0">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-teal-500 to-purple-500 flex items-center justify-center shadow-lg flex-shrink-0">
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
               <div className="text-left">
-                <div className="text-xs font-bold text-white">Generate AI Insights</div>
-                <div className="text-[10px] text-gray-400">
+                <div className="text-sm font-bold text-gray-900 dark:text-white">Generate AI Insights</div>
+                <div className="text-[10px] text-gray-600 dark:text-gray-400">
                   Analyze {lowestCells.length} priority areas • Get recommendations
                 </div>
               </div>
             </div>
-            <ArrowRight className="w-3.5 h-3.5 text-teal-400 group-hover:translate-x-1 transition-transform flex-shrink-0" />
+            <ArrowRight className="w-4 h-4 text-teal-600 dark:text-teal-400 group-hover:translate-x-1 transition-transform flex-shrink-0" />
           </button>
         </div>
       )}

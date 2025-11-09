@@ -24,8 +24,6 @@ interface CategoryDetailModalProps {
     description: string
   }
   categoryData: CategoryActionData | null
-  interventionSize: 'small' | 'large'
-  showInterventions: boolean
   onClose: () => void
 }
 
@@ -96,13 +94,14 @@ const FLAVOR_CONFIG = {
   }
 }
 
+type TabType = 'overview' | 'taboos' | 'interventions'
+
 export default function CategoryDetailModal({
   cellData,
   categoryData,
-  interventionSize,
-  showInterventions,
   onClose
 }: CategoryDetailModalProps) {
+  const [activeTab, setActiveTab] = useState<TabType>('overview')
   const [selectedFlavor, setSelectedFlavor] = useState<SolutionFlavor | null>(null)
   const [showSolution, setShowSolution] = useState(false)
   const [isRolling, setIsRolling] = useState(false)
@@ -139,15 +138,10 @@ export default function CategoryDetailModal({
         // Fetch interventions based on size mode
         let interventionsResponse
 
-        if (interventionSize === 'small') {
-          // Fetch 3 cell-specific interventions
-          interventionsResponse = await fetch(
-            `/api/interventions/sentiment?level=${cellInfo.level}&category=${cellInfo.category}`
-          )
-        } else {
-          // Fetch all 10 strategic interventions
-          interventionsResponse = await fetch('/api/interventions')
-        }
+        // Fetch cell-specific interventions
+        interventionsResponse = await fetch(
+          `/api/interventions/sentiment?level=${cellInfo.level}&category=${cellInfo.category}`
+        )
 
         if (interventionsResponse.ok) {
           const data = await interventionsResponse.json()
@@ -180,7 +174,7 @@ export default function CategoryDetailModal({
     setSelectedFlavor(null)
     setShowSolution(false)
     setIsRolling(false)
-  }, [cellData.cellId, interventionSize])
+  }, [cellData.cellId])
 
   const handleFlavorSelect = (flavor: SolutionFlavor) => {
     if (flavor === 'lucky') {
@@ -226,6 +220,12 @@ export default function CategoryDetailModal({
     }
   }
 
+  const tabs: { id: TabType; label: string; icon: any }[] = [
+    { id: 'overview', label: 'Overview', icon: Info },
+    { id: 'taboos', label: 'Taboos', icon: AlertTriangle },
+    { id: 'interventions', label: 'Interventions', icon: Sparkles },
+  ]
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -239,10 +239,10 @@ export default function CategoryDetailModal({
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.9, y: 20 }}
         onClick={(e) => e.stopPropagation()}
-        className="bg-gradient-to-br from-gray-900 via-black to-gray-900 rounded-2xl border border-white/10 shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col"
+        className="bg-white dark:bg-gradient-to-br dark:from-gray-900 dark:via-black dark:to-gray-900 rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col"
       >
         {/* HEADER */}
-        <div className="flex-shrink-0 p-6 border-b border-white/10 bg-gradient-to-r from-white/5 to-transparent">
+        <div className="flex-shrink-0 p-6 border-b border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-gradient-to-r dark:from-white/5 dark:to-transparent">
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-3">
@@ -253,10 +253,10 @@ export default function CategoryDetailModal({
                   {cellData.score.toFixed(1)}
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-2xl font-bold text-white mb-1">
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">
                     {categoryData?.category || cellData.levelName}
                   </h2>
-                  <div className="flex items-center gap-2 text-sm text-gray-400">
+                  <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-gray-400">
                     <span>{cellData.levelName}</span>
                     <span>•</span>
                     <span>{cellData.categoryName}</span>
@@ -266,24 +266,24 @@ export default function CategoryDetailModal({
 
               {/* Metrics Row */}
               <div className="flex items-center gap-3">
-                <div className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 flex items-center gap-2">
-                  <Users className="w-4 h-4 text-teal-400" />
-                  <span className="text-sm font-semibold text-white">{cellData.count}</span>
-                  <span className="text-xs text-gray-500">affected</span>
+                <div className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center gap-2">
+                  <Users className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+                  <span className="text-sm font-semibold text-slate-900 dark:text-white">{cellData.count}</span>
+                  <span className="text-xs text-slate-500 dark:text-gray-500">affected</span>
                 </div>
-                <div className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-orange-400" />
-                  <span className="text-sm font-semibold text-white">#{cellData.rank}</span>
-                  <span className="text-xs text-gray-500">priority</span>
+                <div className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                  <span className="text-sm font-semibold text-slate-900 dark:text-white">#{cellData.rank}</span>
+                  <span className="text-xs text-slate-500 dark:text-gray-500">priority</span>
                 </div>
                 <div className={cn(
                   "px-3 py-1.5 rounded-lg border flex items-center gap-2",
-                  cellData.rank <= 3 ? "bg-red-500/10 border-red-500/30" :
-                  cellData.rank <= 8 ? "bg-orange-500/10 border-orange-500/30" :
-                  "bg-yellow-500/10 border-yellow-500/30"
+                  cellData.rank <= 3 && "bg-red-500/10 border-red-500/30 text-red-700 dark:text-red-400",
+                  cellData.rank > 3 && cellData.rank <= 8 && "bg-orange-500/10 border-orange-500/30 text-orange-700 dark:text-orange-400",
+                  cellData.rank > 8 && "bg-yellow-500/10 border-yellow-500/30 text-yellow-700 dark:text-yellow-400"
                 )}>
                   <Flame className="w-4 h-4" />
-                  <span className="text-sm font-semibold uppercase text-xs">
+                  <span className="text-xs font-semibold uppercase">
                     {cellData.rank <= 3 ? 'Critical' : cellData.rank <= 8 ? 'High' : 'Medium'}
                   </span>
                 </div>
@@ -292,413 +292,379 @@ export default function CategoryDetailModal({
             
             <button
               onClick={onClose}
-              className="p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-400 hover:text-white"
+              className="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-white/10 transition-colors text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white"
             >
               <X className="w-6 h-6" />
             </button>
           </div>
         </div>
 
-        {/* SCROLLABLE CONTENT */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          
-          {/* Category Description */}
-          {categoryData && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-4"
-            >
-              <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-xl border border-blue-500/20 p-4">
-                <div className="flex items-start gap-3">
-                  <Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <h3 className="text-sm font-semibold text-blue-400 mb-2 uppercase tracking-wide">
-                      What This Means
-                    </h3>
-                    <p className="text-sm text-gray-300 leading-relaxed">
-                      {categoryData.description}
-                    </p>
-                  </div>
-                </div>
-              </div>
+        {/* TABS NAVIGATION */}
+        <div className="flex-shrink-0 border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-black/20">
+          <div className="flex">
+            {tabs.map((tab) => {
+              const Icon = tab.icon
+              const isActive = activeTab === tab.id
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={cn(
+                    "flex-1 px-4 py-3 text-sm font-semibold transition-all relative flex items-center justify-center gap-2",
+                    isActive && "text-teal-600 dark:text-teal-400 bg-white dark:bg-white/5",
+                    !isActive && "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/50 dark:hover:bg-white/5"
+                  )}
+                >
+                  <Icon className="w-4 h-4" />
+                  {tab.label}
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeTab"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-teal-600 dark:bg-teal-400"
+                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    />
+                  )}
+                </button>
+              )
+            })}
+          </div>
+        </div>
 
-              {/* Behavioral Indicators */}
-              {categoryData.showsUpAs && (
-                <div className="bg-gradient-to-r from-orange-500/5 to-transparent rounded-xl border border-orange-500/20 p-4">
+        {/* TAB CONTENT */}
+        <div className="flex-1 overflow-y-auto p-6">
+          <AnimatePresence mode="wait">
+            {/* TAB 1: OVERVIEW */}
+            {activeTab === 'overview' && categoryData && (
+              <motion.div
+                key="overview"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-4"
+              >
+                <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 dark:from-blue-500/10 dark:to-purple-500/10 rounded-xl border border-blue-500/20 p-5">
                   <div className="flex items-start gap-3">
-                    <Eye className="w-5 h-5 text-orange-400 flex-shrink-0 mt-0.5" />
+                    <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
                     <div>
-                      <h3 className="text-sm font-semibold text-orange-400 mb-2 uppercase tracking-wide">
-                        How It Shows Up
+                      <h3 className="text-sm font-semibold text-blue-700 dark:text-blue-400 mb-2 uppercase tracking-wide">
+                        What This Means
                       </h3>
-                      <p className="text-sm text-gray-300 leading-relaxed">
-                        {categoryData.showsUpAs}
+                      <p className="text-sm text-slate-700 dark:text-gray-300 leading-relaxed">
+                        {categoryData.description}
                       </p>
                     </div>
                   </div>
                 </div>
-              )}
 
-              {/* Taboos - Resistance Patterns to Understand */}
-              {!tabooLoading && taboos.length > 0 && (
-                <div className="bg-gradient-to-r from-red-500/5 to-amber-500/5 rounded-xl border border-red-500/20 p-6">
-                  <div className="flex items-start gap-3 mb-4">
-                    <AlertTriangle className="w-6 h-6 text-red-400 flex-shrink-0 mt-0.5" />
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold text-red-400 mb-2">
-                        Adoption Taboos in This Area
-                      </h3>
-                      <p className="text-sm text-gray-400 leading-relaxed mb-4">
-                        Understanding these resistance patterns helps you navigate AI adoption more effectively.
-                        These taboos represent common concerns and anxieties that surface in this sentiment area.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Taboo Cards */}
-                  <div className="space-y-4">
-                    {taboos.map((taboo, index) => (
-                      <motion.div
-                        key={taboo.id}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        className="bg-black/30 rounded-lg border border-red-500/10 p-4 hover:border-red-500/30 transition-colors"
-                      >
-                        {/* Taboo Name and Short Description */}
-                        <div className="flex items-start gap-3 mb-3">
-                          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-red-500/20 border border-red-500/30 flex items-center justify-center">
-                            <span className="text-sm font-bold text-red-400">{index + 1}</span>
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="text-base font-bold text-white mb-1">
-                              {taboo.name}
-                            </h4>
-                            <p className="text-sm text-gray-400 italic">
-                              {taboo.short_description}
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Full Description */}
-                        <p className="text-sm text-gray-300 leading-relaxed mb-3 pl-11">
-                          {taboo.description}
+                {/* Behavioral Indicators */}
+                {categoryData.showsUpAs && (
+                  <div className="bg-gradient-to-r from-orange-500/10 to-transparent dark:from-orange-500/5 dark:to-transparent rounded-xl border border-orange-500/20 p-5">
+                    <div className="flex items-start gap-3">
+                      <Eye className="w-5 h-5 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <h3 className="text-sm font-semibold text-orange-700 dark:text-orange-400 mb-2 uppercase tracking-wide">
+                          How It Shows Up
+                        </h3>
+                        <p className="text-sm text-slate-700 dark:text-gray-300 leading-relaxed">
+                          {categoryData.showsUpAs}
                         </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            )}
 
-                        {/* How It Shows Up */}
-                        <div className="pl-11 mb-3">
-                          <p className="text-xs font-semibold text-orange-400 mb-1 uppercase tracking-wide">
-                            How It Shows Up
-                          </p>
-                          <p className="text-sm text-gray-400 leading-relaxed">
-                            {taboo.how_it_shows_up}
+            {/* TAB 2: TABOOS */}
+            {activeTab === 'taboos' && (
+              <motion.div
+                key="taboos"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+              >
+                {!tabooLoading && taboos.length > 0 ? (
+                  <div className="space-y-4">
+                    <div className="bg-gradient-to-r from-red-500/10 to-amber-500/10 dark:from-red-500/5 dark:to-amber-500/5 rounded-xl border border-red-500/20 p-5">
+                      <div className="flex items-start gap-3">
+                        <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                        <div className="flex-1">
+                          <h3 className="text-lg font-bold text-red-700 dark:text-red-400 mb-2">
+                            Adoption Taboos in This Area
+                          </h3>
+                          <p className="text-sm text-slate-600 dark:text-gray-400 leading-relaxed">
+                            Understanding these resistance patterns helps you navigate AI adoption more effectively.
+                            These taboos represent common concerns and anxieties that surface in this sentiment area.
                           </p>
                         </div>
+                      </div>
+                    </div>
 
-                        {/* Possible Actions */}
-                        <div className="pl-11">
-                          <p className="text-xs font-semibold text-teal-400 mb-1 uppercase tracking-wide">
-                            What You Can Do
-                          </p>
-                          <p className="text-sm text-gray-400 leading-relaxed">
-                            {taboo.possible_actions}
-                          </p>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Loading state for taboos */}
-              {tabooLoading && (
-                <div className="bg-gradient-to-r from-red-500/5 to-amber-500/5 rounded-xl border border-red-500/20 p-6">
-                  <div className="flex items-center gap-3">
-                    <div className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-solid border-red-400 border-r-transparent"></div>
-                    <p className="text-sm text-gray-400">Loading adoption taboos...</p>
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          )}
-
-          {/* LOADING STATE */}
-          {loading && (
-            <div className="text-center py-12">
-              <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-purple-600 border-r-transparent mb-4"></div>
-              <p className="text-gray-400">Loading interventions...</p>
-            </div>
-          )}
-
-          {/* SOLUTION SELECTOR */}
-          {!loading && !showSolution && interventions.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              {interventionSize === 'small' ? (
-                // SMALL MODE: Flavor-based selection (3 interventions)
-                <>
-                  <div className="text-center mb-6">
-                    <h3 className="text-xl font-bold text-white mb-2 flex items-center justify-center gap-2">
-                      <Sparkles className="w-5 h-5 text-teal-400" />
-                      Choose Your Solution Style
-                    </h3>
-                    <p className="text-sm text-gray-400">
-                      Pick an approach that matches your organization's appetite for change
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    {(Object.keys(FLAVOR_CONFIG) as SolutionFlavor[]).map((flavor, idx) => {
-                      const config = FLAVOR_CONFIG[flavor]
-                      const Icon = config.icon
-                      const isSelected = selectedFlavor === flavor && isRolling
-
-                      return (
-                        <motion.button
-                          key={flavor}
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          animate={{
-                            opacity: 1,
-                            scale: isSelected ? 1.05 : 1,
-                          }}
-                          transition={{ delay: idx * 0.1 }}
-                          onClick={() => handleFlavorSelect(flavor)}
-                          disabled={isRolling}
-                          className={cn(
-                            "relative group overflow-hidden rounded-xl border-2 transition-all p-6",
-                            "hover:scale-105 hover:shadow-2xl",
-                            isSelected
-                              ? `${config.borderColor} ring-4 ring-white/20`
-                              : "border-white/10 hover:border-white/30",
-                            isRolling && !isSelected && "opacity-40"
-                          )}
-                        >
-                          {/* Animated Background */}
-                          <div className={cn(
-                            "absolute inset-0 bg-gradient-to-br transition-opacity",
-                            config.bgGradient,
-                            isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-                          )} />
-
-                          {/* Content */}
-                          <div className="relative">
-                            <div className="flex items-center justify-center mb-4">
-                              <motion.div
-                                animate={isSelected ? { rotate: 360 } : {}}
-                                transition={{ duration: 0.5, repeat: isSelected ? Infinity : 0 }}
-                                className={cn(
-                                  "w-16 h-16 rounded-xl bg-gradient-to-br flex items-center justify-center",
-                                  config.gradient
-                                )}
-                              >
-                                <Icon className="w-8 h-8 text-white" />
-                              </motion.div>
-                            </div>
-
-                            <h4 className="text-lg font-bold text-white mb-1">
-                              {config.label}
-                            </h4>
-                            <p className={cn("text-sm font-medium mb-2", config.textColor)}>
-                              {config.subtitle}
-                            </p>
-                            <p className="text-xs text-gray-400 leading-relaxed">
-                              {config.description}
-                            </p>
-
-                            {flavor === 'lucky' && (
-                              <div className="mt-4 flex items-center justify-center gap-1">
-                                {[0, 1, 2].map((i) => (
-                                  <motion.div
-                                    key={i}
-                                    className="w-1.5 h-1.5 rounded-full bg-purple-400"
-                                    animate={{
-                                      scale: [1, 1.5, 1],
-                                      opacity: [0.3, 1, 0.3]
-                                    }}
-                                    transition={{
-                                      duration: 1.5,
-                                      repeat: Infinity,
-                                      delay: i * 0.2
-                                    }}
-                                  />
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        </motion.button>
-                      )
-                    })}
-                  </div>
-                </>
-              ) : (
-                // LARGE MODE: Show all 10 strategic interventions
-                <>
-                  <div className="text-center mb-6">
-                    <h3 className="text-xl font-bold text-white mb-2 flex items-center justify-center gap-2">
-                      <Sparkles className="w-5 h-5 text-teal-400" />
-                      Strategic Intervention Catalogue
-                    </h3>
-                    <p className="text-sm text-gray-400">
-                      Choose from our complete collection of strategic interventions
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {interventions.map((intervention, idx) => {
-                      const level = intervention.code.charAt(0)
-                      const levelColors = {
-                        'A': {
-                          gradient: 'from-purple-600 to-purple-700',
-                          border: 'border-purple-500/50',
-                          text: 'text-purple-400',
-                          bg: 'bg-purple-500/10'
-                        },
-                        'B': {
-                          gradient: 'from-blue-600 to-blue-700',
-                          border: 'border-blue-500/50',
-                          text: 'text-blue-400',
-                          bg: 'bg-blue-500/10'
-                        },
-                        'C': {
-                          gradient: 'from-teal-600 to-teal-700',
-                          border: 'border-teal-500/50',
-                          text: 'text-teal-400',
-                          bg: 'bg-teal-500/10'
-                        }
-                      }
-                      const colors = levelColors[level as 'A' | 'B' | 'C'] || levelColors['A']
-
-                      return (
-                        <motion.button
-                          key={intervention.code}
-                          initial={{ opacity: 0, y: 20 }}
+                    {/* Taboo Cards */}
+                    <div className="space-y-4">
+                      {taboos.map((taboo, index) => (
+                        <motion.div
+                          key={taboo.id}
+                          initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: idx * 0.05 }}
-                          onClick={() => {
-                            // For large mode, show intervention detail directly
-                            setSelectedInterventionCode(intervention.code)
-                            setShowInterventionDetail(true)
-                          }}
-                          className={cn(
-                            "relative group overflow-hidden rounded-xl border-2 transition-all p-4 text-left",
-                            "hover:scale-102 hover:shadow-xl",
-                            colors.border,
-                            "border-white/10 hover:border-white/30"
-                          )}
+                          transition={{ delay: index * 0.1 }}
+                          className="bg-slate-50 dark:bg-black/30 rounded-lg border border-slate-200 dark:border-red-500/10 p-4 hover:border-red-300 dark:hover:border-red-500/30 transition-colors"
                         >
-                          <div className="flex items-start gap-3">
-                            <div className={cn(
-                              "flex-shrink-0 w-12 h-12 rounded-lg bg-gradient-to-br flex items-center justify-center font-bold text-white",
-                              colors.gradient
-                            )}>
-                              {intervention.code}
+                          {/* Taboo Name and Short Description */}
+                          <div className="flex items-start gap-3 mb-3">
+                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-red-500/20 border border-red-500/30 flex items-center justify-center">
+                              <span className="text-sm font-bold text-red-700 dark:text-red-400">{index + 1}</span>
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <h4 className="text-sm font-bold text-white mb-1 line-clamp-2">
-                                {intervention.name}
+                            <div className="flex-1">
+                              <h4 className="text-base font-bold text-slate-900 dark:text-white mb-1">
+                                {taboo.name}
                               </h4>
-                              <p className="text-xs text-gray-400 line-clamp-2">
-                                {intervention.description}
+                              <p className="text-sm text-slate-600 dark:text-gray-400 italic">
+                                {taboo.short_description}
                               </p>
                             </div>
                           </div>
-                        </motion.button>
-                      )
-                    })}
-                  </div>
-                </>
-              )}
-            </motion.div>
-          )}
 
-          {/* SELECTED SOLUTION */}
-          <AnimatePresence>
-            {showSolution && selectedIntervention && flavorConfig && (
+                          {/* Full Description */}
+                          <p className="text-sm text-slate-700 dark:text-gray-300 leading-relaxed mb-3 pl-11">
+                            {taboo.description}
+                          </p>
+
+                          {/* How It Shows Up */}
+                          <div className="pl-11 mb-3">
+                            <p className="text-xs font-semibold text-orange-700 dark:text-orange-400 mb-1 uppercase tracking-wide">
+                              How It Shows Up
+                            </p>
+                            <p className="text-sm text-slate-600 dark:text-gray-400 leading-relaxed">
+                              {taboo.how_it_shows_up}
+                            </p>
+                          </div>
+
+                          {/* Possible Actions */}
+                          <div className="pl-11">
+                            <p className="text-xs font-semibold text-teal-700 dark:text-teal-400 mb-1 uppercase tracking-wide">
+                              What You Can Do
+                            </p>
+                            <p className="text-sm text-slate-600 dark:text-gray-400 leading-relaxed">
+                              {taboo.possible_actions}
+                            </p>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                ) : tabooLoading ? (
+                  <div className="bg-gradient-to-r from-red-500/10 to-amber-500/10 dark:from-red-500/5 dark:to-amber-500/5 rounded-xl border border-red-500/20 p-6">
+                    <div className="flex items-center gap-3">
+                      <div className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-solid border-red-600 dark:border-red-400 border-r-transparent"></div>
+                      <p className="text-sm text-slate-600 dark:text-gray-400">Loading adoption taboos...</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-slate-500 dark:text-gray-500 text-sm">
+                      No taboos data available for this cell.
+                    </p>
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            {/* TAB 3: INTERVENTIONS */}
+            {activeTab === 'interventions' && (
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="space-y-4"
+                key="interventions"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
               >
-                {/* Solution Header */}
-                <div className={cn(
-                  "rounded-xl border-2 p-6 bg-gradient-to-br",
-                  flavorConfig.bgGradient,
-                  flavorConfig.borderColor
-                )}>
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className={cn(
-                      "w-12 h-12 rounded-lg bg-gradient-to-br flex items-center justify-center",
-                      flavorConfig.gradient
-                    )}>
-                      {(() => {
-                        const Icon = flavorConfig.icon
-                        return <Icon className="w-6 h-6 text-white" />
-                      })()}
-                    </div>
-                    <div className="flex-1">
-                      <div className={cn("text-xs font-bold uppercase tracking-wide mb-1", flavorConfig.textColor)}>
-                        {selectedIntervention.code} • {flavorConfig.label}
+
+                {/* LOADING STATE */}
+                {loading ? (
+                  <div className="text-center py-12">
+                    <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-purple-600 dark:border-purple-600 border-r-transparent mb-4"></div>
+                    <p className="text-slate-600 dark:text-gray-400">Loading interventions...</p>
+                  </div>
+                ) : interventions.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-slate-500 dark:text-gray-500 text-sm">
+                      No interventions available for this cell yet.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+
+                    {/* SOLUTION SELECTOR */}
+                    {!showSolution ? (
+                      <div className="space-y-4">
+                        {/* Flavor-based selection (3 interventions) */}
+                        <>
+                            <div className="text-center mb-6">
+                              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2 flex items-center justify-center gap-2">
+                                <Sparkles className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+                                Choose Your Solution Style
+                              </h3>
+                              <p className="text-sm text-slate-600 dark:text-gray-400">
+                                Pick an approach that matches your organization's appetite for change
+                              </p>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              {(Object.keys(FLAVOR_CONFIG) as SolutionFlavor[]).map((flavor, idx) => {
+                                const config = FLAVOR_CONFIG[flavor]
+                                const Icon = config.icon
+                                const isSelected = selectedFlavor === flavor && isRolling
+
+                                return (
+                                  <motion.button
+                                    key={flavor}
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{
+                                      opacity: 1,
+                                      scale: isSelected ? 1.05 : 1,
+                                    }}
+                                    transition={{ delay: idx * 0.1 }}
+                                    onClick={() => handleFlavorSelect(flavor)}
+                                    disabled={isRolling}
+                                    className={cn(
+                                      "relative group overflow-hidden rounded-xl border-2 transition-all p-6",
+                                      "hover:scale-105 hover:shadow-2xl",
+                                      isSelected
+                                        ? `${config.borderColor} ring-4 ring-teal-500/20`
+                                        : "border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/30",
+                                      isRolling && !isSelected && "opacity-40"
+                                    )}
+                                  >
+                                    {/* Animated Background */}
+                                    <div className={cn(
+                                      "absolute inset-0 bg-gradient-to-br transition-opacity",
+                                      config.bgGradient,
+                                      isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                                    )} />
+
+                                    {/* Content */}
+                                    <div className="relative">
+                                      <div className="flex items-center justify-center mb-4">
+                                        <motion.div
+                                          animate={isSelected ? { rotate: 360 } : {}}
+                                          transition={{ duration: 0.5, repeat: isSelected ? Infinity : 0 }}
+                                          className={cn(
+                                            "w-16 h-16 rounded-xl bg-gradient-to-br flex items-center justify-center",
+                                            config.gradient
+                                          )}
+                                        >
+                                          <Icon className="w-8 h-8 text-white" />
+                                        </motion.div>
+                                      </div>
+
+                                      <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-1">
+                                        {config.label}
+                                      </h4>
+                                      <p className={cn("text-sm font-medium mb-2", config.textColor)}>
+                                        {config.subtitle}
+                                      </p>
+                                      <p className="text-xs text-slate-600 dark:text-gray-400 leading-relaxed">
+                                        {config.description}
+                                      </p>
+
+                                      {flavor === 'lucky' && (
+                                        <div className="mt-4 flex items-center justify-center gap-1">
+                                          {[0, 1, 2].map((i) => (
+                                            <motion.div
+                                              key={i}
+                                              className="w-1.5 h-1.5 rounded-full bg-purple-400"
+                                              animate={{
+                                                scale: [1, 1.5, 1],
+                                                opacity: [0.3, 1, 0.3]
+                                              }}
+                                              transition={{
+                                                duration: 1.5,
+                                                repeat: Infinity,
+                                                delay: i * 0.2
+                                              }}
+                                            />
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </motion.button>
+                                )
+                              })}
+                            </div>
+                          </>
                       </div>
-                      <h3 className="text-lg font-bold text-white">
-                        {selectedIntervention.name}
-                      </h3>
-                    </div>
-                  </div>
+                    ) : selectedIntervention && flavorConfig ? (
+                      <div className="space-y-4">
+                        <div className={cn(
+                          "rounded-xl border-2 p-6 bg-gradient-to-br",
+                          flavorConfig.bgGradient,
+                          flavorConfig.borderColor
+                        )}>
+                          <div className="flex items-center gap-3 mb-4">
+                            <div className={cn(
+                              "w-12 h-12 rounded-lg bg-gradient-to-br flex items-center justify-center",
+                              flavorConfig.gradient
+                            )}>
+                              {(() => {
+                                const Icon = flavorConfig.icon
+                                return <Icon className="w-6 h-6 text-white" />
+                              })()}
+                            </div>
+                            <div className="flex-1">
+                              <div className={cn("text-xs font-bold uppercase tracking-wide mb-1", flavorConfig.textColor)}>
+                                {selectedIntervention.code} • {flavorConfig.label}
+                              </div>
+                              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                                {selectedIntervention.name}
+                              </h3>
+                            </div>
+                          </div>
 
-                  <p className="text-sm text-gray-300 leading-relaxed mb-4">
-                    {selectedIntervention.core_function}
-                  </p>
+                          <p className="text-sm text-slate-700 dark:text-gray-300 leading-relaxed mb-4">
+                            {selectedIntervention.core_function}
+                          </p>
 
-                  {/* Level Badge */}
-                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10">
-                    <Sparkles className="w-4 h-4 text-yellow-400" />
-                    <span className="text-xs text-gray-400">
-                      {selectedIntervention.level}
-                    </span>
-                  </div>
-                </div>
+                          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10">
+                            <Sparkles className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
+                            <span className="text-xs text-slate-600 dark:text-gray-400">
+                              {selectedIntervention.level}
+                            </span>
+                          </div>
+                        </div>
 
-                {/* Action Buttons */}
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => {
-                      setShowSolution(false)
-                      setSelectedFlavor(null)
-                    }}
-                    className="flex-1 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all text-sm font-semibold text-gray-300 hover:text-white"
-                  >
-                    Choose Different Intervention
-                  </button>
-                  <button
-                    onClick={handleViewInterventionDetail}
-                    className={cn(
-                      "flex-1 px-4 py-3 rounded-lg border-2 transition-all text-sm font-semibold flex items-center justify-center gap-2 group",
-                      "bg-gradient-to-r text-white shadow-xl hover:shadow-2xl hover:scale-105",
-                      flavorConfig.gradient,
-                      flavorConfig.borderColor
-                    )}
-                  >
-                    View Full Details & Next Steps
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </button>
-                </div>
+                        <div className="flex gap-3">
+                          <button
+                            onClick={() => {
+                              setShowSolution(false)
+                              setSelectedFlavor(null)
+                            }}
+                            className="flex-1 px-4 py-3 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 transition-all text-sm font-semibold text-slate-700 dark:text-gray-300 hover:text-slate-900 dark:hover:text-white"
+                          >
+                            Choose Different Intervention
+                          </button>
+                          <button
+                            onClick={handleViewInterventionDetail}
+                            className={cn(
+                              "flex-1 px-4 py-3 rounded-lg border-2 transition-all text-sm font-semibold flex items-center justify-center gap-2 group",
+                              "bg-gradient-to-r text-white shadow-xl hover:shadow-2xl hover:scale-105",
+                              flavorConfig.gradient,
+                              flavorConfig.borderColor
+                            )}
+                          >
+                            View Full Details & Next Steps
+                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                          </button>
+                        </div>
+                      </div>
+                    ) : null}
+                  </>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
-
-          {/* No Data Fallback */}
-          {!loading && interventions.length === 0 && (
-            <div className="text-center py-8">
-              <p className="text-gray-500 text-sm">
-                No interventions available for this cell yet.
-              </p>
-            </div>
-          )}
         </div>
       </motion.div>
 

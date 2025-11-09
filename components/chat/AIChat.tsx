@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect, memo, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { 
   MessageSquare, 
   X, 
@@ -50,7 +52,7 @@ const AIChatComponent = ({ className }: AIChatProps) => {
     {
       id: 'welcome',
       role: 'assistant',
-      content: "👋 I can help you:\n\n• Analyze your biggest challenges and opportunities\n• Generate executive summaries and recommendations\n• Compare departments, regions, and time periods\n• Design specific interventions with ROI estimates\n• Navigate to detailed views and apply filters\n\nWhat would you like to explore?",
+      content: "Hi! I'm your AI insights companion. I can analyze your data, generate reports, design interventions, and help you navigate the platform.\n\nWhat would you like to know?",
       timestamp: new Date()
     }
   ])
@@ -200,10 +202,10 @@ const AIChatComponent = ({ className }: AIChatProps) => {
   }
 
   const quickPrompts = [
-    { icon: TrendingUp, text: "Top 3 AI adoption challenges", prompt: "What are our top 3 AI adoption challenges?" },
-    { icon: BarChart3, text: "Capability maturity analysis", prompt: "Analyze our capability maturity across all dimensions" },
-    { icon: FileText, text: "Executive summary for the board", prompt: "Generate an executive summary for the board" },
-    { icon: Lightbulb, text: "Intervention recommendations", prompt: "Design specific interventions with ROI estimates" },
+    { icon: TrendingUp, text: "Top challenges", prompt: "What are our top 3 AI adoption challenges?" },
+    { icon: BarChart3, text: "Maturity analysis", prompt: "Analyze our capability maturity" },
+    { icon: FileText, text: "Executive summary", prompt: "Generate an executive summary" },
+    { icon: Lightbulb, text: "Interventions", prompt: "Recommend interventions with ROI" },
   ]
   
   // Determine if we should hide the chat
@@ -221,24 +223,37 @@ const AIChatComponent = ({ className }: AIChatProps) => {
       <motion.button
         className={cn(
           'fixed bottom-6 right-6 z-50',
-          'w-12 h-12 rounded-xl',
-          'bg-gradient-to-br from-teal-500 to-purple-500',
-          'shadow-lg hover:shadow-xl',
+          'w-14 h-14 rounded-2xl',
+          'bg-gradient-to-br from-teal-500 via-teal-600 to-purple-600',
+          'shadow-[0_8px_30px_rgba(20,184,166,0.4)] hover:shadow-[0_12px_40px_rgba(20,184,166,0.5)]',
           'flex items-center justify-center',
           'transition-shadow duration-300',
+          'border border-white/20',
           className
         )}
         onClick={() => setIsOpen(true)}
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        whileHover={{ scale: 1.05, y: -2 }}
+        initial={{ scale: 0, rotate: -180 }}
+        animate={{ scale: 1, rotate: 0 }}
+        whileHover={{ scale: 1.1, y: -4 }}
         whileTap={{ scale: 0.95 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+        transition={{ 
+          type: 'spring', 
+          stiffness: 300, 
+          damping: 15,
+          rotate: { duration: 0.6, ease: 'easeOut' }
+        }}
       >
-        <Bot className="w-5 h-5 text-white" />
+        <Sparkles className="w-6 h-6 text-white" />
         <motion.div
-          className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 rounded-full border border-white"
-          animate={{ scale: [1, 1.2, 1] }}
+          className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full border-2 border-white shadow-lg"
+          animate={{ 
+            scale: [1, 1.3, 1],
+            boxShadow: [
+              '0 0 0 0 rgba(52, 211, 153, 0.4)',
+              '0 0 0 6px rgba(52, 211, 153, 0)',
+              '0 0 0 0 rgba(52, 211, 153, 0)'
+            ]
+          }}
           transition={{ duration: 2, repeat: Infinity }}
         />
       </motion.button>
@@ -264,68 +279,154 @@ const AIChatComponent = ({ className }: AIChatProps) => {
       {/* Chat Panel */}
       <motion.div
         className={cn(
-          'fixed z-50 flex flex-col',
-          'bg-white dark:bg-gray-900 border border-slate-200/60 dark:border-white/[0.08]',
-          'shadow-lg',
-          'bottom-4 right-4 rounded-2xl w-[360px] max-h-[600px]',
+          'fixed z-50 flex flex-col overflow-hidden',
+          'bg-white/90 dark:bg-gray-900/90 backdrop-blur-2xl',
+          'border border-slate-200/80 dark:border-white/10',
+          'shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.5)]',
+          'bottom-5 right-5 rounded-2xl w-[340px] h-[500px]',
           className
         )}
-        initial={{ scale: 0.9, opacity: 0, y: 20 }}
+        initial={{ scale: 0.85, opacity: 0, y: 40 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.9, opacity: 0, y: 20 }}
-        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        exit={{ scale: 0.85, opacity: 0, y: 40 }}
+        transition={{ 
+          type: 'spring', 
+          damping: 20, 
+          stiffness: 260,
+          mass: 0.8
+        }}
       >
+        {/* Gradient Background Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 via-transparent to-purple-500/5 pointer-events-none" />
+        
         {/* Header */}
-        <div className="flex items-center justify-between p-3 border-b border-slate-200/60 dark:border-white/[0.08]">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-500 to-purple-500 flex items-center justify-center">
+        <div className="relative flex items-center justify-between px-4 py-3 border-b border-slate-200/80 dark:border-white/10 shrink-0 bg-gradient-to-r from-slate-50/50 to-transparent dark:from-white/5 dark:to-transparent">
+          <div className="flex items-center gap-2.5">
+            <motion.div 
+              className="relative w-8 h-8 rounded-xl bg-gradient-to-br from-teal-500 to-purple-600 flex items-center justify-center shadow-lg shadow-teal-500/20"
+              animate={{ 
+                boxShadow: [
+                  '0 4px 14px rgba(20, 184, 166, 0.2)',
+                  '0 4px 20px rgba(168, 85, 247, 0.3)',
+                  '0 4px 14px rgba(20, 184, 166, 0.2)'
+                ]
+              }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            >
               <Bot className="w-4 h-4 text-white" />
-            </div>
+              <motion.div 
+                className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-emerald-400 rounded-full border-2 border-white dark:border-gray-900"
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              />
+            </motion.div>
             <div>
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-white">AI Agent</h3>
-              <p className="text-[10px] text-slate-600 dark:text-gray-400">Ask me anything</p>
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-white">AI Insights</h3>
+              <p className="text-[10px] text-slate-600 dark:text-gray-400 flex items-center gap-1">
+                <span className="w-1 h-1 bg-emerald-400 rounded-full animate-pulse" />
+                Online
+              </p>
             </div>
           </div>
           
           <motion.button
             onClick={() => setIsOpen(false)}
-            className="p-1.5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg transition-colors"
-            whileHover={{ scale: 1.05 }}
+            className="p-1.5 hover:bg-slate-200/60 dark:hover:bg-white/10 rounded-lg transition-colors"
+            whileHover={{ scale: 1.05, rotate: 90 }}
             whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.2 }}
           >
             <X className="w-4 h-4 text-slate-600 dark:text-gray-400" />
           </motion.button>
         </div>
 
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-3 scrollbar-thin">
-          {messages.map((message) => (
+        {/* Messages Container */}
+        <div className="relative flex-1 overflow-y-auto px-4 py-3 space-y-3 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-white/10 scrollbar-track-transparent min-h-0">
+          {messages.map((message, idx) => (
             <motion.div
               key={message.id}
-              initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ 
+                delay: idx * 0.05,
+                type: 'spring',
+                stiffness: 500,
+                damping: 30
+              }}
               className={cn(
-                'flex gap-2',
+                'flex gap-2 items-end',
                 message.role === 'user' ? 'justify-end' : 'justify-start'
               )}
             >
-              {/* Message Content */}
+              {/* Avatar for assistant */}
+              {message.role === 'assistant' && (
+                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-teal-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-sm">
+                  <Sparkles className="w-3 h-3 text-white" />
+                </div>
+              )}
+              
+              {/* Message Bubble */}
               <div className={cn(
-                'max-w-[85%]',
+                'max-w-[80%] group',
                 message.role === 'user' ? 'order-2' : 'order-1'
               )}>
-                <div className={cn(
-                  'rounded-2xl px-3 py-2',
-                  message.role === 'user'
-                    ? 'bg-teal-50 dark:bg-teal-500/10 text-slate-900 dark:text-white'
-                    : 'bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white'
-                )}>
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                    {message.content}
-                  </p>
-                </div>
+                <motion.div 
+                  className={cn(
+                    'rounded-2xl px-3.5 py-2.5 shadow-sm overflow-hidden',
+                    message.role === 'user'
+                      ? 'bg-gradient-to-br from-teal-500 to-purple-600 text-white rounded-br-md'
+                      : 'bg-slate-100/80 dark:bg-white/[0.07] text-slate-900 dark:text-white backdrop-blur-sm rounded-bl-md border border-slate-200/50 dark:border-white/5'
+                  )}
+                  whileHover={{ scale: 1.01 }}
+                  transition={{ type: 'spring', stiffness: 400 }}
+                >
+                  {message.role === 'user' ? (
+                    <p className="text-[13px] leading-relaxed whitespace-pre-wrap">
+                      {message.content}
+                    </p>
+                  ) : (
+                    <div className="text-[13px] leading-relaxed chat-markdown text-slate-900 dark:text-white">
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          p: ({ children }) => <p className="my-1">{children}</p>,
+                          ul: ({ children }) => <ul className="my-1 space-y-0.5">{children}</ul>,
+                          ol: ({ children }) => <ol className="my-1 space-y-0.5">{children}</ol>,
+                          li: ({ children }) => <li className="text-[12px]">{children}</li>,
+                          strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                          em: ({ children }) => <em className="italic">{children}</em>,
+                          code: ({ children, className }) => {
+                            const isInline = !className
+                            return isInline ? (
+                              <code className="text-[11px] bg-slate-200/60 dark:bg-white/10 px-1 py-0.5 rounded font-mono">
+                                {children}
+                              </code>
+                            ) : (
+                              <code className={className}>{children}</code>
+                            )
+                          },
+                          pre: ({ children }) => (
+                            <pre className="text-[11px] bg-slate-200/60 dark:bg-white/10 p-2 rounded my-1 overflow-x-auto">
+                              {children}
+                            </pre>
+                          ),
+                          h1: ({ children }) => <h3 className="text-[14px] font-semibold mt-2 mb-1">{children}</h3>,
+                          h2: ({ children }) => <h4 className="text-[13px] font-semibold mt-1.5 mb-0.5">{children}</h4>,
+                          h3: ({ children }) => <h5 className="text-[13px] font-semibold mt-1 mb-0.5">{children}</h5>,
+                          blockquote: ({ children }) => (
+                            <blockquote className="border-l-2 border-slate-300 dark:border-white/20 pl-2 italic my-1 text-slate-700 dark:text-gray-300">
+                              {children}
+                            </blockquote>
+                          ),
+                        }}
+                      >
+                        {message.content}
+                      </ReactMarkdown>
+                    </div>
+                  )}
+                </motion.div>
                 <p className={cn(
-                  "text-[10px] text-slate-500 dark:text-gray-500 mt-1 px-1",
+                  "text-[9px] text-slate-500 dark:text-gray-500 mt-1 px-1 opacity-0 group-hover:opacity-100 transition-opacity",
                   message.role === 'user' ? 'text-right' : 'text-left'
                 )}>
                   {message.timestamp.toLocaleTimeString([], { 
@@ -334,19 +435,45 @@ const AIChatComponent = ({ className }: AIChatProps) => {
                   })}
                 </p>
               </div>
+
+              {/* Avatar for user */}
+              {message.role === 'user' && (
+                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 dark:from-white/10 dark:to-white/5 flex items-center justify-center flex-shrink-0 shadow-sm">
+                  <User className="w-3.5 h-3.5 text-slate-600 dark:text-gray-300" />
+                </div>
+              )}
             </motion.div>
           ))}
 
           {isLoading && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex justify-start"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex justify-start items-end gap-2"
             >
-              <div className="bg-slate-100 dark:bg-white/5 rounded-2xl px-3 py-2">
+              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-teal-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-sm">
+                <Sparkles className="w-3 h-3 text-white" />
+              </div>
+              <div className="bg-slate-100/80 dark:bg-white/[0.07] rounded-2xl rounded-bl-md px-3.5 py-2.5 backdrop-blur-sm border border-slate-200/50 dark:border-white/5">
                 <div className="flex items-center gap-2">
-                  <Loader2 className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 animate-spin" />
-                  <span className="text-sm text-slate-700 dark:text-white/70">Thinking...</span>
+                  <motion.div className="flex gap-1">
+                    {[0, 1, 2].map((i) => (
+                      <motion.div
+                        key={i}
+                        className="w-1.5 h-1.5 bg-teal-600 dark:bg-teal-400 rounded-full"
+                        animate={{ 
+                          scale: [1, 1.2, 1],
+                          opacity: [0.5, 1, 0.5]
+                        }}
+                        transition={{ 
+                          duration: 1.2,
+                          repeat: Infinity,
+                          delay: i * 0.2
+                        }}
+                      />
+                    ))}
+                  </motion.div>
+                  <span className="text-[11px] text-slate-600 dark:text-white/60">Thinking</span>
                 </div>
               </div>
             </motion.div>
@@ -355,50 +482,61 @@ const AIChatComponent = ({ className }: AIChatProps) => {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Quick Prompts (show when no user messages yet) */}
+        {/* Quick Prompts */}
         {messages.length === 1 && (
-          <div className="px-3 pb-3 space-y-1.5">
-            <p className="text-[10px] text-slate-500 dark:text-gray-500 font-semibold uppercase tracking-wider mb-2">Suggestions</p>
-            {quickPrompts.map((prompt, idx) => (
-              <motion.button
-                key={idx}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.05 }}
-                onClick={() => {
-                  setInputValue(prompt.prompt)
-                  inputRef.current?.focus()
-                }}
-                className="w-full flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 transition-all text-left group"
-                whileHover={{ x: 2 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <prompt.icon className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 flex-shrink-0" />
-                <span className="text-xs text-slate-700 dark:text-gray-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
-                  {prompt.text}
-                </span>
-              </motion.button>
-            ))}
-          </div>
+          <motion.div 
+            className="relative px-4 pb-2.5 space-y-1.5 shrink-0"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <p className="text-[10px] text-slate-500 dark:text-gray-500 font-medium tracking-wide mb-2">
+              Popular questions
+            </p>
+            <div className="grid grid-cols-2 gap-1.5">
+              {quickPrompts.map((prompt, idx) => (
+                <motion.button
+                  key={idx}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.3 + idx * 0.05 }}
+                  onClick={() => {
+                    setInputValue(prompt.prompt)
+                    inputRef.current?.focus()
+                  }}
+                  className="flex flex-col items-start gap-1 p-2 rounded-xl bg-gradient-to-br from-slate-50 to-slate-100/50 dark:from-white/5 dark:to-white/[0.02] hover:from-teal-50 hover:to-purple-50 dark:hover:from-teal-500/10 dark:hover:to-purple-500/10 border border-slate-200/60 dark:border-white/5 hover:border-teal-200 dark:hover:border-teal-500/30 transition-all text-left group hover:shadow-md"
+                  whileHover={{ y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <prompt.icon className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 group-hover:scale-110 transition-transform" />
+                  <span className="text-[10px] text-slate-700 dark:text-gray-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors font-medium leading-tight">
+                    {prompt.text}
+                  </span>
+                </motion.button>
+              ))}
+            </div>
+          </motion.div>
         )}
 
-        {/* Input */}
-        <div className="p-3 border-t border-slate-200/60 dark:border-white/[0.08]">
-          <div className="relative">
+        {/* Input Area */}
+        <div className="relative px-4 py-3 border-t border-slate-200/80 dark:border-white/10 shrink-0 bg-gradient-to-t from-slate-50/30 to-transparent dark:from-white/[0.02] dark:to-transparent">
+          <div className="relative group">
             <input
               ref={inputRef}
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Ask me anything..."
+              placeholder="Ask anything..."
               className={cn(
-                'w-full px-3 py-2.5 pr-10',
-                'bg-slate-50 dark:bg-white/5',
-                'rounded-lg text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-500',
-                'focus:outline-none focus:ring-1 focus:ring-teal-500',
-                'transition-all',
-                'text-sm'
+                'w-full pl-3.5 pr-10 py-2.5',
+                'bg-slate-100/80 dark:bg-white/[0.07]',
+                'border border-slate-200/60 dark:border-white/10',
+                'rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-500',
+                'focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500/40',
+                'focus:bg-white dark:focus:bg-white/10',
+                'transition-all duration-200',
+                'text-[13px] backdrop-blur-sm'
               )}
               disabled={isLoading}
             />
@@ -407,20 +545,20 @@ const AIChatComponent = ({ className }: AIChatProps) => {
               disabled={!inputValue.trim() || isLoading}
               className={cn(
                 'absolute right-1.5 top-1/2 -translate-y-1/2',
-                'w-7 h-7 rounded-lg',
+                'w-8 h-8 rounded-lg',
                 'flex items-center justify-center',
-                'transition-all',
+                'transition-all duration-200',
                 inputValue.trim() && !isLoading
-                  ? 'bg-gradient-to-br from-teal-500 to-purple-500'
-                  : 'bg-slate-200 dark:bg-white/10 opacity-40 cursor-not-allowed'
+                  ? 'bg-gradient-to-br from-teal-500 to-purple-600 shadow-lg shadow-teal-500/25 hover:shadow-xl hover:shadow-teal-500/30'
+                  : 'bg-slate-300/50 dark:bg-white/10 opacity-50 cursor-not-allowed'
               )}
-              whileHover={inputValue.trim() && !isLoading ? { scale: 1.05 } : {}}
+              whileHover={inputValue.trim() && !isLoading ? { scale: 1.05, rotate: 5 } : {}}
               whileTap={inputValue.trim() && !isLoading ? { scale: 0.95 } : {}}
             >
               {isLoading ? (
-                <Loader2 className="w-3.5 h-3.5 text-white animate-spin" />
+                <Loader2 className="w-4 h-4 text-white animate-spin" />
               ) : (
-                <Send className="w-3.5 h-3.5 text-white" />
+                <Send className="w-4 h-4 text-white" />
               )}
             </motion.button>
           </div>

@@ -10,11 +10,11 @@ const cardVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-black/20 backdrop-blur-xl border border-white/[0.08]',
-        elevated: 'bg-black/30 backdrop-blur-2xl border border-white/[0.1] shadow-2xl',
-        interactive: 'bg-black/20 backdrop-blur-xl border border-white/[0.08] cursor-pointer hover:bg-white/[0.02] hover:border-white/[0.12] hover:shadow-2xl hover:-translate-y-0.5',
-        glass: 'bg-white/[0.03] backdrop-blur-2xl border border-white/[0.08]',
-        gradient: 'bg-gradient-to-br from-white/[0.08] to-transparent backdrop-blur-xl border border-white/[0.12]'
+        default: 'dark:bg-black/20 bg-white/70 backdrop-blur-xl dark:border-white/[0.08] border-gray-900/[0.1]',
+        elevated: 'dark:bg-black/30 bg-white/80 backdrop-blur-2xl dark:border-white/[0.1] border-gray-900/[0.15] shadow-2xl',
+        interactive: 'dark:bg-black/20 bg-white/70 backdrop-blur-xl dark:border-white/[0.08] border-gray-900/[0.1] cursor-pointer dark:hover:bg-white/[0.02] hover:bg-gray-900/[0.02] dark:hover:border-white/[0.12] hover:border-gray-900/[0.15] hover:shadow-2xl hover:-translate-y-0.5',
+        glass: 'dark:bg-white/[0.03] bg-white/80 backdrop-blur-2xl dark:border-white/[0.08] border-gray-900/[0.12]',
+        gradient: 'dark:bg-gradient-to-br dark:from-white/[0.08] dark:to-transparent bg-gradient-to-br from-gray-900/[0.05] to-transparent backdrop-blur-xl dark:border-white/[0.12] border-gray-900/[0.15]'
       },
       size: {
         sm: 'p-4',
@@ -170,7 +170,7 @@ export const CardFooter = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivEleme
     return (
       <div
         ref={ref}
-        className={cn('mt-6 pt-6 border-t border-white/[0.08]', className)}
+        className={cn('mt-6 pt-6 border-t dark:border-white/[0.08] border-gray-900/[0.1]', className)}
         {...props}
       >
         {children}

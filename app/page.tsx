@@ -4,6 +4,16 @@ import React from "react"
 import { useState, useEffect } from "react"
 import { Sun, Moon, Brain, ArrowRight, Sparkles, Shield, Check, X, Building2, ChevronRight, BarChart3, Target, Zap, Clock, AlertTriangle, TrendingUp, Users, Layers, FileText, Lock, Globe, Database, Award, Hexagon, Activity, ArrowUpRight, Cpu } from "lucide-react"
 import Link from 'next/link'
+import { useTheme } from '@/lib/contexts/theme-context'
+
+// Safely check if theme is available (for build-time)
+const useThemeSafe = () => {
+  try {
+    return useTheme()
+  } catch {
+    return { theme: 'light', toggleTheme: () => {} }
+  }
+}
 
 // Company demo data schema
 const COMPANY_ACCESS_CODES = {
@@ -101,9 +111,10 @@ const Button = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HT
 Button.displayName = "Button"
 
 export default function Home() {
+  const { theme, toggleTheme } = useThemeSafe()
+  const isDarkMode = theme === 'dark'
   const [email, setEmail] = useState("")
   const [isSubmitted, setIsSubmitted] = useState(false)
-  const [isDarkMode, setIsDarkMode] = useState(true)
   const [activeTab, setActiveTab] = useState('sentiment')
   const [isMounted, setIsMounted] = useState(false)
   const [accessCode, setAccessCode] = useState("")
@@ -310,7 +321,7 @@ export default function Home() {
                   </Link>
                 
                 <button
-                  onClick={() => setIsDarkMode(!isDarkMode)}
+                  onClick={toggleTheme}
                     className={`p-2.5 rounded-2xl transition-all duration-300 ${
                     isDarkMode 
                         ? "bg-white/[0.06] hover:bg-white/[0.10] text-white" 

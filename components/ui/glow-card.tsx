@@ -44,9 +44,9 @@ export function GlowCard({
       onClick={onClick}
       className={cn(
         'relative rounded-2xl overflow-hidden',
-        'bg-white dark:bg-gray-900/50 backdrop-blur-xl',
-        'border border-gray-200 dark:border-white/10',
-        'shadow-lg transition-shadow duration-300',
+        'bg-white/80 dark:bg-gray-900/50 backdrop-blur-xl',
+        'border border-gray-900/[0.12] dark:border-white/10',
+        'shadow-lg dark:shadow-xl transition-shadow duration-300',
         onClick && 'cursor-pointer hover:shadow-2xl',
         className
       )}

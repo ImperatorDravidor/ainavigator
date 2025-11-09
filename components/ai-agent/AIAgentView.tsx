@@ -49,8 +49,8 @@ export default function AIAgentView({
       id: 'welcome',
       role: 'assistant',
       content: sentimentData.length > 0 || capabilityData.length > 0
-        ? `# Welcome to AI Navigator\n\nI'm your AI assistant analyzing **${companyName}'s** AI readiness:\n\n📊 **Your Data:**\n• ${sentimentData.length} sentiment responses across 25 dimensions\n• ${capabilityData.length} capability assessments across 8 dimensions\n\n💡 **I can help you:**\n• Analyze your biggest challenges and opportunities\n• Generate executive summaries and recommendations\n• Compare departments, regions, and time periods\n• Design specific interventions with ROI estimates\n• Navigate to detailed views and apply filters\n\n**Try asking:**\n"What are our top 3 AI adoption challenges?"\n"Analyze our capability maturity across all dimensions"\n"Generate an executive summary for the board"\n\nWhat would you like to explore?`
-        : `# Welcome to AI Navigator\n\nI'm your AI assistant, ready to help analyze your AI readiness data.\n\n⚠️ **No data loaded yet**\n\nTo get started:\n1. Upload your assessment data\n2. Or try the demo with sample data\n\nI can help you understand sentiment patterns, capability gaps, and generate actionable recommendations once data is available.`,
+        ? `**Welcome!** I'm analyzing ${companyName}'s AI readiness data.\n\n**Available Data:**\n• ${sentimentData.length} sentiment responses\n• ${capabilityData.length} capability assessments\n\n**I can help you:**\n• Identify top challenges and strengths\n• Generate executive summaries\n• Recommend specific interventions\n• Compare teams and time periods\n\n**Try asking:** "What are our top 3 challenges?" or "Show me capability gaps"`
+        : `**Ready to help!** Upload your assessment data or try the demo to get started.\n\nI can analyze sentiment patterns, capability gaps, and generate actionable recommendations.`,
       timestamp: new Date()
     }
   ])

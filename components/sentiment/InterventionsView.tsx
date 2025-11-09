@@ -263,49 +263,55 @@ export default function InterventionsView({
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   {/* Number badge */}
-                  <div className="flex items-center gap-3 mb-3">
-                    <motion.div 
-                      className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg"
+                  <div className="flex items-center gap-4 mb-4">
+                    <motion.div
+                      className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-xl"
                       whileHover={{ scale: 1.1, rotate: 5 }}
                     >
-                      <span className="text-lg font-bold text-white">{intervention.number}</span>
+                      <span className="text-2xl font-bold text-white">{intervention.number}</span>
                     </motion.div>
-                    <h4 className="text-lg font-bold text-gray-900 dark:text-white">{intervention.title}</h4>
+                    <h4 className="text-2xl font-bold text-gray-900 dark:text-white leading-tight">{intervention.title}</h4>
                   </div>
 
                   {/* Quick Stats - Colorful badges */}
-                  <div className="flex flex-wrap items-center gap-2 mb-3">
+                  <div className="flex flex-wrap items-center gap-3 mb-5">
                     <div className={cn(
-                      "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold",
-                      intervention.impact === 'high' && 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400',
-                      intervention.impact === 'medium' && 'bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400',
+                      "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold shadow-sm",
+                      intervention.impact === 'high' && 'bg-gradient-to-r from-green-500 to-emerald-500 text-white',
+                      intervention.impact === 'medium' && 'bg-gradient-to-r from-yellow-500 to-amber-500 text-white',
                       intervention.impact === 'low' && 'bg-gray-100 dark:bg-gray-500/20 text-gray-700 dark:text-gray-400'
                     )}>
-                      <TrendingUp className="w-3.5 h-3.5" />
-                      <span className="uppercase">{intervention.impact} Impact</span>
+                      <TrendingUp className="w-4 h-4" />
+                      <span className="uppercase tracking-wide">{intervention.impact} Impact</span>
                     </div>
                     <div className={cn(
-                      "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold",
-                      intervention.effort === 'low' && 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400',
-                      intervention.effort === 'medium' && 'bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400',
-                      intervention.effort === 'high' && 'bg-orange-100 dark:bg-orange-500/20 text-orange-700 dark:text-orange-400'
+                      "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold shadow-sm",
+                      intervention.effort === 'low' && 'bg-gradient-to-r from-green-500 to-emerald-500 text-white',
+                      intervention.effort === 'medium' && 'bg-gradient-to-r from-yellow-500 to-amber-500 text-white',
+                      intervention.effort === 'high' && 'bg-gradient-to-r from-orange-500 to-red-500 text-white'
                     )}>
-                      <Target className="w-3.5 h-3.5" />
-                      <span className="uppercase">{intervention.effort} Effort</span>
+                      <Target className="w-4 h-4" />
+                      <span className="uppercase tracking-wide">{intervention.effort} Effort</span>
                     </div>
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 text-xs font-semibold">
-                      <Clock className="w-3.5 h-3.5" />
-                      <span>{intervention.timeframe}</span>
+                    <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-sm font-bold shadow-sm">
+                      <Clock className="w-4 h-4" />
+                      <span className="tracking-wide">{intervention.timeframe}</span>
                     </div>
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-teal-100 dark:bg-teal-500/20 text-teal-700 dark:text-teal-400 text-xs font-semibold">
-                      <DollarSign className="w-3.5 h-3.5" />
-                      <span>{intervention.budget_estimate}</span>
+                    <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white text-sm font-bold shadow-sm">
+                      <DollarSign className="w-4 h-4" />
+                      <span className="tracking-wide">{intervention.budget_estimate}</span>
                     </div>
                   </div>
 
-                  <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                    {intervention.what_to_do}
-                  </p>
+                  <div className="bg-white dark:bg-white/5 rounded-xl p-5 border-l-4 border-purple-500 shadow-sm">
+                    <h5 className="text-xs font-bold text-purple-700 dark:text-purple-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                      What to Do
+                    </h5>
+                    <p className="text-base text-gray-900 dark:text-gray-100 leading-relaxed font-normal">
+                      {intervention.what_to_do}
+                    </p>
+                  </div>
                 </div>
 
                 <motion.div 
@@ -327,46 +333,53 @@ export default function InterventionsView({
                   exit={{ height: 0, opacity: 0 }}
                   className="border-t border-white/10"
                 >
-                  <div className="p-6 space-y-5 bg-white dark:bg-black/20">
+                  <div className="p-8 space-y-6 bg-gradient-to-b from-white to-gray-50 dark:from-black/20 dark:to-black/30">
                     {/* Why It Works - Highlighted */}
-                    <motion.div 
-                      className="rounded-xl bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-500/10 dark:to-pink-500/10 border border-purple-200 dark:border-purple-500/20 p-5"
+                    <motion.div
+                      className="rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-500/15 dark:to-pink-500/15 border-2 border-purple-200 dark:border-purple-500/30 p-6 shadow-lg"
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.1 }}
                     >
-                      <div className="flex items-center gap-2 mb-3">
-                        <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                        <h5 className="text-sm font-bold text-purple-700 dark:text-purple-400">Why This Works</h5>
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-xl bg-purple-500/20">
+                          <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                        </div>
+                        <h5 className="text-xl font-extrabold text-purple-900 dark:text-purple-300">Why This Works</h5>
                       </div>
-                      <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                      <p className="text-base text-gray-800 dark:text-gray-200 leading-relaxed font-normal">
                         {intervention.why_it_works}
                       </p>
                     </motion.div>
 
                     {/* Quick Wins - If available, show first */}
                     {intervention.quick_wins && intervention.quick_wins.length > 0 && (
-                      <motion.div 
-                        className="rounded-xl bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-500/10 dark:to-cyan-500/10 border border-teal-200 dark:border-teal-500/20 p-5"
+                      <motion.div
+                        className="rounded-2xl bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-teal-500/15 dark:to-cyan-500/15 border-2 border-teal-200 dark:border-teal-500/30 p-6 shadow-lg"
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.15 }}
                       >
-                        <div className="flex items-center gap-2 mb-3">
-                          <CheckCircle className="w-4 h-4 text-teal-600 dark:text-teal-400" />
-                          <h5 className="text-sm font-bold text-teal-700 dark:text-teal-400">Quick Wins (First 2-4 Weeks)</h5>
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="p-2 rounded-xl bg-teal-500/20">
+                            <CheckCircle className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+                          </div>
+                          <div>
+                            <h5 className="text-xl font-extrabold text-teal-900 dark:text-teal-300">Quick Wins</h5>
+                            <p className="text-xs font-semibold text-teal-700 dark:text-teal-400 uppercase tracking-wide">First 2-4 Weeks</p>
+                          </div>
                         </div>
-                        <ul className="space-y-2">
+                        <ul className="space-y-3">
                           {intervention.quick_wins.map((win, idx) => (
-                            <motion.li 
-                              key={idx} 
-                              className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2"
+                            <motion.li
+                              key={idx}
+                              className="text-base text-gray-800 dark:text-gray-200 flex items-start gap-3 bg-white/50 dark:bg-white/5 p-3 rounded-xl font-normal"
                               initial={{ opacity: 0, x: -5 }}
                               animate={{ opacity: 1, x: 0 }}
                               transition={{ delay: 0.2 + idx * 0.05 }}
                             >
-                              <span className="text-teal-600 dark:text-teal-400 mt-0.5 font-bold">→</span>
-                              <span>{win}</span>
+                              <span className="text-teal-600 dark:text-teal-400 text-xl font-bold flex-shrink-0">→</span>
+                              <span className="leading-relaxed">{win}</span>
                             </motion.li>
                           ))}
                         </ul>
@@ -374,28 +387,30 @@ export default function InterventionsView({
                     )}
 
                     {/* Resources & Stakeholders */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       <motion.div
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 p-4"
+                        className="rounded-2xl bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-500/15 dark:to-cyan-500/15 border-2 border-blue-200 dark:border-blue-500/30 p-6 shadow-lg"
                       >
-                        <h5 className="text-sm font-bold text-blue-700 dark:text-blue-400 mb-3 flex items-center gap-2">
-                          <Users className="w-4 h-4" />
-                          Key Stakeholders
-                        </h5>
-                        <ul className="space-y-2">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="p-2 rounded-xl bg-blue-500/20">
+                            <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                          </div>
+                          <h5 className="text-lg font-extrabold text-blue-900 dark:text-blue-300">Key Stakeholders</h5>
+                        </div>
+                        <ul className="space-y-3">
                           {intervention.key_stakeholders.map((stakeholder, idx) => (
-                            <motion.li 
-                              key={idx} 
-                              className="text-xs text-gray-700 dark:text-gray-300 flex items-start gap-2"
+                            <motion.li
+                              key={idx}
+                              className="text-sm text-gray-800 dark:text-gray-200 flex items-start gap-3 bg-white/50 dark:bg-white/5 p-3 rounded-xl font-normal"
                               initial={{ opacity: 0, x: -5 }}
                               animate={{ opacity: 1, x: 0 }}
                               transition={{ delay: 0.25 + idx * 0.05 }}
                             >
-                              <CheckCircle className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-                              <span>{stakeholder}</span>
+                              <CheckCircle className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                              <span className="leading-relaxed">{stakeholder}</span>
                             </motion.li>
                           ))}
                         </ul>
@@ -405,23 +420,25 @@ export default function InterventionsView({
                         initial={{ opacity: 0, x: 10 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="rounded-xl bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20 p-4"
+                        className="rounded-2xl bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-500/15 dark:to-amber-500/15 border-2 border-orange-200 dark:border-orange-500/30 p-6 shadow-lg"
                       >
-                        <h5 className="text-sm font-bold text-orange-700 dark:text-orange-400 mb-3 flex items-center gap-2">
-                          <Target className="w-4 h-4" />
-                          Required Resources
-                        </h5>
-                        <ul className="space-y-2">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="p-2 rounded-xl bg-orange-500/20">
+                            <Target className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                          </div>
+                          <h5 className="text-lg font-extrabold text-orange-900 dark:text-orange-300">Required Resources</h5>
+                        </div>
+                        <ul className="space-y-3">
                           {intervention.required_resources.map((resource, idx) => (
-                            <motion.li 
-                              key={idx} 
-                              className="text-xs text-gray-700 dark:text-gray-300 flex items-start gap-2"
+                            <motion.li
+                              key={idx}
+                              className="text-sm text-gray-800 dark:text-gray-200 flex items-start gap-3 bg-white/50 dark:bg-white/5 p-3 rounded-xl font-normal"
                               initial={{ opacity: 0, x: -5 }}
                               animate={{ opacity: 1, x: 0 }}
                               transition={{ delay: 0.25 + idx * 0.05 }}
                             >
-                              <CheckCircle className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5" />
-                              <span>{resource}</span>
+                              <CheckCircle className="w-4 h-4 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5" />
+                              <span className="leading-relaxed">{resource}</span>
                             </motion.li>
                           ))}
                         </ul>
@@ -433,13 +450,19 @@ export default function InterventionsView({
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3 }}
+                      className="rounded-2xl bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-500/15 dark:to-emerald-500/15 border-2 border-green-200 dark:border-green-500/30 p-6 shadow-lg"
                     >
-                      <h5 className="text-sm font-bold text-gray-700 dark:text-gray-400 mb-3">Success Metrics</h5>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-xl bg-green-500/20">
+                          <TrendingUp className="w-5 h-5 text-green-600 dark:text-green-400" />
+                        </div>
+                        <h5 className="text-xl font-extrabold text-green-900 dark:text-green-300">Success Metrics</h5>
+                      </div>
+                      <div className="flex flex-wrap gap-3">
                         {intervention.success_metrics.map((metric, idx) => (
                           <motion.span
                             key={idx}
-                            className="px-3 py-2 rounded-lg bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-500/20 dark:to-emerald-500/20 text-green-700 dark:text-green-300 text-xs font-semibold border border-green-200 dark:border-green-500/30"
+                            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold border-2 border-green-600 dark:border-green-400 shadow-md"
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
                             transition={{ delay: 0.35 + idx * 0.05, type: "spring", stiffness: 500 }}

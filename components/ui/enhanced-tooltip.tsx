@@ -35,77 +35,9 @@ export function EnhancedTooltip({
   disabled = false
 }: EnhancedTooltipProps) {
   const [isVisible, setIsVisible] = useState(false)
-  const [actualPosition, setActualPosition] = useState(position)
-  const [tooltipStyles, setTooltipStyles] = useState<React.CSSProperties>({})
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const tooltipRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (isVisible && tooltipRef.current && triggerRef.current) {
-      const tooltip = tooltipRef.current.getBoundingClientRect()
-      const trigger = triggerRef.current.getBoundingClientRect()
-      const viewport = {
-        width: window.innerWidth,
-        height: window.innerHeight
-      }
-
-      const gap = 8 // Gap between trigger and tooltip
-      let newPosition = position
-      let top = 0
-      let left = 0
-
-      // Calculate initial position based on preference
-      switch (position) {
-        case 'top':
-          top = trigger.top - tooltip.height - gap
-          left = trigger.left + trigger.width / 2 - tooltip.width / 2
-          break
-        case 'bottom':
-          top = trigger.bottom + gap
-          left = trigger.left + trigger.width / 2 - tooltip.width / 2
-          break
-        case 'left':
-          top = trigger.top + trigger.height / 2 - tooltip.height / 2
-          left = trigger.left - tooltip.width - gap
-          break
-        case 'right':
-          top = trigger.top + trigger.height / 2 - tooltip.height / 2
-          left = trigger.right + gap
-          break
-      }
-
-      // Check boundaries and adjust if needed
-      if (position === 'top' && top < 0) {
-        newPosition = 'bottom'
-        top = trigger.bottom + gap
-      } else if (position === 'bottom' && top + tooltip.height > viewport.height) {
-        newPosition = 'top'
-        top = trigger.top - tooltip.height - gap
-      } else if (position === 'left' && left < 0) {
-        newPosition = 'right'
-        left = trigger.right + gap
-      } else if (position === 'right' && left + tooltip.width > viewport.width) {
-        newPosition = 'left'
-        left = trigger.left - tooltip.width - gap
-      }
-
-      // Ensure tooltip stays within viewport horizontally
-      if (left < gap) left = gap
-      if (left + tooltip.width > viewport.width - gap) {
-        left = viewport.width - tooltip.width - gap
-      }
-
-      // Ensure tooltip stays within viewport vertically
-      if (top < gap) top = gap
-      if (top + tooltip.height > viewport.height - gap) {
-        top = viewport.height - tooltip.height - gap
-      }
-
-      setActualPosition(newPosition)
-      setTooltipStyles({ top: `${top}px`, left: `${left}px` })
-    }
-  }, [isVisible, position])
 
   const handleMouseEnter = () => {
     if (disabled) return
@@ -119,7 +51,6 @@ export function EnhancedTooltip({
       clearTimeout(timeoutRef.current)
     }
     setIsVisible(false)
-    setTooltipStyles({})
   }
 
   const IconComponent = icon ? iconMap[icon] : null
@@ -127,7 +58,7 @@ export function EnhancedTooltip({
   return (
     <div
       ref={triggerRef}
-      className="relative inline-flex"
+      className="relative inline-flex group/tooltip"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -137,38 +68,44 @@ export function EnhancedTooltip({
         {isVisible && (
           <motion.div
             ref={tooltipRef}
-            className="fixed z-[9999] pointer-events-none"
-            style={{ maxWidth, ...tooltipStyles }}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
+            className={cn(
+              "absolute z-[9999] pointer-events-none",
+              position === 'top' && "bottom-full left-1/2 -translate-x-1/2 mb-2",
+              position === 'bottom' && "top-full left-1/2 -translate-x-1/2 mt-2",
+              position === 'left' && "right-full top-1/2 -translate-y-1/2 mr-2",
+              position === 'right' && "left-full top-1/2 -translate-y-1/2 ml-2"
+            )}
+            style={{ maxWidth }}
+            initial={{ opacity: 0, scale: 0.9, y: position === 'top' ? 10 : position === 'bottom' ? -10 : 0 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{
               duration: 0.15,
               ease: [0.16, 1, 0.3, 1]
             }}
           >
-            <div className="relative bg-gray-900/98 dark:bg-gray-900/98 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden">
+            <div className="relative bg-gray-900 dark:bg-gray-800 backdrop-blur-xl border-2 border-white/20 rounded-xl shadow-2xl overflow-hidden">
               {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
-              
+              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
+
               {/* Content */}
-              <div className="relative p-3">
+              <div className="relative p-4">
                 {(title || icon) && (
-                  <div className="flex items-center gap-2 mb-2 pb-2 border-b border-white/10">
+                  <div className="flex items-center gap-2 mb-2 pb-2 border-b border-white/20">
                     {IconComponent && (
-                      <div className="flex-shrink-0 w-5 h-5 rounded-lg bg-teal-500/20 flex items-center justify-center">
-                        <IconComponent className="w-3 h-3 text-teal-400" />
+                      <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-teal-500/30 flex items-center justify-center">
+                        <IconComponent className="w-4 h-4 text-teal-300" />
                       </div>
                     )}
                     {title && (
-                      <span className="text-xs font-semibold text-white">
+                      <span className="text-sm font-bold text-white">
                         {title}
                       </span>
                     )}
                   </div>
                 )}
-                
-                <div className="text-[13px] leading-relaxed text-gray-300">
+
+                <div className="text-sm leading-relaxed text-white font-medium">
                   {content}
                 </div>
               </div>
@@ -190,23 +127,12 @@ export function EnhancedTooltip({
 
             {/* Arrow */}
             <div className={cn(
-              'absolute',
-              actualPosition === 'top' && 'bottom-0 left-1/2 -translate-x-1/2 translate-y-full',
-              actualPosition === 'bottom' && 'top-0 left-1/2 -translate-x-1/2 -translate-y-full rotate-180',
-              actualPosition === 'left' && 'right-0 top-1/2 -translate-y-1/2 translate-x-full -rotate-90',
-              actualPosition === 'right' && 'left-0 top-1/2 -translate-y-1/2 -translate-x-full rotate-90'
-            )}>
-              <div className="w-3 h-3">
-                <svg viewBox="0 0 12 12" className="w-full h-full">
-                  <path
-                    d="M6 0 L12 12 L0 12 Z"
-                    fill="rgb(17 24 39 / 0.98)"
-                    stroke="rgb(255 255 255 / 0.1)"
-                    strokeWidth="1"
-                  />
-                </svg>
-              </div>
-            </div>
+              'absolute w-0 h-0',
+              position === 'top' && 'bottom-0 left-1/2 -translate-x-1/2 translate-y-full border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-gray-900',
+              position === 'bottom' && 'top-0 left-1/2 -translate-x-1/2 -translate-y-full border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[6px] border-b-gray-900',
+              position === 'left' && 'right-0 top-1/2 -translate-y-1/2 translate-x-full border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-l-[6px] border-l-gray-900',
+              position === 'right' && 'left-0 top-1/2 -translate-y-1/2 -translate-x-full border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-r-[6px] border-r-gray-900'
+            )} />
           </motion.div>
         )}
       </AnimatePresence>

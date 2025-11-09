@@ -42,8 +42,8 @@ export default function LoginPage() {
       // Store new session
       sessionStorage.setItem('aiNavigatorSession', JSON.stringify(data.session))
 
-      // Redirect to dashboard
-      router.push('/dashboard')
+      // Redirect directly to assessment
+      router.push('/assessment')
     } catch (err) {
       setError('Network error. Please try again.')
       setIsLoading(false)
