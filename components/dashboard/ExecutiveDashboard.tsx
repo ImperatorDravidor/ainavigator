@@ -7,6 +7,7 @@ import {
   ChevronRight, Info, Zap, Brain, TrendingDown as Down, Sparkles
 } from 'lucide-react'
 import { useMemo } from 'react'
+import { format } from 'date-fns'
 import { cn } from '@/lib/utils'
 import { calculateCapabilityAssessment } from '@/lib/calculations/capability-analysis'
 import { calculateSentimentHeatmap } from '@/lib/calculations/sentiment-ranking'
@@ -133,7 +134,7 @@ export default function ExecutiveDashboard({
           >
             <div className="px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10">
               <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-0.5">Date</div>
-              <div className="text-xs text-slate-900 dark:text-white font-semibold">Oct 27, 2024</div>
+              <div className="text-xs text-slate-900 dark:text-white font-semibold">{format(new Date(), 'MMM yyyy')}</div>
             </div>
             <div className="px-2.5 py-1.5 rounded-lg bg-green-500/10 border border-green-500/20">
               <div className="text-[10px] text-green-500 uppercase tracking-wider mb-0.5">Status</div>

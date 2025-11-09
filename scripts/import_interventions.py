@@ -33,8 +33,8 @@ if not SUPABASE_URL or not SUPABASE_KEY:
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # File paths
-EXCEL_FILE = 'Interventions/0 - Overview of interventions per area.xlsx'
-INTERVENTIONS_DIR = 'Interventions'
+EXCEL_FILE = 'docs/archive/intervention-source-docs/0 - Overview of interventions per area.xlsx'
+INTERVENTIONS_DIR = 'docs/archive/intervention-source-docs'
 
 def extract_word_description(code: str) -> str:
     """Extract description from Word document for given intervention code."""

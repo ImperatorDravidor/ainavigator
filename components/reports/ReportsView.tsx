@@ -1,10 +1,11 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { 
+import {
   FileText, Download, Share2, Presentation, FileSpreadsheet,
   CheckCircle, Clock, Users, BarChart3, Calendar, Mail, Target
 } from 'lucide-react'
+import { format } from 'date-fns'
 import { cn } from '@/lib/utils'
 
 interface ReportsViewProps {
@@ -251,7 +252,7 @@ export default function ReportsView({ companyName, onExportPDF }: ReportsViewPro
                 <div className="flex items-center gap-3 text-xs text-slate-600 dark:text-gray-400">
                   <div className="flex items-center gap-1">
                     <Calendar className="w-3 h-3" />
-                    <span>October 27, 2024</span>
+                    <span>{format(new Date(), 'MMMM yyyy')}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Users className="w-3 h-3" />
