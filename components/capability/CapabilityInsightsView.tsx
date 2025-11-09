@@ -57,23 +57,25 @@ export default function CapabilityInsightsView({
       const dataInsights: CapabilityInsight[] = weakDimensions
         .slice(0, 3) // Top 3 weakest
         .map((dim) => {
-          const gap = ((dim.benchmark - dim.score) / dim.benchmark) * 100
+          const currentScore = dim.average || dim.score || 0
+          const benchmarkScore = dim.benchmark || 5.0
+          const gap = ((benchmarkScore - currentScore) / benchmarkScore) * 100
           
           return {
-            dimension: dim.dimension,
-            current_score: dim.score,
-            benchmark: dim.benchmark,
+            dimension: dim.name || dim.dimension,
+            current_score: currentScore,
+            benchmark: benchmarkScore,
             gap_percentage: Math.round(gap),
             priority: gap > 30 ? 'critical' : gap > 20 ? 'high' : 'medium',
             evidence: {
-              score: dim.score,
+              score: currentScore,
               response_count: dim.count || 0,
-              common_themes: generateThemesForDimension(dim.dimension, dim.score)
+              common_themes: generateThemesForDimension(dim.name || dim.dimension, currentScore)
             },
-            root_causes: generateRootCauses(dim.dimension, dim.score),
-            immediate_actions: generateImmediateActions(dim.dimension),
-            recommended_interventions: getInterventionsForDimension(dim.dimension),
-            why_these_interventions: getInterventionRationale(dim.dimension)
+            root_causes: generateRootCauses(dim.name || dim.dimension, currentScore),
+            immediate_actions: generateImmediateActions(dim.name || dim.dimension),
+            recommended_interventions: getInterventionsForDimension(dim.name || dim.dimension),
+            why_these_interventions: getInterventionRationale(dim.name || dim.dimension)
           }
         })
 
