@@ -6,7 +6,8 @@ import {
   Filter, Download, Activity,
   Users, Target, ChevronRight,
   BarChart3, Brain, FileText, Settings,
-  Maximize2, Minimize2, Search, Lightbulb, Sparkles
+  Maximize2, Minimize2, Search, Lightbulb, Sparkles,
+  Upload
 } from 'lucide-react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/hooks/useAuth'
@@ -38,6 +39,9 @@ import RecommendationsView from '@/components/recommendations/RecommendationsVie
 import ReportsView from '@/components/reports/ReportsView'
 import AIAgentView from '@/components/ai-agent/AIAgentView'
 import InterventionsBrowsePage from '@/components/interventions/InterventionsBrowsePage'
+// InterventionTracker ready but not yet integrated - add to interventions page when needed
+// import { InterventionTracker } from '@/components/interventions/InterventionTracker'
+import { ImportSnapshotDialog } from '@/components/ui/import-snapshot-dialog'
 import { generateCompletePDF } from '@/lib/utils/pdfExport-complete'
 import { calculateSentimentHeatmap, getLowestScoringCells } from '@/lib/calculations/sentiment-ranking'
 import { calculateCapabilityAssessment } from '@/lib/calculations/capability-analysis'
@@ -68,7 +72,9 @@ export default function AssessmentPage() {
   const [showCommandPalette, setShowCommandPalette] = useState(false)
   const [showKeyboardHelp, setShowKeyboardHelp] = useState(false)
   const [showComparison, setShowComparison] = useState(false)
+  const [showImportDialog, setShowImportDialog] = useState(false)
   const [selectedWave, setSelectedWave] = useState<string | undefined>(undefined)
+  // selectedPeriodId removed - can be added when InterventionTracker is integrated
   const [visitedSections, setVisitedSections] = useState<Set<NavigationView>>(new Set())
   const [keyboardShortcutCount, setKeyboardShortcutCount] = useState(0)
   const { achievementToShow, unlock, dismiss } = useAchievements()
@@ -989,6 +995,24 @@ export default function AssessmentPage() {
                 </>
               )}
               
+              {/* Import Snapshot */}
+              <EnhancedTooltip
+                content="Import new assessment snapshot"
+                icon="tip"
+                position="bottom"
+              >
+                <motion.button
+                  onClick={() => setShowImportDialog(true)}
+                  className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-purple-50 dark:hover:bg-purple-500/20 transition-all flex items-center gap-1.5 text-slate-700 dark:text-gray-200 hover:text-purple-700 dark:hover:text-purple-300 shadow-md hover:shadow-lg border border-slate-200 dark:border-white/20 relative z-50"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  aria-label="Import new snapshot"
+                >
+                  <Upload className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline text-[11px] font-medium">Import</span>
+                </motion.button>
+              </EnhancedTooltip>
+
               {/* Export */}
               <EnhancedTooltip
                 content="Export comprehensive PDF report"
@@ -1381,6 +1405,16 @@ export default function AssessmentPage() {
         onCompare={(config) => {
           console.log('Comparison config:', config)
           toast.success('Comparison mode activated!')
+        }}
+      />
+
+      {/* Import Snapshot Dialog */}
+      <ImportSnapshotDialog
+        isOpen={showImportDialog}
+        onClose={() => setShowImportDialog(false)}
+        onSuccess={() => {
+          toast.success('Snapshot imported successfully!')
+          loadData()
         }}
       />
 

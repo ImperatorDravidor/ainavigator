@@ -22,7 +22,8 @@
       "Bash(curl:*)",
       "Bash(npm run build:*)",
       "Bash(awk:*)",
-      "mcp__linear-server__list_teams"
+      "mcp__linear-server__list_teams",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []

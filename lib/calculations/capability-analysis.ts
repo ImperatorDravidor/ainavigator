@@ -15,6 +15,7 @@ export interface DimensionScore {
   benchmark: number
   status: 'above' | 'at' | 'below' | 'significantly_below'
   constructs: ConstructScore[]
+  count: number // Number of respondents who answered questions in this dimension
 }
 
 export interface ConstructScore {
@@ -114,7 +115,8 @@ export function calculateCapabilityAssessment(
       spread,
       benchmark,
       status,
-      constructs: constructScores
+      constructs: constructScores,
+      count: filtered.length // Number of respondents in filtered data
     }
   })
   
