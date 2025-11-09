@@ -326,7 +326,7 @@ export default function Home() {
       </nav>
 
         {/* Hero Section - Compact & Refined */}
-        <section className="relative min-h-[55vh] flex items-center justify-center px-6 pt-20 pb-12 overflow-hidden">
+        <section className="relative min-h-[55vh] flex items-center justify-center px-6 pt-32 md:pt-36 pb-12 overflow-hidden">
           {/* Optimized gradient orbs with better performance */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
             <div className="absolute top-1/4 left-1/4 w-64 md:w-96 h-64 md:h-96 bg-[#5380b3]/10 rounded-full blur-3xl animate-pulse will-change-transform" />
