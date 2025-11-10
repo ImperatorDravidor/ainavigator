@@ -73,9 +73,24 @@ class MiniInterventionsService {
   private categories: Map<string, MiniInterventionCategory> = new Map()
   private interventions: Map<string, MiniIntervention> = new Map()
   private loaded = false
+  private loading = false
 
   async loadData(): Promise<void> {
+    // Prevent concurrent loads
     if (this.loaded) return
+    if (this.loading) {
+      // Wait for the current load to finish
+      while (this.loading) {
+        await new Promise(resolve => setTimeout(resolve, 50))
+      }
+      return
+    }
+
+    this.loading = true
+
+    // Clear existing data to prevent duplicates
+    this.categories.clear()
+    this.interventions.clear()
 
     try {
       const response = await fetch('/data/categoriesandactionainav.csv')
@@ -97,22 +112,23 @@ class MiniInterventionsService {
         
         const { levelId, categoryId, cellId } = mapCategoryToCell(reason, level)
 
-        // Create category if doesn't exist
-        if (!this.categories.has(cellId)) {
-          this.categories.set(cellId, {
-            category,
-            reason,
-            level,
-            description,
-            showsUpAs,
-            levelId,
-            categoryId,
-            cellId,
-            actions: []
-          })
+        // Skip if we've already processed this cell (prevents duplicates)
+        if (this.categories.has(cellId)) {
+          continue
         }
 
-        const categoryData = this.categories.get(cellId)!
+        // Create category
+        const categoryData = {
+          category,
+          reason,
+          level,
+          description,
+          showsUpAs,
+          levelId,
+          categoryId,
+          cellId,
+          actions: [] as MiniIntervention[]
+        }
 
         // Create 3 mini interventions for this category
         const actions: [string, string][] = [
@@ -144,13 +160,19 @@ class MiniInterventionsService {
           categoryData.actions.push(intervention)
           this.interventions.set(id, intervention)
         })
+
+        // Add category after all actions are created
+        this.categories.set(cellId, categoryData)
       }
 
       this.loaded = true
       console.log(`✅ Loaded ${this.interventions.size} mini interventions across ${this.categories.size} categories`)
     } catch (error) {
       console.error('Error loading mini interventions:', error)
+      this.loaded = false
       throw error
+    } finally {
+      this.loading = false
     }
   }
 
