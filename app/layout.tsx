@@ -17,6 +17,14 @@ export const metadata: Metadata = {
   description: "Join 500+ leading enterprises using data-driven insights to navigate AI transformation. Assess readiness, identify gaps, and accelerate adoption with confidence.",
   keywords: ["AI readiness", "AI transformation", "enterprise AI", "AI adoption", "digital transformation", "AI assessment", "organizational readiness"],
   authors: [{ name: "AI Navigator" }],
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' }
+    ],
+    apple: [
+      { url: '/apple-icon.svg', type: 'image/svg+xml' }
+    ]
+  },
   openGraph: {
     title: "AI Navigator | Enterprise AI Readiness Platform",
     description: "Transform your AI journey with data-driven insights and comprehensive readiness assessments",

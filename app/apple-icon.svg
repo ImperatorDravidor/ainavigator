@@ -1,0 +1,44 @@
+<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="180" height="180" rx="40" fill="url(#gradient)"/>
+  
+  <!-- AI Neural Network Icon -->
+  <g transform="translate(45, 45)">
+    <!-- Center node -->
+    <circle cx="45" cy="45" r="12" fill="white" opacity="0.95"/>
+    
+    <!-- Main connections -->
+    <path d="M45 33 L45 12" stroke="white" stroke-width="5" opacity="0.7" stroke-linecap="round"/>
+    <path d="M45 57 L45 78" stroke="white" stroke-width="5" opacity="0.7" stroke-linecap="round"/>
+    <path d="M33 45 L12 45" stroke="white" stroke-width="5" opacity="0.7" stroke-linecap="round"/>
+    <path d="M57 45 L78 45" stroke="white" stroke-width="5" opacity="0.7" stroke-linecap="round"/>
+    
+    <!-- Diagonal connections -->
+    <path d="M37 37 L20 20" stroke="white" stroke-width="4" opacity="0.6" stroke-linecap="round"/>
+    <path d="M53 53 L70 70" stroke="white" stroke-width="4" opacity="0.6" stroke-linecap="round"/>
+    <path d="M53 37 L70 20" stroke="white" stroke-width="4" opacity="0.6" stroke-linecap="round"/>
+    <path d="M37 53 L20 70" stroke="white" stroke-width="4" opacity="0.6" stroke-linecap="round"/>
+    
+    <!-- Outer nodes -->
+    <circle cx="45" cy="12" r="7" fill="white" opacity="0.85"/>
+    <circle cx="45" cy="78" r="7" fill="white" opacity="0.85"/>
+    <circle cx="12" cy="45" r="7" fill="white" opacity="0.85"/>
+    <circle cx="78" cy="45" r="7" fill="white" opacity="0.85"/>
+    
+    <!-- Corner nodes -->
+    <circle cx="20" cy="20" r="5.5" fill="white" opacity="0.75"/>
+    <circle cx="70" cy="70" r="5.5" fill="white" opacity="0.75"/>
+    <circle cx="70" cy="20" r="5.5" fill="white" opacity="0.75"/>
+    <circle cx="20" cy="70" r="5.5" fill="white" opacity="0.75"/>
+  </g>
+  
+  <!-- Gradient definition -->
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#14B8A6;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#6366F1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#A855F7;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>
+
