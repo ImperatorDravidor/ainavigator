@@ -195,7 +195,7 @@ export async function generateCompletePDF(options: CompletePDFOptions): Promise<
       pdf.text(sublabel, x + w/2, y + 23, { align: 'center' })
     }
 
-    const infoBox = (content: string, icon = '💡') => {
+    const infoBox = (content: string, icon = 'i') => {
       checkSpace(20)
       const boxHeight = Math.max(18, pdf.splitTextToSize(content, CW - 12).length * 4 + 8)
       
@@ -206,12 +206,13 @@ export async function generateCompletePDF(options: CompletePDFOptions): Promise<
       
       pdf.setTextColor(BRAND.neutral.r, BRAND.neutral.g, BRAND.neutral.b)
       pdf.setFontSize(9)
-      pdf.setFont('helvetica', 'normal')
+      pdf.setFont('helvetica', 'bold')
       
       const lines = pdf.splitTextToSize(content, CW - 12)
       const textY = Y + 6
-      pdf.text(icon, M + 3, textY)
-      pdf.text(lines, M + 9, textY)
+      pdf.text('Note:', M + 3, textY)
+      pdf.setFont('helvetica', 'normal')
+      pdf.text(lines, M + 15, textY)
       
       Y += boxHeight + 5
     }
@@ -377,7 +378,7 @@ export async function generateCompletePDF(options: CompletePDFOptions): Promise<
       
       const interpretation = options.sentimentData?.stats?.overallAverage 
         ? options.sentimentData.stats.overallAverage >= 3.5
-          ? 'Across 25 sentiment dimensions, your employees are demonstrating strong resistance that must be understood and addressed. We identified priority areas where sentiment is notably low. These represent specific fears or concerns ("taboos") that, if left unaddressed, will slow adoption.'
+          ? 'Across 25 sentiment dimensions, your employees are demonstrating strong resistance that must be understood and addressed. We identified priority areas where sentiment is notably low. These represent specific fears or concerns (taboos) that, if left unaddressed, will slow adoption.'
           : 'Your employees are demonstrating significant resistance and concerns about AI adoption. Multiple priority areas have been identified where sentiment is critically low, requiring immediate strategic intervention.'
         : 'Understanding employee sentiment across multiple dimensions helps identify specific resistance patterns.'
       
@@ -417,16 +418,16 @@ export async function generateCompletePDF(options: CompletePDFOptions): Promise<
             pdf.addImage(imgData, 'PNG', M, Y, imgW, Math.min(imgH, 160))
             Y += Math.min(imgH, 160) + 8
           } else {
-            bodyText('⚠️ Heatmap visualization not available - element not found in DOM', 8, BRAND.warning)
+            bodyText('WARNING: Heatmap visualization not available - element not found in DOM', 8, BRAND.warning)
             Y += 5
           }
         } catch (err) {
           console.error('Heatmap capture error:', err)
-          bodyText('⚠️ Heatmap visualization could not be captured', 8, BRAND.warning)
+          bodyText('WARNING: Heatmap visualization could not be captured', 8, BRAND.warning)
           Y += 5
         }
       } else {
-        infoBox('Note: Run this export from the Sentiment page to include the interactive heatmap visualization.', '💡')
+        infoBox('Note: Run this export from the Sentiment page to include the interactive heatmap visualization.')
       }
 
       // Priority Concern Areas - Clean Table Format
@@ -435,7 +436,7 @@ export async function generateCompletePDF(options: CompletePDFOptions): Promise<
         
         subsectionHeader('Priority Concern Areas', 11)
         
-        bodyText('These specific combinations of sentiment level × reason show the strongest resistance. Each represents a unique "taboo" that requires targeted intervention.', 8)
+        bodyText('These specific combinations of sentiment level x reason show the strongest resistance. Each represents a unique concern that requires targeted intervention.', 8)
         Y += 3
 
         // Clean table header
@@ -475,7 +476,7 @@ export async function generateCompletePDF(options: CompletePDFOptions): Promise<
           pdf.setTextColor(BRAND.neutral.r, BRAND.neutral.g, BRAND.neutral.b)
       pdf.setFontSize(8)
       pdf.setFont('helvetica', 'normal')
-          const title = `${cell.level || cell.levelName || ''} × ${cell.reason || cell.categoryName || ''}`
+          const title = `${cell.level || cell.levelName || ''} x ${cell.reason || cell.categoryName || ''}`
           const truncated = title.length > 70 ? title.substring(0, 67) + '...' : title
           pdf.text(truncated, M + 10, Y + 4.5)
           
@@ -484,7 +485,7 @@ export async function generateCompletePDF(options: CompletePDFOptions): Promise<
           pdf.setTextColor(scoreColor.r, scoreColor.g, scoreColor.b)
         pdf.setFont('helvetica', 'bold')
           pdf.setFontSize(9)
-          pdf.text(cell.score?.toFixed(2) || '—', CW + M - 35, Y + 4.5, { align: 'right' })
+          pdf.text(cell.score?.toFixed(2) || '--', CW + M - 35, Y + 4.5, { align: 'right' })
           
           // Affected count
           pdf.setTextColor(BRAND.neutral.r, BRAND.neutral.g, BRAND.neutral.b)
@@ -566,7 +567,7 @@ export async function generateCompletePDF(options: CompletePDFOptions): Promise<
           }
         } catch (err) {
           console.error('Radar chart capture error:', err)
-          bodyText('⚠️ Radar chart visualization could not be captured', 8, BRAND.warning)
+          bodyText('WARNING: Radar chart visualization could not be captured', 8, BRAND.warning)
           Y += 5
         }
       }
@@ -631,10 +632,11 @@ export async function generateCompletePDF(options: CompletePDFOptions): Promise<
         const gapText = gap >= 0 ? `+${gap.toFixed(1)}` : gap.toFixed(1)
           pdf.text(gapText, CW + M - 25, Y + 4, { align: 'center' })
           
-          // Status icon
-          const statusIcon = gap >= 0 ? '✓' : gap > -1 ? '○' : '!'
-          pdf.setFontSize(10)
-          pdf.text(statusIcon, CW + M - 5, Y + 4, { align: 'right' })
+          // Status text
+          const statusText = gap >= 0 ? 'OK' : gap > -1 ? 'GAP' : 'LOW'
+          pdf.setFontSize(7)
+          pdf.setFont('helvetica', 'bold')
+          pdf.text(statusText, CW + M - 5, Y + 4, { align: 'right' })
 
           Y += 8
       })
@@ -792,7 +794,7 @@ export async function generateCompletePDF(options: CompletePDFOptions): Promise<
     })
 
     Y += 5
-    infoBox('70% of AI initiatives fail due to organizational resistance, not technology. Understanding sentiment helps identify hidden barriers ("taboos") that block adoption. Capability gaps reveal systemic weaknesses that need strategic investment. Early intervention prevents costly failures and accelerates time-to-value.')
+    infoBox('70% of AI initiatives fail due to organizational resistance, not technology. Understanding sentiment helps identify hidden barriers (taboos) that block adoption. Capability gaps reveal systemic weaknesses that need strategic investment. Early intervention prevents costly failures and accelerates time-to-value.')
 
     // Contact section - professional
     Y += 5

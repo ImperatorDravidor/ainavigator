@@ -159,8 +159,10 @@ export async function generateComprehensivePDF(options: ComprehensivePDFOptions)
       pdf.setTextColor(BRAND.neutral.r, BRAND.neutral.g, BRAND.neutral.b)
       pdf.setFontSize(9)
       pdf.setFont('helvetica', 'normal')
-      pdf.text('💡', M + 3, Y + 6)
-      pdf.text(lines, M + 10, Y + 6)
+      pdf.setFont('helvetica', 'bold')
+      pdf.text('Note:', M + 3, Y + 6)
+      pdf.setFont('helvetica', 'normal')
+      pdf.text(lines, M + 15, Y + 6)
       Y += boxH + 5
     }
 
@@ -328,7 +330,7 @@ export async function generateComprehensivePDF(options: ComprehensivePDFOptions)
     // Try to capture heatmap
     if (options.elementIds?.heatmap) {
       subheading('Sentiment Heatmap')
-      paragraph('5 concern levels × 5 perception categories. Green = low resistance, Red = high resistance.', 9)
+      paragraph('5 concern levels x 5 perception categories. Green = low resistance, Red = high resistance.', 9)
       space(3)
       
       const captured = await captureChart(options.elementIds.heatmap)
@@ -358,7 +360,7 @@ export async function generateComprehensivePDF(options: ComprehensivePDFOptions)
         pdf.setFont('helvetica', 'normal')
         pdf.setTextColor(BRAND.neutral.r, BRAND.neutral.g, BRAND.neutral.b)
         
-        const title = `${cell.level || cell.levelName || ''} × ${cell.reason || cell.categoryName || ''}`
+        const title = `${cell.level || cell.levelName || ''} x ${cell.reason || cell.categoryName || ''}`
         const titleLines = pdf.splitTextToSize(title, CW - 30)
         pdf.text(titleLines, M + 6, Y)
         
@@ -426,8 +428,9 @@ export async function generateComprehensivePDF(options: ComprehensivePDFOptions)
         pdf.setTextColor(100, 100, 100)
         pdf.text(`(vs ${benchmark.toFixed(1)})`, CW/2 + M + 15, Y)
         
-        const icon = gap >= 0 ? '✓' : '!'
+        const icon = gap >= 0 ? 'OK' : 'GAP'
         pdf.setFont('helvetica', 'bold')
+        pdf.setFontSize(7)
         pdf.text(icon, CW + M, Y, { align: 'right' })
         
         Y += 6
