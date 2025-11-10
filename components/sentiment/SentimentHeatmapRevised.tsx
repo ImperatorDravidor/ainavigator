@@ -287,11 +287,11 @@ export default function SentimentHeatmapRevised({ data, filters, onAnalyzeProble
         <div className="flex gap-1.5 md:gap-2 min-h-0 flex-1">
           
           {/* Y-Axis Labels - Clean aligned */}
-          <div className="hidden lg:flex flex-col flex-shrink-0 gap-1.5 md:gap-2">
+          <div className="hidden lg:flex flex-col flex-shrink-0 gap-1.5 md:gap-2 justify-between">
             {/* Row labels aligned with grid rows */}
-            <div className="grid grid-rows-5 gap-1.5 md:gap-2" style={{ height: 'calc(100% - 50px - 6px)' }}>
+            <div className="flex flex-col gap-1.5 md:gap-2 flex-1">
               {SENTIMENT_LEVELS.map((level, idx) => (
-                <div key={level.id} className="flex items-center justify-end pr-2 md:pr-3">
+                <div key={level.id} className="flex items-center justify-end pr-2 md:pr-3 flex-1">
                   <div className="text-right flex items-center gap-1.5 md:gap-2">
                     <div className="text-[9px] md:text-[10px] font-bold text-gray-900 dark:text-white leading-tight text-right max-w-[140px] md:max-w-[160px]">
                       {level.name}
@@ -311,7 +311,7 @@ export default function SentimentHeatmapRevised({ data, filters, onAnalyzeProble
               ))}
             </div>
             {/* Empty spacer for column averages alignment */}
-            <div className="h-[50px]" />
+            <div className="h-[50px] flex-shrink-0" />
           </div>
 
           {/* Grid + Averages */}
@@ -319,7 +319,7 @@ export default function SentimentHeatmapRevised({ data, filters, onAnalyzeProble
             {/* Main Grid with Row Averages */}
             <div className="flex gap-1.5 md:gap-2 flex-1">
               {/* Heatmap Grid - Responsive with breathing room */}
-              <div className="grid grid-cols-5 grid-rows-5 gap-1 sm:gap-1.5 md:gap-2 flex-1 w-full" style={{ aspectRatio: '5/5', maxHeight: 'min(calc(100vh - 320px), 700px)' }}>
+              <div className="grid grid-cols-5 gap-1 sm:gap-1.5 md:gap-2 flex-1" style={{ gridTemplateRows: 'repeat(5, 1fr)', maxHeight: 'min(calc(100vh - 320px), 700px)' }}>
                 {SENTIMENT_LEVELS.map((level) => (
                   SENTIMENT_CATEGORIES.map((cat) => {
                     const cellId = `L${level.id}_C${cat.id}`
@@ -330,7 +330,7 @@ export default function SentimentHeatmapRevised({ data, filters, onAnalyzeProble
                         key={cellId}
                         onClick={() => cell && cell.count > 0 ? setSelectedCell(cellId) : null}
                         className={cn(
-                          "relative rounded-xl transition-all border group min-h-0 overflow-hidden",
+                          "relative rounded-xl transition-all border group overflow-hidden w-full h-full",
                           selectedCell === cellId 
                             ? 'ring-4 ring-teal-400/50 dark:ring-teal-500/60 ring-offset-2 ring-offset-white dark:ring-offset-black scale-[1.08] z-20 border-white dark:border-white/70 shadow-2xl' 
                             : 'ring-0 border-white/20 dark:border-white/10',
@@ -340,6 +340,7 @@ export default function SentimentHeatmapRevised({ data, filters, onAnalyzeProble
                         )}
                         style={{
                           backgroundColor: cell?.color || '#1f2937',
+                          minHeight: '80px'
                         }}
                         whileHover={cell && cell.count > 0 ? { 
                           scale: 1.03,
@@ -450,7 +451,7 @@ export default function SentimentHeatmapRevised({ data, filters, onAnalyzeProble
               </div>
 
               {/* Row Averages - Enhanced */}
-              <div className="hidden md:grid grid-rows-5 gap-1.5 md:gap-2 w-14 md:w-16 flex-shrink-0">
+              <div className="hidden md:flex flex-col gap-1.5 md:gap-2 w-14 md:w-16 flex-shrink-0" style={{ gridTemplateRows: 'repeat(5, 1fr)' }}>
                 {stats.rowAverages.map((avg, idx) => {
                   const isHigh = avg >= 3.5
                   const isMed = avg >= 2.5 && avg < 3.5
@@ -458,7 +459,7 @@ export default function SentimentHeatmapRevised({ data, filters, onAnalyzeProble
                   
                   return (
                     <div key={idx} className={cn(
-                      "flex items-center justify-center rounded-lg border-2 shadow-md backdrop-blur-sm",
+                      "flex items-center justify-center rounded-lg border-2 shadow-md backdrop-blur-sm flex-1",
                       isHigh ? "bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-500/15 dark:to-rose-500/15 border-red-300 dark:border-red-500/40" :
                       isMed ? "bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-500/15 dark:to-amber-500/15 border-yellow-300 dark:border-yellow-500/40" :
                       "bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-500/15 dark:to-emerald-500/15 border-green-300 dark:border-green-500/40"
