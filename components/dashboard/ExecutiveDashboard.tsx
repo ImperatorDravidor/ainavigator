@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import {
   Target, Users, Activity, TrendingUp, TrendingDown,
   AlertTriangle, CheckCircle, Lightbulb, ArrowRight,
-  ChevronRight, Info, Zap, Brain, TrendingDown as Down, Sparkles
+  ChevronRight, Info, Zap, TrendingDown as Down, Sparkles
 } from 'lucide-react'
 import { useMemo } from 'react'
 import { format } from 'date-fns'
@@ -118,7 +118,7 @@ export default function ExecutiveDashboard({
   const readinessStatus = getReadinessStatus(metrics.readinessScore)
 
   return (
-    <div className="h-full flex flex-col gap-4 overflow-hidden">
+    <div id="executive-dashboard" className="h-full flex flex-col gap-4 overflow-hidden">
       
       {/* REFINED HEADER with playful animations */}
       <motion.div 

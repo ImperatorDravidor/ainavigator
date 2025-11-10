@@ -7,11 +7,12 @@ export interface CategoryActionData {
   level: string
   description: string
   showsUpAs: string
-  actions: {
-    title: string
-    explanation: string
-    flavor: 'risky' | 'basic' | 'boring'
-  }[]
+  action1: string
+  explanation1: string
+  action2: string
+  explanation2: string
+  action3: string
+  explanation3: string
 }
 
 // Map category names to cell IDs
@@ -77,30 +78,12 @@ export class CategoryDataService {
           level: row.Level || '',
           description: row.Description || '',
           showsUpAs: row['Shows up as'] || '',
-          actions: []
-        }
-
-        // Parse 3 actions with different flavors
-        if (row['Action 1']) {
-          categoryData.actions.push({
-            title: row['Action 1'],
-            explanation: row['Explanation 1'] || '',
-            flavor: 'basic' // Action 1 = Basic/Standard
-          })
-        }
-        if (row['Action 2']) {
-          categoryData.actions.push({
-            title: row['Action 2'],
-            explanation: row['Explanation 2'] || '',
-            flavor: 'risky' // Action 2 = Risky/Creative
-          })
-        }
-        if (row['Action 3']) {
-          categoryData.actions.push({
-            title: row['Action 3'],
-            explanation: row['Explanation 3'] || '',
-            flavor: 'boring' // Action 3 = Boring/Safe
-          })
+          action1: row['Action 1'] || '',
+          explanation1: row['Explanation 1'] || '',
+          action2: row['Action 2'] || '',
+          explanation2: row['Explanation 2'] || '',
+          action3: row['Action 3'] || '',
+          explanation3: row['Explanation 3'] || ''
         }
 
         this.data.set(cellId, categoryData)
@@ -117,8 +100,8 @@ export class CategoryDataService {
     return this.data.get(cellId) || null
   }
 
-  static getAllCategories(): Map<string, CategoryActionData> {
-    return this.data
+  static getAllCategories(): CategoryActionData[] {
+    return Array.from(this.data.values())
   }
 
   static getCellIdForCategory(categoryName: string): string | null {
