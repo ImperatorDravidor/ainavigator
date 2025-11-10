@@ -28,7 +28,11 @@
       "Bash(if [ -f .env.local ])",
       "Bash(then echo \"✅ .env.local exists\")",
       "Bash(else echo \"❌ .env.local not found\")",
-      "Bash(fi)"
+      "Bash(fi)",
+      "Bash(node:*)",
+      "Bash(npm run regenerate-phase2:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run regenerate-capability:*)"
     ],
     "deny": [],
     "ask": []

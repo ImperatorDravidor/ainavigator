@@ -19,6 +19,9 @@ interface ExecutiveDashboardProps {
   capabilityData: any[]
   benchmarks: Record<number, number>
   onNavigate: (view: 'sentiment' | 'capability') => void
+  selectedWave?: string
+  baselineSentimentData?: any[]
+  baselineCapabilityData?: any[]
 }
 
 export default function ExecutiveDashboard({
@@ -27,7 +30,10 @@ export default function ExecutiveDashboard({
   sentimentData,
   capabilityData,
   benchmarks,
-  onNavigate
+  onNavigate,
+  selectedWave = 'oct-2024-baseline',
+  baselineSentimentData = [],
+  baselineCapabilityData = []
 }: ExecutiveDashboardProps) {
 
   // Calculate real capability assessment
@@ -49,20 +55,47 @@ export default function ExecutiveDashboard({
     // Use real capability average from calculated assessment
     const capabilityAvg = capabilityAssessment.overall.average
 
-    // Calculate readiness score (sentiment is on 1-4 scale after transformation)
-    const readiness = Math.round(((sentimentAvg / 4) * 0.4 + (capabilityAvg / 7) * 0.6) * 100)
+    // Calculate readiness score (sentiment is on 1-5 resistance scale, inverted: 5-score gives positive sentiment)
+    const readiness = Math.round((((5 - sentimentAvg) / 4) * 0.4 + (capabilityAvg / 7) * 0.6) * 100)
 
     // Count cells with low scores (high resistance areas)
     const lowScores = sentimentAssessment.cells.filter(c => c.score >= 3.0 && c.count > 0).length
+
+    // Calculate deltas if baseline data is available and we're not on baseline
+    const isBaseline = selectedWave === 'oct-2024-baseline'
+    const hasBaselineData = baselineSentimentData.length > 0 && baselineCapabilityData.length > 0
+    const showDelta = !isBaseline && hasBaselineData
+
+    let sentimentDelta = 0
+    let capabilityDelta = 0
+    let readinessDelta = 0
+
+    if (showDelta) {
+      const baselineSentimentAssessment = calculateSentimentHeatmap(baselineSentimentData, {})
+      const baselineCapabilityAssessment = calculateCapabilityAssessment(baselineCapabilityData, benchmarks, {})
+
+      const baselineSentimentAvg = baselineSentimentAssessment.stats.overallAverage
+      const baselineCapabilityAvg = baselineCapabilityAssessment.overall.average
+      const baselineReadiness = Math.round((((5 - baselineSentimentAvg) / 4) * 0.4 + (baselineCapabilityAvg / 7) * 0.6) * 100)
+
+      // Calculate deltas (for sentiment, negative delta is improvement)
+      sentimentDelta = baselineSentimentAvg - sentimentAvg // Lower is better, so baseline - current gives positive for improvement
+      capabilityDelta = capabilityAvg - baselineCapabilityAvg
+      readinessDelta = readiness - baselineReadiness
+    }
 
     return {
       respondentCount: sentimentData.length,
       sentimentAvg: sentimentAvg.toFixed(1),
       capabilityAvg: capabilityAvg.toFixed(1),
       readinessScore: readiness,
-      lowScoreCount: lowScores
+      lowScoreCount: lowScores,
+      showDelta,
+      sentimentDelta,
+      capabilityDelta,
+      readinessDelta
     }
-  }, [sentimentData, sentimentAssessment, capabilityAssessment])
+  }, [sentimentData, sentimentAssessment, capabilityAssessment, selectedWave, baselineSentimentData, baselineCapabilityData, benchmarks])
 
   // Use real dimension data from capability assessment
   const dimensions = useMemo(() =>
@@ -180,32 +213,38 @@ export default function ExecutiveDashboard({
                     <span className="text-xl text-gray-500 leading-none">%</span>
                   </div>
                 </div>
-                <div className="text-right mb-1">
-                  <div className={cn(
-                    "px-2 py-1 rounded-md border inline-flex items-center gap-1.5",
-                    metrics.readinessScore >= 60 
-                      ? "bg-green-500/10 border-green-500/20" 
-                      : "bg-orange-500/10 border-orange-500/20"
-                  )}>
-                    {metrics.readinessScore >= 60 ? (
-                      <>
-                        <TrendingUp className="w-3.5 h-3.5 text-green-700 dark:text-green-400" />
-                        <div>
-                          <div className="text-sm font-bold tabular-nums text-green-700 dark:text-green-400">+8%</div>
-                          <div className="text-[8px] text-gray-500 uppercase tracking-wide">vs Q3</div>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <TrendingDown className="w-3.5 h-3.5 text-orange-700 dark:text-orange-400" />
-                        <div>
-                          <div className="text-sm font-bold tabular-nums text-orange-700 dark:text-orange-400">-3%</div>
-                          <div className="text-[8px] text-gray-500 uppercase tracking-wide">vs Q3</div>
-                        </div>
-                      </>
-                    )}
+                {metrics.showDelta && (
+                  <div className="text-right mb-1">
+                    <div className={cn(
+                      "px-2 py-1 rounded-md border inline-flex items-center gap-1.5",
+                      metrics.readinessDelta > 0
+                        ? "bg-green-500/10 border-green-500/20"
+                        : "bg-orange-500/10 border-orange-500/20"
+                    )}>
+                      {metrics.readinessDelta > 0 ? (
+                        <>
+                          <TrendingUp className="w-3.5 h-3.5 text-green-700 dark:text-green-400" />
+                          <div>
+                            <div className="text-sm font-bold tabular-nums text-green-700 dark:text-green-400">
+                              +{metrics.readinessDelta}%
+                            </div>
+                            <div className="text-[8px] text-gray-500 uppercase tracking-wide">vs Baseline</div>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <TrendingDown className="w-3.5 h-3.5 text-orange-700 dark:text-orange-400" />
+                          <div>
+                            <div className="text-sm font-bold tabular-nums text-orange-700 dark:text-orange-400">
+                              {metrics.readinessDelta}%
+                            </div>
+                            <div className="text-[8px] text-gray-500 uppercase tracking-wide">vs Baseline</div>
+                          </div>
+                        </>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Progress bar with goal marker */}
@@ -263,8 +302,8 @@ export default function ExecutiveDashboard({
                   <Users className="w-4 h-4 text-purple-400" />
                 </div>
                 <div className="flex-1">
-                  <div className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wide">Employee Sentiment</div>
-                  <div className="text-xs text-gray-500">How people feel about AI transformation</div>
+                  <div className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wide">Employee Resistance</div>
+                  <div className="text-xs text-gray-500">Resistance to AI transformation (lower is better)</div>
                 </div>
               </div>
 
@@ -272,7 +311,7 @@ export default function ExecutiveDashboard({
               <div className="flex items-baseline gap-1 mb-3">
                 <span className="text-6xl font-bold text-purple-400 tabular-nums leading-none">{metrics.sentimentAvg}</span>
                 <div className="flex flex-col justify-end pb-1">
-                  <span className="text-xl text-gray-500 leading-none">/4.0</span>
+                  <span className="text-xl text-gray-500 leading-none">/3.0</span>
                   <span className="text-[8px] text-gray-600 uppercase tracking-wide">Scale</span>
                 </div>
               </div>
@@ -295,14 +334,14 @@ export default function ExecutiveDashboard({
                 <div className="relative h-2 bg-white/5 rounded-full overflow-hidden">
                   {/* Neutral marker at 50% */}
                   <div className="absolute top-0 bottom-0 left-[50%] w-px bg-gray-500/30" />
-                  <div 
+                  <div
                     className={cn(
                       "h-full rounded-full",
                       parseFloat(metrics.sentimentAvg) <= 1.5 ? "bg-gradient-to-r from-green-400 to-teal-400" :
                       parseFloat(metrics.sentimentAvg) <= 2.5 ? "bg-gradient-to-r from-yellow-400 to-orange-400" :
                       "bg-gradient-to-r from-orange-400 to-red-400"
                     )}
-                    style={{ width: `${(parseFloat(metrics.sentimentAvg) / 4) * 100}%` }} 
+                    style={{ width: `${(parseFloat(metrics.sentimentAvg) / 4) * 100}%` }}
                   />
                 </div>
                 <div className="flex items-center justify-between text-[9px] text-gray-600">

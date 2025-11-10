@@ -152,8 +152,7 @@ export function AssessmentPeriodSelector({
                 <p className="text-xs font-medium text-slate-600 dark:text-gray-400">
                   {new Date(baselinePeriod.assessment_date).toLocaleDateString('en-US', {
                     year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
+                    month: 'short'
                   })}
                 </p>
                 {baselinePeriod.description && (
@@ -205,8 +204,7 @@ export function AssessmentPeriodSelector({
                 <p className="text-xs font-medium text-slate-600 dark:text-gray-400">
                   {new Date(phase2Period.assessment_date).toLocaleDateString('en-US', {
                     year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
+                    month: 'short'
                   })}
                 </p>
                 {phase2Period.interventions_applied && phase2Period.interventions_applied.length > 0 && (

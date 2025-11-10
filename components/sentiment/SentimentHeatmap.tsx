@@ -98,17 +98,17 @@ export default function SentimentHeatmap({ data, filters, onAnalyzeProblemAreas 
         </div>
       </div>
 
-      {/* MAIN HEATMAP - Row 3-10 */}
-      <div className="col-span-12 row-span-8 bg-gradient-to-br from-white/[0.08] to-white/[0.02] rounded-lg border border-white/10 p-2 flex flex-col">
+      {/* MAIN HEATMAP - Row 3-9 (reduced from 3-10 to prevent overlap) */}
+      <div className="col-span-12 row-span-7 bg-gradient-to-br from-white/[0.08] to-white/[0.02] rounded-lg border border-white/10 p-2 flex flex-col">
         <div className="flex items-center justify-between mb-1.5 pb-1 border-b border-white/5">
           <div className="flex items-center gap-1.5">
             <span className="text-[9px] font-semibold text-gray-400 uppercase tracking-wider">Sentiment Matrix</span>
             <span className="text-[8px] text-gray-600">• 5×5 Grid</span>
           </div>
-          <span className="text-[8px] text-gray-500">Click cells for details • Colors = relative ranking</span>
+          <span className="text-[8px] text-gray-500">Click cells for details • Rank #1 = Best (low resistance)</span>
         </div>
 
-        <div className="flex-1 overflow-auto min-h-0">
+        <div className="flex-1 overflow-auto min-h-0 scrollbar-thin">
           <table className="w-full border-collapse text-[9px]">
             <thead className="sticky top-0 bg-black/80 backdrop-blur-sm z-10">
               <tr>
@@ -215,37 +215,37 @@ export default function SentimentHeatmap({ data, filters, onAnalyzeProblemAreas 
         {/* Compact Legend */}
         <div className="mt-1.5 pt-1.5 border-t border-white/5">
           <div className="flex items-center justify-between gap-2 flex-wrap">
-            <span className="text-[8px] text-gray-500 uppercase tracking-wide">Color Key:</span>
+            <span className="text-[8px] text-gray-500 uppercase tracking-wide">Resistance Scale:</span>
             <div className="flex items-center gap-1.5 flex-wrap">
               <div className="flex items-center gap-1">
                 <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: '#15803d' }} />
-                <span className="text-[8px] text-gray-400">Top 3</span>
+                <span className="text-[8px] text-gray-400">Excellent (1.0-1.4)</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: '#84cc16' }} />
-                <span className="text-[8px] text-gray-400">Strong</span>
+                <span className="text-[8px] text-gray-400">Good (1.4-1.8)</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: '#fcd34d' }} />
-                <span className="text-[8px] text-gray-400">Moderate</span>
+                <span className="text-[8px] text-gray-400">Moderate (1.8-2.2)</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: '#fb923c' }} />
-                <span className="text-[8px] text-gray-400">Concern</span>
+                <span className="text-[8px] text-gray-400">High (2.2-2.6)</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: '#dc2626' }} />
-                <span className="text-[8px] text-gray-400">Critical</span>
+                <span className="text-[8px] text-gray-400">Critical (2.6-3.0)</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* BOTTOM SECTION - Row 11-12 */}
+      {/* BOTTOM SECTION - Row 10-12 (3 rows for better spacing) */}
       {selectedCellData && selectedCellData.count > 0 ? (
         /* Cell Detail Panel */
-        <div className="col-span-12 row-span-2 bg-gradient-to-br from-blue-500/5 to-transparent rounded-lg border border-blue-500/20 p-2 grid grid-cols-12 gap-2">
+        <div className="col-span-12 row-span-3 bg-gradient-to-br from-blue-500/5 to-transparent rounded-lg border border-blue-500/20 p-2 grid grid-cols-12 gap-2">
           <div className="col-span-4 flex flex-col">
             <div className="flex items-start justify-between mb-1">
               <div>
@@ -255,33 +255,34 @@ export default function SentimentHeatmap({ data, filters, onAnalyzeProblemAreas 
               {selectedCellData.rank <= 3 && (
                 <div className="px-1.5 py-0.5 rounded text-[8px] bg-green-500/10 border border-green-500/20 text-green-400 font-medium flex items-center gap-1">
                   <TrendingUp className="w-2.5 h-2.5" />
-                  STRENGTH
+                  TOP PERFORMING
                 </div>
               )}
               {selectedCellData.rank >= 23 && (
                 <div className="px-1.5 py-0.5 rounded text-[8px] bg-red-500/10 border border-red-500/20 text-red-400 font-medium flex items-center gap-1">
                   <TrendingDown className="w-2.5 h-2.5" />
-                  CRITICAL
+                  NEEDS ATTENTION
                 </div>
               )}
             </div>
             <div className="flex-1 flex items-center gap-2">
               <div className="flex-1">
-                <div className="text-[8px] text-gray-500 uppercase tracking-wide mb-0.5">Score</div>
-                <div className="text-xl font-bold tabular-nums">{selectedCellData.score.toFixed(1)}<span className="text-xs text-gray-500">/5.0</span></div>
+                <div className="text-[8px] text-gray-500 uppercase tracking-wide mb-0.5">Resistance</div>
+                <div className="text-xl font-bold tabular-nums">{selectedCellData.score.toFixed(2)}<span className="text-xs text-gray-500">/3.0</span></div>
               </div>
               <div className="flex-1">
-                <div className="text-[8px] text-gray-500 uppercase tracking-wide mb-0.5">Count</div>
+                <div className="text-[8px] text-gray-500 uppercase tracking-wide mb-0.5">Responses</div>
                 <div className="text-xl font-bold tabular-nums">{selectedCellData.count.toLocaleString()}</div>
               </div>
               <div className="flex-1">
                 <div className="text-[8px] text-gray-500 uppercase tracking-wide mb-0.5">Rank</div>
                 <div className={cn(
                   "text-xl font-bold tabular-nums",
-                  selectedCellData.rank >= 23 ? 'text-red-400' :
-                  selectedCellData.rank >= 20 ? 'text-orange-400' :
                   selectedCellData.rank <= 5 ? 'text-green-400' :
-                  'text-gray-300'
+                  selectedCellData.rank <= 8 ? 'text-lime-400' :
+                  selectedCellData.rank >= 23 ? 'text-red-400' :
+                  selectedCellData.rank >= 18 ? 'text-orange-400' :
+                  'text-yellow-400'
                 )}>
                   #{selectedCellData.rank}<span className="text-xs text-gray-500">/25</span>
                 </div>
@@ -311,7 +312,7 @@ export default function SentimentHeatmap({ data, filters, onAnalyzeProblemAreas 
       ) : (
         /* Action Button - Generate AI Recommendations */
         lowestCells.length > 0 && (
-          <div className="col-span-12 row-span-2 bg-gradient-to-br from-teal-500/10 to-purple-500/5 rounded-lg border border-teal-500/20 p-2 flex items-center justify-between">
+          <div className="col-span-12 row-span-3 bg-gradient-to-br from-teal-500/10 to-purple-500/5 rounded-lg border border-teal-500/20 p-3 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-500 to-purple-500 flex items-center justify-center flex-shrink-0">
                 <Sparkles className="w-5 h-5 text-white" />

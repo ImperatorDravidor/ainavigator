@@ -5,9 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Filter, Download, Activity,
   Users, Target, ChevronRight,
-  BarChart3, Brain, FileText, Settings,
+  BarChart3, Brain, FileText,
   Maximize2, Minimize2, Search, Lightbulb, Sparkles,
-  Upload
+  Upload, RefreshCw
 } from 'lucide-react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/hooks/useAuth'
@@ -17,7 +17,6 @@ import { EnhancedTooltip } from '@/components/ui/enhanced-tooltip'
 import { ContextualHelp } from '@/components/ui/contextual-help'
 import { OnboardingHint } from '@/components/ui/onboarding-hint'
 import { CommandPalette } from '@/components/ui/command-palette'
-import { QuickActionsMenu } from '@/components/ui/quick-actions-menu'
 import { DataComparisonMode } from '@/components/ui/data-comparison-mode'
 import { KeyboardShortcutsHelp } from '@/components/ui/keyboard-shortcuts-help'
 import { useKeyboardNavigation } from '@/hooks/use-keyboard-navigation'
@@ -41,6 +40,7 @@ import AIAgentView from '@/components/ai-agent/AIAgentView'
 import InterventionsBrowsePage from '@/components/interventions/InterventionsBrowsePage'
 // InterventionTracker ready but not yet integrated - add to interventions page when needed
 // import { InterventionTracker } from '@/components/interventions/InterventionTracker'
+import InterventionImpactReport from '@/components/interventions/InterventionImpactReport'
 import { ImportSnapshotDialog } from '@/components/ui/import-snapshot-dialog'
 import { generateCompletePDF } from '@/lib/utils/pdfExport-complete'
 import { calculateSentimentHeatmap, getLowestScoringCells } from '@/lib/calculations/sentiment-ranking'
@@ -64,16 +64,23 @@ export default function AssessmentPage() {
   const [sentimentData, setSentimentData] = useState<any[]>([])
   const [capabilityData, setCapabilityData] = useState<any[]>([])
   const [openEndedResponses, setOpenEndedResponses] = useState<string[]>([])
+  const [baselineSentimentData, setBaselineSentimentData] = useState<any[]>([]) // For delta calculation
+  const [baselineCapabilityData, setBaselineCapabilityData] = useState<any[]>([]) // For delta calculation
+  const [phase2SentimentData, setPhase2SentimentData] = useState<any[]>([]) // For impact analysis
+  const [phase2CapabilityData, setPhase2CapabilityData] = useState<any[]>([]) // For impact analysis
+  const [phase3SentimentData, setPhase3SentimentData] = useState<any[]>([]) // For impact analysis
+  const [phase3CapabilityData, setPhase3CapabilityData] = useState<any[]>([]) // For impact analysis
   const [filters, setFilters] = useState<FilterState>({})
   const [showFilters, setShowFilters] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [isLoadingPhase, setIsLoadingPhase] = useState(false)
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [showCommandPalette, setShowCommandPalette] = useState(false)
   const [showKeyboardHelp, setShowKeyboardHelp] = useState(false)
   const [showComparison, setShowComparison] = useState(false)
   const [showImportDialog, setShowImportDialog] = useState(false)
-  const [selectedWave, setSelectedWave] = useState<string | undefined>(undefined)
+  const [selectedWave, setSelectedWave] = useState<string | undefined>('oct-2024-baseline')
   // selectedPeriodId removed - can be added when InterventionTracker is integrated
   const [visitedSections, setVisitedSections] = useState<Set<NavigationView>>(new Set())
   const [keyboardShortcutCount, setKeyboardShortcutCount] = useState(0)
@@ -110,7 +117,7 @@ export default function AssessmentPage() {
   // Reload data when selectedWave changes (temporal filtering)
   useEffect(() => {
     if (company?.id && selectedWave !== undefined) {
-      loadData(selectedWave)
+      loadData(selectedWave, true) // Pass true to indicate phase switch
     }
   }, [selectedWave])
 
@@ -123,6 +130,55 @@ export default function AssessmentPage() {
       }, 1500)
     }
   }, [isLoading])
+
+  // Load all phases' data for impact analysis (one-time load)
+  useEffect(() => {
+    if (company?.id) {
+      loadAllPhasesData()
+    }
+  }, [company?.id])
+
+  const loadAllPhasesData = async () => {
+    if (!company?.id) return
+
+    try {
+      // Load Phase 2 data
+      const phase2SentimentResponse = await fetch(`/api/data/respondents?survey_wave=mar-2025-phase2`, {
+        headers: { 'x-company-id': company.id }
+      })
+      if (phase2SentimentResponse.ok) {
+        const phase2SentimentResult = await phase2SentimentResponse.json()
+        setPhase2SentimentData(phase2SentimentResult.data)
+      }
+
+      const phase2CapabilityResponse = await fetch(`/api/data/capability?survey_wave=mar-2025-phase2`, {
+        headers: { 'x-company-id': company.id }
+      })
+      if (phase2CapabilityResponse.ok) {
+        const phase2CapabilityResult = await phase2CapabilityResponse.json()
+        setPhase2CapabilityData(phase2CapabilityResult.data)
+      }
+
+      // Load Phase 3 data
+      const phase3SentimentResponse = await fetch(`/api/data/respondents?survey_wave=nov-2025-phase3`, {
+        headers: { 'x-company-id': company.id }
+      })
+      if (phase3SentimentResponse.ok) {
+        const phase3SentimentResult = await phase3SentimentResponse.json()
+        setPhase3SentimentData(phase3SentimentResult.data)
+      }
+
+      const phase3CapabilityResponse = await fetch(`/api/data/capability?survey_wave=nov-2025-phase3`, {
+        headers: { 'x-company-id': company.id }
+      })
+      if (phase3CapabilityResponse.ok) {
+        const phase3CapabilityResult = await phase3CapabilityResponse.json()
+        setPhase3CapabilityData(phase3CapabilityResult.data)
+      }
+    } catch (error) {
+      console.error('Failed to load all phases data:', error)
+    }
+  }
 
   // PDF Export handler - COMPLETE with all real data
   const handleExportPDF = async () => {
@@ -362,17 +418,6 @@ export default function AssessmentPage() {
         handleExportPDF()
         toast.success('Exporting PDF report...')
         break
-      case 'share':
-        navigator.clipboard.writeText(window.location.href)
-        toast.success('Link copied to clipboard!')
-        break
-      case 'bookmark':
-        toast.success('View bookmarked!')
-        break
-      case 'copy':
-        navigator.clipboard.writeText(window.location.href)
-        toast.success('Link copied!')
-        break
       case 'refresh':
         loadData()
         toast.success('Refreshing data...')
@@ -380,22 +425,24 @@ export default function AssessmentPage() {
       case 'toggle-filters':
         setShowFilters(!showFilters)
         break
-      case 'settings':
-        toast('Settings coming soon!')
-        break
       case 'help':
         setShowKeyboardHelp(true)
         break
     }
   }
 
-  const loadData = async (wave?: string) => {
+  const loadData = async (wave?: string, isPhaseSwitch = false) => {
     if (!company?.id) {
       setIsLoading(false)
       return
     }
 
-    setIsLoading(true)
+    // Use different loading state for phase switches vs initial load
+    if (isPhaseSwitch) {
+      setIsLoadingPhase(true)
+    } else {
+      setIsLoading(true)
+    }
     try {
       // Build query params for temporal filtering
       const queryParams = wave ? `?survey_wave=${encodeURIComponent(wave)}` : ''
@@ -427,6 +474,37 @@ export default function AssessmentPage() {
         setCapabilityData([])
       }
 
+      // Always load baseline data for delta comparison (if not already baseline)
+      if (wave !== 'oct-2024-baseline') {
+        const baselineQueryParams = '?survey_wave=oct-2024-baseline'
+
+        const baselineSentimentResponse = await fetch(`/api/data/respondents${baselineQueryParams}`, {
+          headers: {
+            'x-company-id': company.id
+          }
+        })
+
+        if (baselineSentimentResponse.ok) {
+          const baselineSentimentResult = await baselineSentimentResponse.json()
+          setBaselineSentimentData(baselineSentimentResult.data)
+        }
+
+        const baselineCapabilityResponse = await fetch(`/api/data/capability${baselineQueryParams}`, {
+          headers: {
+            'x-company-id': company.id
+          }
+        })
+
+        if (baselineCapabilityResponse.ok) {
+          const baselineCapabilityResult = await baselineCapabilityResponse.json()
+          setBaselineCapabilityData(baselineCapabilityResult.data)
+        }
+      } else {
+        // Clear baseline data if we're viewing baseline itself
+        setBaselineSentimentData([])
+        setBaselineCapabilityData([])
+      }
+
       // Load open-ended responses for NLP analysis
       const openEndedResponse = await fetch(`/api/data/open-ended${queryParams}`, {
         headers: {
@@ -443,8 +521,21 @@ export default function AssessmentPage() {
       }
     } catch (error) {
       console.error('Data load error:', error)
+      toast.error('Failed to load data')
     } finally {
-      setIsLoading(false)
+      if (isPhaseSwitch) {
+        setIsLoadingPhase(false)
+        // Show success toast for phase switches
+        const phaseName = wave === 'oct-2024-baseline' ? 'Baseline (Oct 2024)'
+          : wave === 'mar-2025-phase2' ? 'Phase 2 (Mar 2025)'
+          : 'Phase 3 (Nov 2025)'
+        toast.success(`Switched to ${phaseName}`, {
+          icon: wave === 'oct-2024-baseline' ? '📊' : wave === 'mar-2025-phase2' ? '🚀' : '✨',
+          duration: 2000
+        })
+      } else {
+        setIsLoading(false)
+      }
     }
   }
 
@@ -566,9 +657,9 @@ export default function AssessmentPage() {
         {
           id: 'recommendations' as NavigationView,
           icon: Brain,
-          label: 'Insights',
-          description: 'AI-powered',
-          tooltip: 'Get AI-powered recommendations tailored to your specific needs.'
+          label: 'Impact Analysis',
+          description: 'Intervention results',
+          tooltip: 'See which interventions were applied and their measured impact on your organization.'
         },
         {
           id: 'interventions' as NavigationView,
@@ -732,7 +823,7 @@ export default function AssessmentPage() {
                           if (item.id === 'overview') setCurrentView({ type: 'overview' })
                           else if (item.id === 'sentiment') setCurrentView({ type: 'sentiment_heatmap' })
                           else if (item.id === 'capability') setCurrentView({ type: 'capability_overview' })
-                          // AI Agent doesn't need a currentView, it's handled by activeView
+                          // AI Agent and other sections don't need a currentView, handled by activeView
                         }}
                         className={cn(
                           "relative w-full flex items-center rounded-xl transition-all group",
@@ -913,17 +1004,33 @@ export default function AssessmentPage() {
                   </div>
                 </EnhancedTooltip>
                 
-                {/* Wave Selector for Progress Tracking */}
-                <select
-                  value={selectedWave || 'all'}
-                  onChange={(e) => setSelectedWave(e.target.value === 'all' ? undefined : e.target.value)}
-                  className="px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs font-medium text-slate-700 dark:text-gray-300 hover:border-teal-300 dark:hover:border-teal-500/30 transition-all cursor-pointer"
+                {/* Assessment Period Selector - Enhanced */}
+                <motion.div
+                  className="relative"
+                  animate={isLoadingPhase ? { scale: [1, 1.02, 1] } : {}}
+                  transition={{ duration: 0.3 }}
                 >
-                  <option value="all">All Data</option>
-                  <option value="baseline">Baseline Assessment</option>
-                  <option value="wave-2">After Interventions (Wave 2)</option>
-                  <option value="wave-3">Latest (Wave 3)</option>
-                </select>
+                  <select
+                    value={selectedWave || 'oct-2024-baseline'}
+                    onChange={(e) => setSelectedWave(e.target.value)}
+                    disabled={isLoadingPhase}
+                    className={cn(
+                      "px-4 py-2 pr-10 rounded-lg border-2 text-sm font-semibold transition-all cursor-pointer",
+                      isLoadingPhase
+                        ? "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 cursor-wait opacity-60 animate-pulse"
+                        : "bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-blue-300 dark:border-blue-600 text-blue-900 dark:text-blue-300 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md"
+                    )}
+                  >
+                    <option value="oct-2024-baseline">📊 Baseline (Oct 2024)</option>
+                    <option value="mar-2025-phase2">🚀 Phase 2 (Mar 2025)</option>
+                    <option value="nov-2025-phase3">✨ Phase 3 (Nov 2025)</option>
+                  </select>
+                  {isLoadingPhase && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                      <RefreshCw className="w-4 h-4 animate-spin text-blue-500" />
+                    </div>
+                  )}
+                </motion.div>
 
                 <EnhancedTooltip
                   content="Data is synced and up-to-date"
@@ -1031,16 +1138,6 @@ export default function AssessmentPage() {
                 </motion.button>
               </EnhancedTooltip>
 
-              {/* Quick Actions Menu */}
-              <QuickActionsMenu
-                onExport={handleExportPDF}
-                onShare={() => handleQuickAction('share')}
-                onBookmark={() => handleQuickAction('bookmark')}
-                onCopy={() => handleQuickAction('copy')}
-                onRefresh={() => handleQuickAction('refresh')}
-                onFullscreen={() => toast('Fullscreen mode coming soon!')}
-              />
-
               <div className="w-px h-6 bg-slate-300 dark:bg-white/10" />
 
               {/* Theme Toggle */}
@@ -1078,21 +1175,6 @@ export default function AssessmentPage() {
                   }
                 ]}
               />
-              
-              <EnhancedTooltip
-                content="Settings and preferences"
-                icon="info"
-                position="bottom"
-              >
-                <motion.button
-                  className="p-2 rounded-lg bg-white dark:bg-white/5 hover:bg-teal-50 dark:hover:bg-teal-500/10 transition-all text-slate-700 dark:text-gray-300 hover:text-teal-700 dark:hover:text-teal-400 shadow-sm hover:shadow-md ring-1 ring-slate-200/50 dark:ring-white/5"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  aria-label="Settings"
-                >
-                  <Settings className="w-3.5 h-3.5" />
-                </motion.button>
-              </EnhancedTooltip>
             </div>
           </motion.div>
 
@@ -1121,7 +1203,13 @@ export default function AssessmentPage() {
             </AnimatePresence>
 
             {/* Main Content - Fills viewport perfectly */}
-            <div className="h-full p-4">
+            <motion.div
+              className="h-full p-4"
+              key={`content-${selectedWave}`}
+              initial={{ opacity: 0.7, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
               <AnimatePresence mode="wait">
                 {/* OVERVIEW */}
                 {activeView === 'overview' && (
@@ -1139,6 +1227,9 @@ export default function AssessmentPage() {
                       sentimentData={sentimentData}
                       capabilityData={capabilityData}
                       benchmarks={benchmarks}
+                      selectedWave={selectedWave}
+                      baselineSentimentData={baselineSentimentData}
+                      baselineCapabilityData={baselineCapabilityData}
                       onNavigate={(view) => {
                         if (view === 'sentiment') {
                           setActiveView('sentiment')
@@ -1171,6 +1262,8 @@ export default function AssessmentPage() {
                           onAnalyzeProblemAreas={(lowestCells) =>
                             setCurrentView({ type: 'sentiment_problem_categories', lowestCells })
                           }
+                          baselineData={baselineSentimentData}
+                          showDelta={selectedWave !== 'oct-2024-baseline' && baselineSentimentData.length > 0}
                         />
                       </motion.div>
                     )}
@@ -1240,6 +1333,14 @@ export default function AssessmentPage() {
                           onViewSummary={() => setCurrentView({ type: 'capability_summary' })}
                           onAnalyzeWeakDimensions={(weakDimensions) =>
                             setCurrentView({ type: 'capability_insights', weakDimensions })
+                          }
+                          baselineData={baselineCapabilityData}
+                          showDelta={selectedWave !== 'oct-2024-baseline' && baselineCapabilityData.length > 0}
+                          phase2Data={phase2CapabilityData}
+                          currentPhase={
+                            selectedWave === 'oct-2024-baseline' ? 'baseline' :
+                            selectedWave === 'mar-2025-phase2' ? 'phase2' :
+                            'phase3'
                           }
                         />
                       </motion.div>
@@ -1318,21 +1419,39 @@ export default function AssessmentPage() {
                   </motion.div>
                 )}
 
-                {/* RECOMMENDATIONS */}
+                {/* IMPACT ANALYSIS (formerly RECOMMENDATIONS) */}
                 {activeView === 'recommendations' && (
                   <motion.div
-                    key="recommendations"
+                    key="impact-analysis"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.3 }}
-                    className="h-full"
+                    className="h-full overflow-y-auto scrollbar-thin"
                   >
-                    <RecommendationsView
-                      sentimentData={sentimentData}
-                      capabilityData={capabilityData}
-                      companyName={companyProfile.displayName}
-                    />
+                    {selectedWave === 'oct-2024-baseline' ? (
+                      <div className="h-full flex items-center justify-center">
+                        <div className="text-center max-w-md p-8">
+                          <Brain className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                            No Impact Data for Baseline
+                          </h3>
+                          <p className="text-gray-600 dark:text-gray-400">
+                            Switch to Phase 2 or Phase 3 to see intervention impact analysis.
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <InterventionImpactReport
+                        baselineData={baselineSentimentData}
+                        phase2Data={phase2SentimentData}
+                        phase3Data={phase3SentimentData}
+                        baselineCapability={baselineCapabilityData}
+                        phase2Capability={phase2CapabilityData}
+                        phase3Capability={phase3CapabilityData}
+                        selectedPhase={selectedWave === 'nov-2025-phase3' ? 'phase3' : 'phase2'}
+                      />
+                    )}
                   </motion.div>
                 )}
 
@@ -1373,7 +1492,7 @@ export default function AssessmentPage() {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>
@@ -1387,7 +1506,6 @@ export default function AssessmentPage() {
           if (view === 'overview') setCurrentView({ type: 'overview' })
           else if (view === 'sentiment') setCurrentView({ type: 'sentiment_heatmap' })
           else if (view === 'capability') setCurrentView({ type: 'capability_overview' })
-          else if (view === 'interventions') setCurrentView({ type: 'overview' })
         }}
         onAction={handleQuickAction}
       />

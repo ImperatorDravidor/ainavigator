@@ -20,6 +20,10 @@ interface CapabilityAnalysisProProps {
   onDimensionClick: (dimensionId: number) => void
   onViewSummary: () => void
   onAnalyzeWeakDimensions?: (weakDimensions: any[]) => void
+  baselineData?: any[]  // Optional baseline data for delta calculation
+  showDelta?: boolean    // Whether to show growth indicators
+  phase2Data?: any[]     // Phase 2 data for cumulative comparison
+  currentPhase?: 'baseline' | 'phase2' | 'phase3'  // Current phase being viewed
 }
 
 type ChartView = 'comparison' | 'variance' | 'performance'
@@ -31,13 +35,29 @@ export default function CapabilityAnalysisPro({
   filters,
   onDimensionClick,
   onViewSummary,
-  onAnalyzeWeakDimensions
+  onAnalyzeWeakDimensions,
+  baselineData,
+  showDelta = false,
+  phase2Data,
+  currentPhase = 'baseline'
 }: CapabilityAnalysisProProps) {
 
   const { theme } = useTheme()
   const [chartView, setChartView] = useState<ChartView>('comparison')
   const [benchmarkType, setBenchmarkType] = useState<BenchmarkType>('industry')
   const [showGuide, setShowGuide] = useState(false)
+
+  // Calculate baseline assessment for delta comparison
+  const baselineAssessment = useMemo(() => {
+    if (!baselineData || !showDelta) return null
+    return calculateCapabilityAssessment(baselineData, benchmarks, filters)
+  }, [baselineData, benchmarks, filters, showDelta])
+
+  // Calculate Phase 2 assessment for cumulative comparison (when viewing Phase 3)
+  const phase2Assessment = useMemo(() => {
+    if (!phase2Data || currentPhase !== 'phase3') return null
+    return calculateCapabilityAssessment(phase2Data, benchmarks, filters)
+  }, [phase2Data, benchmarks, filters, currentPhase])
 
   // Mock benchmark data (replace with actual database queries)
   const benchmarkComparisons = useMemo(() => ({
@@ -66,15 +86,22 @@ export default function CapabilityAnalysisPro({
     [data, adjustedBenchmarks, filters]
   )
   
-  // Chart 1: Your Score vs Benchmark
-  const comparisonData = useMemo(() => 
-    assessment.dimensions.map(dim => ({
-      dimension: dim.name.split(' ')[0],
-      yourScore: dim.average,
-      benchmark: dim.benchmark,
-      fullName: dim.name
-    })),
-    [assessment.dimensions]
+  // Chart 1: Your Score vs Benchmark - Enhanced with cumulative phase data
+  const comparisonData = useMemo(() =>
+    assessment.dimensions.map(dim => {
+      const baselineDim = baselineAssessment?.dimensions.find(d => d.dimensionId === dim.dimensionId)
+      const phase2Dim = phase2Assessment?.dimensions.find(d => d.dimensionId === dim.dimensionId)
+
+      return {
+        dimension: dim.name.split(' ')[0],
+        yourScore: dim.average,
+        benchmark: dim.benchmark,
+        baseline: baselineDim?.average,
+        phase2: phase2Dim?.average,
+        fullName: dim.name
+      }
+    }),
+    [assessment.dimensions, baselineAssessment, phase2Assessment]
   )
 
   // Chart 2: Max/Min/Avg Variance
@@ -123,6 +150,18 @@ export default function CapabilityAnalysisPro({
             <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
               Organizational Capability Analysis
             </h2>
+            {currentPhase !== 'baseline' && baselineAssessment && (
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-500/10 dark:to-emerald-500/10 border border-green-200 dark:border-green-500/20"
+              >
+                <TrendingUp className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
+                <span className="text-xs font-semibold text-green-700 dark:text-green-300">
+                  {currentPhase === 'phase3' ? 'Showing 3-Phase Journey' : 'Showing Growth vs Baseline'}
+                </span>
+              </motion.div>
+            )}
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -328,7 +367,19 @@ export default function CapabilityAnalysisPro({
         {/* Radar Chart */}
         <div className="flex-1 glass-dark rounded-lg p-4 flex flex-col min-h-0">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs text-gray-700 dark:text-gray-400">{chartViews.find(v => v.id === chartView)?.description}</span>
+            <div className="flex flex-col gap-0.5">
+              <span className="text-xs text-gray-700 dark:text-gray-400">{chartViews.find(v => v.id === chartView)?.description}</span>
+              {currentPhase === 'phase3' && phase2Assessment && baselineAssessment && chartView === 'comparison' && (
+                <span className="text-[10px] text-green-600 dark:text-green-400 font-medium">
+                  Cumulative growth: Baseline → Phase 2 → Phase 3
+                </span>
+              )}
+              {currentPhase === 'phase2' && baselineAssessment && chartView === 'comparison' && (
+                <span className="text-[10px] text-green-600 dark:text-green-400 font-medium">
+                  Growth from Baseline (Oct 2024)
+                </span>
+              )}
+            </div>
             <span className="text-xs text-purple-600 dark:text-purple-400 font-medium">{benchmarkComparisons[benchmarkType].label}</span>
           </div>
 
@@ -378,8 +429,33 @@ export default function CapabilityAnalysisPro({
                       strokeWidth={2}
                       strokeDasharray="5 5"
                     />
+                    {/* Show baseline for Phase 2 and Phase 3 */}
+                    {currentPhase !== 'baseline' && baselineAssessment && (
+                      <Radar
+                        name="Baseline (Oct 2024)"
+                        dataKey="baseline"
+                        stroke="#94a3b8"
+                        fill="#94a3b8"
+                        fillOpacity={0.08}
+                        strokeWidth={1.5}
+                        strokeDasharray="3 3"
+                      />
+                    )}
+                    {/* Show Phase 2 when viewing Phase 3 */}
+                    {currentPhase === 'phase3' && phase2Assessment && (
+                      <Radar
+                        name="Phase 2 (Mar 2025)"
+                        dataKey="phase2"
+                        stroke="#3b82f6"
+                        fill="#3b82f6"
+                        fillOpacity={0.15}
+                        strokeWidth={2}
+                        strokeDasharray="2 4"
+                      />
+                    )}
+                    {/* Current phase - always shown as the main line */}
                     <Radar
-                      name="Your Organization"
+                      name={currentPhase === 'phase3' ? 'Phase 3 (Nov 2025)' : currentPhase === 'phase2' ? 'Phase 2 (Mar 2025)' : 'Current'}
                       dataKey="yourScore"
                       stroke="#14b8a6"
                       fill="#14b8a6"
@@ -446,13 +522,27 @@ export default function CapabilityAnalysisPro({
             </ResponsiveContainer>
           </div>
 
-          {/* Custom Legend */}
-          <div className="flex items-center justify-center gap-4 pt-3 border-t border-gray-200 dark:border-white/5">
+          {/* Custom Legend - Dynamic based on phases */}
+          <div className="flex items-center justify-center gap-3 pt-3 border-t border-gray-200 dark:border-white/5 flex-wrap">
             {chartView === 'comparison' && (
               <>
+                {currentPhase !== 'baseline' && baselineAssessment && (
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-5 h-0.5 bg-slate-400" style={{ borderTop: '1.5px dashed #94a3b8' }} />
+                    <span className="text-xs text-gray-700 dark:text-gray-400">Baseline</span>
+                  </div>
+                )}
+                {currentPhase === 'phase3' && phase2Assessment && (
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-5 h-0.5 bg-blue-500" style={{ borderTop: '2px dashed #3b82f6' }} />
+                    <span className="text-xs text-gray-700 dark:text-gray-400">Phase 2</span>
+                  </div>
+                )}
                 <div className="flex items-center gap-1.5">
                   <div className="w-3 h-3 rounded-full bg-teal-400" />
-                  <span className="text-xs text-gray-700 dark:text-gray-400">Your Score</span>
+                  <span className="text-xs font-semibold text-gray-700 dark:text-gray-400">
+                    {currentPhase === 'phase3' ? 'Phase 3' : currentPhase === 'phase2' ? 'Phase 2' : 'Current'}
+                  </span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <div className="w-6 h-0.5 bg-purple-400" style={{ borderTop: '2px dashed #a855f7' }} />
@@ -560,10 +650,17 @@ export default function CapabilityAnalysisPro({
               </thead>
               <tbody>
                 {assessment.dimensions.map((dim, index) => {
+                  // Calculate growth delta vs baseline (if available)
+                  const baselineDim = baselineAssessment?.dimensions.find(d => d.dimensionId === dim.dimensionId)
+                  const growth = baselineDim ? dim.average - baselineDim.average : null
+                  const growthPercent = baselineDim ? ((dim.average - baselineDim.average) / baselineDim.average) * 100 : null
+
+                  // Fallback to benchmark delta if no baseline
                   const delta = ((dim.average - dim.benchmark) / dim.benchmark) * 100
+
                   return (
-                    <tr 
-                      key={dim.dimensionId} 
+                    <tr
+                      key={dim.dimensionId}
                       className={cn(
                         "border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer transition-colors group",
                         index % 2 === 0 ? "bg-gray-50/50 dark:bg-white/[0.02]" : ""
@@ -573,17 +670,35 @@ export default function CapabilityAnalysisPro({
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-2">
                           <span className="font-semibold text-gray-900 dark:text-white group-hover:text-teal-700 dark:group-hover:text-teal-300 transition-colors">{dim.name}</span>
+                          {/* Growth badge - only show if we have baseline data */}
+                          {showDelta && growthPercent !== null && Math.abs(growthPercent) > 1 && (
+                            <motion.span
+                              initial={{ scale: 0, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              className={cn(
+                                "inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[10px] font-bold border",
+                                growthPercent > 0
+                                  ? "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-500/30"
+                                  : "bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 border-red-300 dark:border-red-500/30"
+                              )}
+                            >
+                              {growthPercent > 0 ? <TrendingUp className="w-2.5 h-2.5" /> : <TrendingDown className="w-2.5 h-2.5" />}
+                              {Math.abs(growthPercent).toFixed(0)}%
+                            </motion.span>
+                          )}
                           <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
                       </td>
                       <td className="text-center px-3 tabular-nums">
-                        <span className={cn(
-                          "font-bold text-base",
-                          dim.average >= dim.benchmark ? "text-green-700 dark:text-green-400" : "text-orange-700 dark:text-orange-400"
-                        )}>
-                          {dim.average.toFixed(1)}
-                        </span>
-                        <span className="text-gray-600 dark:text-gray-600 text-sm ml-0.5">/10</span>
+                        <div className="flex flex-col items-center">
+                          <span className={cn(
+                            "font-bold text-base",
+                            dim.average >= dim.benchmark ? "text-green-700 dark:text-green-400" : "text-orange-700 dark:text-orange-400"
+                          )}>
+                            {dim.average.toFixed(1)}
+                          </span>
+                          <span className="text-gray-600 dark:text-gray-600 text-sm">/10</span>
+                        </div>
                       </td>
                       <td className="text-center px-3 text-green-700 dark:text-green-400 tabular-nums font-medium">{dim.max.toFixed(1)}</td>
                       <td className="text-center px-3 text-orange-700 dark:text-orange-400 tabular-nums font-medium">{dim.min.toFixed(1)}</td>

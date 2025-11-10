@@ -11,6 +11,7 @@ export interface SentimentCellData {
   score: number
   count: number
   rank: number  // 1 = highest, 25 = lowest
+  ranking: number  // Alias for rank (for UI convenience)
   color: string
   levelName: string
   categoryName: string
@@ -54,10 +55,10 @@ export function calculateSentimentHeatmap(
       .map(row => {
         const rawScore = row[columnName]
         if (typeof rawScore === 'number' && !isNaN(rawScore)) {
-          // NO TRANSFORMATION - data is already on 1-5 scale
-          // Raw data: 1.0 = low resistance (good), 5.0 = high resistance (concerning)
+          // NO TRANSFORMATION - data is already on 1-3 scale
+          // Raw data: 1.0 = low resistance (good), 3.0 = high resistance (concerning)
           // Display as-is where higher = MORE resistance (worse)
-          return Math.max(1.0, Math.min(5.0, rawScore))
+          return Math.max(1.0, Math.min(3.0, rawScore))
         }
         return null
       })
@@ -71,41 +72,46 @@ export function calculateSentimentHeatmap(
     }
   })
 
-  // Get all valid scores for ranking - DESCENDING (highest = most resistance = worst)
+  // Get all valid scores for ranking - ASCENDING (lowest = least resistance = best)
   const allValidScores = cellScores
     .filter(c => c.count > 0)
     .map(c => c.score)
-    .sort((a, b) => b - a) // DESCENDING - highest scores = most resistance = worst
-  
+    .sort((a, b) => a - b) // ASCENDING - lowest scores = least resistance = best (rank #1)
+
   // Calculate color based on relative ranking
   const cells: SentimentCellData[] = cellScores.map((cell, index) => {
     const [levelStr, categoryStr] = cell.cellId.split('_')
     const levelId = parseInt(levelStr.replace('L', ''))
     const categoryId = parseInt(categoryStr.replace('C', ''))
-    
+
     const level = SENTIMENT_LEVELS[levelId - 1]
     const category = SENTIMENT_CATEGORIES[categoryId - 1]
-    
-    // Determine rank (1 = HIGHEST score = MOST resistance = WORST)
+
+    // Determine rank (1 = LOWEST score = LEAST resistance = BEST)
+    // Rank 25 = HIGHEST score = MOST resistance = WORST
     const rank = cell.count > 0
       ? allValidScores.findIndex(s => Math.abs(s - cell.score) < 0.001) + 1
       : 99
 
-    // Determine color - RELATIVE RANKING within your data
-    // HIGH scores (toward 3.0) = HIGH resistance = RED (problem areas)
-    // LOW scores (toward 1.0) = LOW resistance = GREEN (strengths)
+    // Determine color - ABSOLUTE THRESHOLDS based on 1-3 resistance scale
+    // 1.0-1.4: LOW resistance = DARK GREEN (excellent)
+    // 1.4-1.8: MODERATE resistance = LIGHT GREEN (good)
+    // 1.8-2.2: ELEVATED resistance = YELLOW (needs attention)
+    // 2.2-2.6: HIGH resistance = ORANGE (concerning)
+    // 2.6-3.0: CRITICAL resistance = RED (urgent action needed)
     let color: string = COLOR_RANKING.NO_DATA
     if (cell.count > 0) {
-      if (rank <= 3) {
-        color = COLOR_RANKING.BOTTOM_3 // Dark red - Top 3 highest scores (most resistance)
-      } else if (rank <= 8) {
-        color = COLOR_RANKING.BOTTOM_8 // Orange - Top 4-8 scores (significant resistance)
-      } else if (rank >= allValidScores.length - 2) {
-        color = COLOR_RANKING.TOP_3 // Dark green - Bottom 3 scores (least resistance)
-      } else if (rank >= allValidScores.length - 7) {
-        color = COLOR_RANKING.TOP_8 // Light green - Bottom 4-8 scores (low resistance)
+      const score = cell.score
+      if (score >= 2.6) {
+        color = COLOR_RANKING.BOTTOM_3 // Dark red - Critical resistance
+      } else if (score >= 2.2) {
+        color = COLOR_RANKING.BOTTOM_8 // Orange - High resistance
+      } else if (score >= 1.8) {
+        color = COLOR_RANKING.MIDDLE // Yellow - Elevated resistance
+      } else if (score >= 1.4) {
+        color = COLOR_RANKING.TOP_8 // Light green - Moderate (good)
       } else {
-        color = COLOR_RANKING.MIDDLE // Yellow - Middle range (moderate)
+        color = COLOR_RANKING.TOP_3 // Dark green - Low resistance (excellent)
       }
     }
     
@@ -116,6 +122,7 @@ export function calculateSentimentHeatmap(
       score: cell.score,
       count: cell.count,
       rank,
+      ranking: rank,  // Alias for UI convenience
       color,
       levelName: level?.name || '',
       categoryName: category?.name || '',
@@ -171,19 +178,20 @@ function filterData(data: any[], filters: FilterState): any[] {
 }
 
 // Get cells with HIGHEST resistance scores (problem areas - need attention)
+// Now returns cells with HIGHEST RANKS (rank 25, 24, 23... = worst areas)
 // Raw scores: 1.0 = low resistance, 3.0 = high resistance
-// So highest scores = most resistance = problem areas
 export function getLowestScoringCells(
   cells: SentimentCellData[],
   count: number = 5
 ): SentimentCellData[] {
   return cells
     .filter(c => c.count > 0)
-    .sort((a, b) => b.score - a.score) // DESCENDING - highest scores = most resistance = problem areas
+    .sort((a, b) => b.rank - a.rank) // Sort by rank DESCENDING - highest ranks (25, 24...) = worst areas
     .slice(0, count)
 }
 
 // Get cells with LOWEST resistance scores (strengths - least concern)
+// Now returns cells with LOWEST RANKS (rank 1, 2, 3... = best areas)
 // Raw scores: lowest scores = least resistance = strengths
 export function getHighestScoringCells(
   cells: SentimentCellData[],
@@ -191,7 +199,7 @@ export function getHighestScoringCells(
 ): SentimentCellData[] {
   return cells
     .filter(c => c.count > 0)
-    .sort((a, b) => a.score - b.score) // ASCENDING - lowest scores = least resistance = strengths
+    .sort((a, b) => a.rank - b.rank) // Sort by rank ASCENDING - lowest ranks (1, 2, 3...) = best areas
     .slice(0, count)
 }
 

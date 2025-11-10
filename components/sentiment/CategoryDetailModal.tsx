@@ -8,8 +8,10 @@ import {
   CheckCircle2, ChevronRight, Info, Eye, AlertTriangle
 } from 'lucide-react'
 import { CategoryActionData } from '@/lib/services/category-data.service'
+import { miniInterventionsService, MiniIntervention } from '@/lib/services/mini-interventions-service'
 import { cn } from '@/lib/utils'
 import { InterventionDetail } from '@/components/interventions/InterventionDetail'
+import MiniInterventionCard from '@/components/interventions/MiniInterventionCard'
 import { CELL_TABOOS } from '@/lib/constants/sentiment-metadata'
 
 interface CategoryDetailModalProps {
@@ -94,7 +96,7 @@ const FLAVOR_CONFIG = {
   }
 }
 
-type TabType = 'overview' | 'taboos' | 'interventions'
+type TabType = 'overview' | 'taboos' | 'interventions' | 'quick-actions'
 
 export default function CategoryDetailModal({
   cellData,
@@ -107,8 +109,11 @@ export default function CategoryDetailModal({
   const [isRolling, setIsRolling] = useState(false)
   const [interventions, setInterventions] = useState<Intervention[]>([])
   const [taboos, setTaboos] = useState<Taboo[]>([])
+  const [miniInterventions, setMiniInterventions] = useState<MiniIntervention[]>([])
+  const [selectedMiniIntervention, setSelectedMiniIntervention] = useState<MiniIntervention | null>(null)
   const [loading, setLoading] = useState(true)
   const [tabooLoading, setTabooLoading] = useState(true)
+  const [miniLoading, setMiniLoading] = useState(true)
   const [selectedInterventionCode, setSelectedInterventionCode] = useState<string | null>(null)
   const [showInterventionDetail, setShowInterventionDetail] = useState(false)
 
@@ -126,11 +131,13 @@ export default function CategoryDetailModal({
     const fetchData = async () => {
       setLoading(true)
       setTabooLoading(true)
+      setMiniLoading(true)
       const cellInfo = parseCellId(cellData.cellId)
 
       if (!cellInfo) {
         setLoading(false)
         setTabooLoading(false)
+        setMiniLoading(false)
         return
       }
 
@@ -168,12 +175,27 @@ export default function CategoryDetailModal({
       } finally {
         setTabooLoading(false)
       }
+
+      try {
+        // Load mini interventions from CSV service
+        await miniInterventionsService.loadData()
+        const cellMiniInterventions = miniInterventionsService.getInterventionsForCell(
+          cellInfo.level,
+          cellInfo.category
+        )
+        setMiniInterventions(cellMiniInterventions)
+      } catch (error) {
+        console.error('Error loading mini interventions:', error)
+      } finally {
+        setMiniLoading(false)
+      }
     }
 
     fetchData()
     setSelectedFlavor(null)
     setShowSolution(false)
     setIsRolling(false)
+    setSelectedMiniIntervention(null)
   }, [cellData.cellId])
 
   const handleFlavorSelect = (flavor: SolutionFlavor) => {
@@ -220,10 +242,11 @@ export default function CategoryDetailModal({
     }
   }
 
-  const tabs: { id: TabType; label: string; icon: any }[] = [
+  const tabs: { id: TabType; label: string; icon: any; count?: number }[] = [
     { id: 'overview', label: 'Overview', icon: Info },
-    { id: 'taboos', label: 'Taboos', icon: AlertTriangle },
-    { id: 'interventions', label: 'Interventions', icon: Sparkles },
+    { id: 'taboos', label: 'Taboos', icon: AlertTriangle, count: taboos.length },
+    { id: 'interventions', label: 'Strategic', icon: Sparkles, count: interventions.length },
+    { id: 'quick-actions', label: 'Quick Actions', icon: Zap, count: miniInterventions.length },
   ]
 
   return (
@@ -317,6 +340,15 @@ export default function CategoryDetailModal({
                 >
                   <Icon className="w-4 h-4" />
                   {tab.label}
+                  {tab.count !== undefined && tab.count > 0 && (
+                    <span className={cn(
+                      "px-1.5 py-0.5 text-xs font-bold rounded",
+                      isActive && "bg-teal-100 dark:bg-teal-500/20 text-teal-700 dark:text-teal-300",
+                      !isActive && "bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-400"
+                    )}>
+                      {tab.count}
+                    </span>
+                  )}
                   {isActive && (
                     <motion.div
                       layoutId="activeTab"
@@ -658,9 +690,128 @@ export default function CategoryDetailModal({
                             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                           </button>
                         </div>
+
+                        {/* Quick Actions Callout */}
+                        {miniInterventions.length > 0 && (
+                          <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 rounded-xl border border-orange-500/20 p-5 mt-6">
+                            <div className="flex items-start gap-3">
+                              <Zap className="w-5 h-5 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5" />
+                              <div>
+                                <h4 className="text-sm font-semibold text-orange-700 dark:text-orange-400 mb-1 uppercase tracking-wide">
+                                  Want Quick, Tactical Actions?
+                                </h4>
+                                <p className="text-sm text-slate-700 dark:text-gray-300 mb-3">
+                                  Check out the <strong>Quick Actions</strong> tab for {miniInterventions.length} lightweight interventions you can implement immediately without major organizational change.
+                                </p>
+                                <button
+                                  onClick={() => setActiveTab('quick-actions')}
+                                  className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-semibold hover:shadow-lg transition-all flex items-center gap-2"
+                                >
+                                  View Quick Actions
+                                  <ArrowRight className="w-3 h-3" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ) : null}
                   </>
+                )}
+              </motion.div>
+            )}
+
+            {/* TAB 4: QUICK ACTIONS */}
+            {activeTab === 'quick-actions' && (
+              <motion.div
+                key="quick-actions"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+              >
+                {miniLoading ? (
+                  <div className="text-center py-12">
+                    <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-purple-600 dark:border-purple-600 border-r-transparent mb-4"></div>
+                    <p className="text-slate-600 dark:text-gray-400">Loading quick actions...</p>
+                  </div>
+                ) : miniInterventions.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-slate-500 dark:text-gray-500 text-sm">
+                      No quick actions available for this cell.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {/* Header */}
+                    <div className="text-center">
+                      <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2 flex items-center justify-center gap-2">
+                        <Zap className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                        Quick Win Actions
+                      </h3>
+                      <p className="text-sm text-slate-600 dark:text-gray-400 max-w-2xl mx-auto">
+                        Tactical interventions you can implement immediately. Each approach offers a different risk/reward profile.
+                      </p>
+                    </div>
+
+                    {/* Mini Interventions Grid */}
+                    <div className="grid grid-cols-1 gap-4">
+                      {miniInterventions.map((mini, index) => (
+                        <MiniInterventionCard
+                          key={mini.id}
+                          intervention={mini}
+                          index={index}
+                          onSelect={setSelectedMiniIntervention}
+                          selected={selectedMiniIntervention?.id === mini.id}
+                        />
+                      ))}
+                    </div>
+
+                    {/* Explanation about flavors */}
+                    <div className="bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-xl border border-blue-500/20 p-5 mt-6">
+                      <div className="flex items-start gap-3">
+                        <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <h4 className="text-sm font-semibold text-blue-700 dark:text-blue-400 mb-2 uppercase tracking-wide">
+                            About These Actions
+                          </h4>
+                          <div className="text-sm text-slate-700 dark:text-gray-300 leading-relaxed space-y-2">
+                            <p>
+                              <strong className="text-blue-600 dark:text-blue-400">Structured:</strong> Procedural frameworks with clear governance
+                            </p>
+                            <p>
+                              <strong className="text-orange-600 dark:text-orange-400">Creative:</strong> Bold, engaging approaches with humor and innovation
+                            </p>
+                            <p>
+                              <strong className="text-emerald-600 dark:text-emerald-400">Reflective:</strong> Thoughtful, low-risk methods focused on awareness
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Strategic Interventions Callout */}
+                    <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-xl border border-purple-500/20 p-5">
+                      <div className="flex items-start gap-3">
+                        <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <h4 className="text-sm font-semibold text-purple-700 dark:text-purple-400 mb-1 uppercase tracking-wide">
+                            Need Something More Strategic?
+                          </h4>
+                          <p className="text-sm text-slate-700 dark:text-gray-300 mb-3">
+                            For comprehensive organizational change, check out the <strong>Strategic</strong> tab for larger interventions that address root causes.
+                          </p>
+                          <button
+                            onClick={() => setActiveTab('interventions')}
+                            className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-semibold hover:shadow-lg transition-all flex items-center gap-2"
+                          >
+                            View Strategic Interventions
+                            <ArrowRight className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 )}
               </motion.div>
             )}

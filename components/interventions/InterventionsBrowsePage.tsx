@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Sparkles, Lightbulb, ArrowRight, Search, Filter as FilterIcon } from 'lucide-react'
+import { Sparkles, Lightbulb, ArrowRight, Search, Filter as FilterIcon, Zap, Layers } from 'lucide-react'
 import { InterventionDetail } from './InterventionDetail'
+import { miniInterventionsService, MiniIntervention } from '@/lib/services/mini-interventions-service'
+import MiniInterventionCard from './MiniInterventionCard'
 
 interface Intervention {
   code: string
@@ -13,21 +15,30 @@ interface Intervention {
   description?: string
 }
 
+type ViewMode = 'all' | 'strategic' | 'tactical'
+
 export default function InterventionsBrowsePage() {
   const [interventions, setInterventions] = useState<Intervention[]>([])
   const [filteredInterventions, setFilteredInterventions] = useState<Intervention[]>([])
+  const [miniInterventions, setMiniInterventions] = useState<MiniIntervention[]>([])
+  const [filteredMiniInterventions, setFilteredMiniInterventions] = useState<MiniIntervention[]>([])
   const [selectedIntervention, setSelectedIntervention] = useState<string | null>(null)
+  const [selectedMiniIntervention, setSelectedMiniIntervention] = useState<MiniIntervention | null>(null)
+  const [viewMode, setViewMode] = useState<ViewMode>('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [levelFilter, setLevelFilter] = useState<string>('all')
   const [loading, setLoading] = useState(true)
+  const [miniLoading, setMiniLoading] = useState(true)
 
   useEffect(() => {
     fetchAllInterventions()
+    loadMiniInterventions()
   }, [])
 
   useEffect(() => {
     filterInterventions()
-  }, [interventions, searchQuery, levelFilter])
+    filterMiniInterventions()
+  }, [interventions, miniInterventions, searchQuery, levelFilter])
 
   const fetchAllInterventions = async () => {
     setLoading(true)
@@ -40,6 +51,19 @@ export default function InterventionsBrowsePage() {
       setInterventions([])
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadMiniInterventions = async () => {
+    setMiniLoading(true)
+    try {
+      await miniInterventionsService.loadData()
+      setMiniInterventions(miniInterventionsService.getAllInterventions())
+    } catch (error) {
+      console.error('Failed to load mini interventions:', error)
+      setMiniInterventions([])
+    } finally {
+      setMiniLoading(false)
     }
   }
 
@@ -65,6 +89,35 @@ export default function InterventionsBrowsePage() {
     }
 
     setFilteredInterventions(filtered)
+  }
+
+  const filterMiniInterventions = () => {
+    let filtered = miniInterventions
+
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter(
+        (mini) =>
+          mini.title.toLowerCase().includes(query) ||
+          mini.explanation.toLowerCase().includes(query) ||
+          mini.category.toLowerCase().includes(query) ||
+          mini.reason.toLowerCase().includes(query)
+      )
+    }
+
+    // Level filter (map to concern levels)
+    if (levelFilter !== 'all') {
+      if (levelFilter === 'strategy') {
+        filtered = filtered.filter(m => m.levelId >= 4) // Org-level concerns
+      } else if (levelFilter === 'adoption') {
+        filtered = filtered.filter(m => m.levelId >= 2 && m.levelId <= 3) // Team/Trust concerns
+      } else if (levelFilter === 'innovation') {
+        filtered = filtered.filter(m => m.levelId === 1) // Personal concerns
+      }
+    }
+
+    setFilteredMiniInterventions(filtered)
   }
 
   const getLevelColor = (level: string) => {
@@ -116,23 +169,75 @@ export default function InterventionsBrowsePage() {
                 Interventions Library
               </h1>
               <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
-                {interventions.length} proven solutions to accelerate AI adoption
+                {interventions.length} strategic + {miniInterventions.length} tactical solutions
               </p>
             </div>
           </div>
           
-          {/* Stats badge */}
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-500/10 dark:to-amber-500/10 border-2 border-orange-200 dark:border-orange-500/30"
+          {/* Stats badges */}
+          <div className="flex items-center gap-3">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-500/10 dark:to-pink-500/10 border-2 border-purple-200 dark:border-purple-500/30"
+            >
+              <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+              <div className="text-center">
+                <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">Strategic</div>
+                <div className="text-lg font-bold text-gray-900 dark:text-white tabular-nums">{filteredInterventions.length}</div>
+              </div>
+            </motion.div>
+            
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.1 }}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-500/10 dark:to-amber-500/10 border-2 border-orange-200 dark:border-orange-500/30"
+            >
+              <Zap className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+              <div className="text-center">
+                <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">Tactical</div>
+                <div className="text-lg font-bold text-gray-900 dark:text-white tabular-nums">{filteredMiniInterventions.length}</div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* View Mode Toggle */}
+        <div className="flex items-center gap-2 mb-4">
+          <button
+            onClick={() => setViewMode('all')}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 ${
+              viewMode === 'all'
+                ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg'
+                : 'bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10'
+            }`}
           >
-            <Sparkles className="w-4 h-4 text-orange-600 dark:text-orange-400" />
-            <div className="text-center">
-              <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">Showing</div>
-              <div className="text-lg font-bold text-gray-900 dark:text-white tabular-nums">{filteredInterventions.length}</div>
-            </div>
-          </motion.div>
+            <Layers className="w-4 h-4" />
+            All Interventions
+          </button>
+          <button
+            onClick={() => setViewMode('strategic')}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 ${
+              viewMode === 'strategic'
+                ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                : 'bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10'
+            }`}
+          >
+            <Sparkles className="w-4 h-4" />
+            Strategic Only
+          </button>
+          <button
+            onClick={() => setViewMode('tactical')}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 ${
+              viewMode === 'tactical'
+                ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
+                : 'bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10'
+            }`}
+          >
+            <Zap className="w-4 h-4" />
+            Tactical Only
+          </button>
         </div>
 
         {/* REFINED Search and Filter */}
@@ -175,7 +280,7 @@ export default function InterventionsBrowsePage() {
 
       {/* BEAUTIFUL Interventions Grid */}
       <div className="flex-1 overflow-y-auto">
-        {loading ? (
+        {(loading || miniLoading) ? (
           <div className="flex items-center justify-center py-20">
             <motion.div
               animate={{ rotate: 360 }}
@@ -185,7 +290,7 @@ export default function InterventionsBrowsePage() {
               <Sparkles className="w-8 h-8 text-white" />
             </motion.div>
           </div>
-        ) : filteredInterventions.length === 0 ? (
+        ) : filteredInterventions.length === 0 && filteredMiniInterventions.length === 0 ? (
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -198,8 +303,18 @@ export default function InterventionsBrowsePage() {
             <p className="text-sm text-gray-600 dark:text-gray-400">Try adjusting your search or filters</p>
           </motion.div>
         ) : (
-          <div className="space-y-8 pb-6">
-            {levels.map((levelKey, levelIndex) => (
+          <div className="space-y-12 pb-6">
+            {/* STRATEGIC INTERVENTIONS SECTION */}
+            {(viewMode === 'all' || viewMode === 'strategic') && filteredInterventions.length > 0 && (
+              <div className="space-y-8">
+                <div className="flex items-center gap-3">
+                  <Sparkles className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Strategic Interventions</h2>
+                  <span className="px-3 py-1 rounded-lg bg-purple-100 dark:bg-purple-500/20 text-sm font-bold text-purple-700 dark:text-purple-300">
+                    {filteredInterventions.length}
+                  </span>
+                </div>
+                {levels.map((levelKey, levelIndex) => (
               <motion.div 
                 key={levelKey}
                 initial={{ opacity: 0, y: 20 }}
@@ -279,6 +394,69 @@ export default function InterventionsBrowsePage() {
                 </div>
               </motion.div>
             ))}
+              </div>
+            )}
+
+            {/* TACTICAL INTERVENTIONS SECTION (MINI INTERVENTIONS) */}
+            {(viewMode === 'all' || viewMode === 'tactical') && filteredMiniInterventions.length > 0 && (
+              <div className="space-y-8">
+                <div className="flex items-center gap-3">
+                  <Zap className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Tactical Quick Actions</h2>
+                  <span className="px-3 py-1 rounded-lg bg-orange-100 dark:bg-orange-500/20 text-sm font-bold text-orange-700 dark:text-orange-300">
+                    {filteredMiniInterventions.length}
+                  </span>
+                </div>
+                
+                <p className="text-sm text-gray-600 dark:text-gray-400 max-w-3xl">
+                  Lightweight, tactical interventions you can implement immediately. Each intervention addresses specific resistance patterns with three different approaches: structured, creative, and reflective.
+                </p>
+
+                {/* Group mini interventions by reason/category */}
+                {(() => {
+                  const grouped = filteredMiniInterventions.reduce((acc, mini) => {
+                    if (!acc[mini.reason]) acc[mini.reason] = []
+                    acc[mini.reason].push(mini)
+                    return acc
+                  }, {} as Record<string, MiniIntervention[]>)
+
+                  const reasons = Object.keys(grouped).sort()
+
+                  return reasons.map((reason, reasonIndex) => (
+                    <motion.div
+                      key={reason}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: reasonIndex * 0.1 }}
+                    >
+                      <div className="mb-4">
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="h-1 w-12 rounded-full bg-gradient-to-r from-orange-500 to-red-500" />
+                          <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                            {reason}
+                          </h3>
+                          <span className="px-3 py-1 rounded-lg bg-gray-100 dark:bg-white/5 text-xs font-bold text-gray-600 dark:text-gray-400">
+                            {grouped[reason].length}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {grouped[reason].map((mini, idx) => (
+                          <MiniInterventionCard
+                            key={mini.id}
+                            intervention={mini}
+                            index={idx}
+                            onSelect={setSelectedMiniIntervention}
+                            selected={selectedMiniIntervention?.id === mini.id}
+                          />
+                        ))}
+                      </div>
+                    </motion.div>
+                  ))
+                })()}
+              </div>
+            )}
           </div>
         )}
       </div>

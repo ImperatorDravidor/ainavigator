@@ -16,7 +16,9 @@
     "test:e2e": "playwright test",
     "test:coverage": "jest --coverage",
     "analyze": "next build && next-bundle-analyzer",
-    "import-demo-data": "tsx scripts/import-demo-data.ts"
+    "import-demo-data": "tsx scripts/import-demo-data.ts",
+    "regenerate-phase2": "tsx scripts/regenerate-phase2-data.ts",
+    "regenerate-capability": "tsx scripts/regenerate-capability-scores.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -67,6 +69,7 @@
     "@types/three": "^0.180.0",
     "autoprefixer": "^10.4.21",
     "csv-parse": "^5.6.0",
+    "dotenv": "^17.2.3",
     "eslint": "^9",
     "eslint-config-next": "16.0.0",
     "postcss": "^8.5.6",
