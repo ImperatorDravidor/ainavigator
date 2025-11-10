@@ -89,8 +89,8 @@ export default function AssessmentPage() {
   // Mock company profile (replace with actual data)
   const companyProfile: CompanyProfile = {
     id: company?.id || 'demo',
-    name: company?.display_name || 'Demo Company',
-    displayName: company?.display_name || 'Demo Company',
+    name: company?.display_name || 'Acme Wealth Advisors',
+    displayName: company?.display_name || 'Acme Wealth Advisors',
     industry: 'Financial Services', // TODO: Get from company data
     size: '1000-5000',
     aiMaturity: 'early_adoption'

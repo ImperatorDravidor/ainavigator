@@ -165,10 +165,6 @@ export default function ExecutiveDashboard({
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            <div className="px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10">
-              <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-0.5">Date</div>
-              <div className="text-xs text-slate-900 dark:text-white font-semibold">{format(new Date(), 'MMM yyyy')}</div>
-            </div>
             <div className="px-2.5 py-1.5 rounded-lg bg-green-500/10 border border-green-500/20">
               <div className="text-[10px] text-green-500 uppercase tracking-wider mb-0.5">Status</div>
               <div className="text-xs text-green-700 dark:text-green-400 font-semibold flex items-center gap-1">
