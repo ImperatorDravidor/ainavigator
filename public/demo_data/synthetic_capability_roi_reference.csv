@@ -1,0 +1,9 @@
+intervention_id,metric,roi_description,improvement_min_percent,improvement_max_percent
+101,Strategy and Vision,Estimated improvement in strategy and vision capability (%),8,14
+102,Data,Estimated improvement in data capability (%),7,12
+103,Technology,Estimated improvement in technology capability (%),6,10
+104,Talent and Skills,Estimated improvement in talent and skills capability (%),10,18
+105,Organisation and Processes,Estimated improvement in organisation and processes capability (%),9,15
+106,Innovation,Estimated improvement in innovation capability (%),8,16
+107,Adaptation & Adoption,Estimated improvement in adaptation & adoption capability (%),6,11
+108,Ethics and Responsibility,Estimated improvement in ethics and responsibility capability (%),5,9

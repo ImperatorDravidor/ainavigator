@@ -1,0 +1,79 @@
+# Milestone 4 — Interventions and ROI Data
+
+This update provides the datasets required to power the **Spotlight Interventions** and **ROI Glimpse** features in both the **Sentiment** and **Capability** flows.  
+All files are structured for direct integration with the existing backend endpoints.
+
+---
+
+## Overview
+
+| Flow | File | Description | Synthetic |
+|------|------|--------------|------------|
+| Sentiment | `sentiment_interventions.csv` | Interventions derived from real 3NF sentiment data (`actions_3NF.csv` and `categories_3NF.csv`). | No |
+| Sentiment | `sentiment_roi_reference.csv` | Synthetic ROI ranges linked to each sentiment intervention. | Yes |
+| Capability | `capability_interventions.csv` | Fully synthetic interventions aligned with the 8 capability dimensions. | Yes |
+| Capability | `capability_roi_reference.csv` | Fully synthetic ROI data linked to capability interventions. | Yes |
+
+All datasets are demo-ready and formatted for direct integration into the sentiment and capability analytics flows.
+
+---
+
+## File Schemas
+
+### Interventions
+
+| Column | Description |
+|---------|-------------|
+| `intervention_id` | Unique identifier for the intervention. |
+| `intervention_title` | Title or name of the intervention. |
+| `intervention_description` | Description summarizing the intervention. |
+| `target_area` | Indicates the flow: "Sentiment" or "Capability". |
+| `sentiment_area` / `capability_dimension` | Key for linking to the relevant demo dataset. |
+| `roi_min_percent` | Minimum estimated improvement range (%). |
+| `roi_max_percent` | Maximum estimated improvement range (%). |
+
+### ROI Reference
+
+| Column | Description |
+|---------|-------------|
+| `intervention_id` | Links to the intervention dataset. |
+| `metric` | Name of the sentiment area or capability dimension. |
+| `roi_description` | Text summary of the ROI metric for display. |
+| `improvement_min_percent` | Minimum estimated improvement (%). |
+| `improvement_max_percent` | Maximum estimated improvement (%). |
+
+---
+
+## Integration
+
+The data connects directly to the backend endpoints:
+
+- **POST `/api/interventions/recommend`**  
+  Filters interventions by `target_area` ("Sentiment" or "Capability") and the selected key (`sentiment_area` or `capability_dimension`).
+
+- **GET `/api/roi/:interventionId`**  
+  Returns the corresponding ROI record based on `intervention_id`.
+
+### Join Keys
+
+| Flow | Demo Dataset | Join Key | Notes |
+|------|---------------|----------|-------|
+| Sentiment | `sentiment_demo.csv` | `sentiment_area` | Based on real sentiment constructs. |
+| Capability | `capability_demo.csv` | `dimension` (maps to `capability_dimension`) | Fully synthetic demo alignment. |
+
+---
+
+## Synthetic Data Clarification
+
+### Sentiment Flow
+- Interventions are based on real structure from the survey’s 3NF data.  
+- ROI ranges are **synthetic** and generated logically (e.g., 6–12% for Trust, 8–15% for Engagement).
+
+### Capability Flow
+- Both interventions and ROI data are **fully synthetic**.  
+- They were generated to align with the eight capability dimensions and simulate realistic organizational improvement potential.  
+- There is no underlying respondent or survey source data for these records.
+
+---
+
+This README provides all required context for integrating the new data sources into the recommendation and ROI endpoints for Milestone 4.

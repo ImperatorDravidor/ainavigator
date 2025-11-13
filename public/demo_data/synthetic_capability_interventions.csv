@@ -1,0 +1,9 @@
+intervention_id,intervention_title,intervention_description,target_area,capability_dimension,roi_min_percent,roi_max_percent
+101,Define AI Strategy Roadmap,Develop and communicate a clear enterprise-wide AI strategy aligned with business goals.,Capability,Strategy and Vision,8,14
+102,Improve Data Governance & Quality,"Establish data standards, ownership, and governance to enhance data reliability and accessibility.",Capability,Data,7,12
+103,Modernize Technology Stack,Upgrade legacy systems and integrate AI-ready infrastructure for scalability and interoperability.,Capability,Technology,6,10
+104,Upskill Workforce in AI Literacy,Deliver targeted training and mentorship programs to build AI capabilities across roles and levels.,Capability,Talent and Skills,10,18
+105,Embed AI into Core Processes,Redesign workflows and decision-making processes to leverage AI-driven insights and automation.,Capability,Organisation and Processes,9,15
+106,Launch AI Innovation Lab,Create a cross-functional innovation hub to experiment and pilot emerging AI solutions.,Capability,Innovation,8,16
+107,Strengthen Change Management for AI,Implement structured change management to accelerate adoption and minimize resistance.,Capability,Adaptation & Adoption,6,11
+108,Implement Responsible AI Framework,"Develop ethical AI principles and governance to ensure transparency, fairness, and accountability.",Capability,Ethics and Responsibility,5,9
